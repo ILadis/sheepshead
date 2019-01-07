@@ -1,26 +1,16 @@
 
-import * as Phases from './phases.mjs';
+import { Game } from './game.mjs';
 
-let game = {};
-let phase = Phases.Setup;
-
-game.onplay = async function(player) {
-  return player.cards.pop();
-};
+let game = new Game();
 
 game.onplayed = async function(player, card) {
   console.log(`${player} played ${card} with value ${this.order.valueOf(card)}`);
 };
 
-game.onwon = async function(winner) {
+game.oncompleted = async function(trick, winner) {
   console.log(`Winner of this trick is: ${winner}`);
+  console.log(`${winner} now has ${winner.points} point(s)`);
 };
 
-(async function() {
-  do {
-    console.log(`Phase: ${phase.name}...`);
-
-    phase = await phase(game);
-  } while (phase);
-})();
+game.run();
 

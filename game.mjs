@@ -2,15 +2,14 @@
 import * as Phases from './phases.mjs';
 
 export function Game() {
-  this.phase = Phases.Setup;
 };
 
 Game.prototype.run = async function() {
-  let phase = this.phase;
-  let game = this;
+  let phase = Phases.setup;
 
   do {
-    phase = await phase(game);
+    this.phase = phase;
+    phase = await phase(this);
   } while (phase);
 };
 

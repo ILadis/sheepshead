@@ -5,7 +5,7 @@ import { Order } from './order.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 
-export async function Setup(game) {
+export async function setup(game) {
   let players = new Array();
   for (let index of [1, 2, 3, 4]) {
     let player = new Player(`Player #${index}`);
@@ -15,20 +15,20 @@ export async function Setup(game) {
   game.players = players;
   game.sequence = Player.sequence(players);
 
-  return Shuffle;
+  return shuffle;
 }
 
-export async function Shuffle(game) {
+export async function shuffle(game) {
   let deck = new Deck();
   deck.fill();
   deck.shuffle();
 
   game.deck = deck;
 
-  return Dealing;
+  return dealing;
 }
 
-export async function Dealing(game) {
+export async function dealing(game) {
   let deck = game.deck;
   for (let player of game.sequence) {
     let cards = deck.draw();
@@ -39,19 +39,19 @@ export async function Dealing(game) {
     }
   }
 
-  return Auction;
+  return auction;
 }
 
-export async function Auction(game) {
+export async function auction(game) {
   let order = new Order();
   order.promote([Suits.Heart], [Ranks.Sergeant, Ranks.Officer]);
 
   game.order = order;
 
-  return Playing;
+  return playing;
 }
 
-export async function Playing(game) {
+export async function playing(game) {
   let trick = new Trick();
   let players = game.players;
 
@@ -80,7 +80,7 @@ export async function Playing(game) {
   game.sequence = Player.sequence(players, winner);
 
   if (winner.cards.length > 0) {
-    return Playing;
+    return playing;
   }
 }
 

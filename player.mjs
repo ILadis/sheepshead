@@ -1,6 +1,7 @@
 
 export function Player(name) {
   this.name = name;
+  this.points = 0;
   this.cards = new Array();
 }
 

@@ -1,11 +1,11 @@
 
-import { Suits, Ranks, Points } from './card.mjs';
+import { Suits, Ranks } from './card.mjs';
 import { Deck } from './deck.mjs';
 import { Order } from './order.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 
-export async function Setup(game = {}) {
+export async function Setup(game) {
   let players = new Array();
   for (let index of [1, 2, 3, 4]) {
     let player = new Player(`Player #${index}`);
@@ -55,6 +55,8 @@ export async function Playing(game) {
   let trick = new Trick();
   let players = game.players;
 
+  game.trick = trick;
+
   for (let player of game.sequence) {
     let card = await game.onplay(player, trick);
 
@@ -71,7 +73,9 @@ export async function Playing(game) {
   }
 
   let winner = trick.winner(game.order);
-  await game.onwon(winner, trick);
+  winner.points += trick.points();
+
+  await game.oncompleted(trick, winner);
 
   game.sequence = Player.sequence(players, winner);
 

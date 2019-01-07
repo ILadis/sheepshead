@@ -30,23 +30,37 @@ export async function shuffle(game) {
 
 export async function dealing(game) {
   let deck = game.deck;
-  for (let player of game.sequence) {
-    let cards = deck.draw();
-    player.cards.push(...cards);
 
-    if (deck.empty()) {
-      break;
+  do {
+    for (let player of game.sequence) {
+      let cards = deck.draw();
+      player.cards.push(...cards);
     }
-  }
+  } while (!deck.empty());
 
   return auction;
 }
 
 export async function auction(game) {
-  let order = new Order();
-  order.promote([Suits.Heart], [Ranks.Sergeant, Ranks.Officer]);
+  let contracts = new Array();
+  let players = game.players;
 
-  game.order = order;
+  for (let player of game.sequence) {
+    let bid = await game.onbid(player);
+    if (bid) {
+      let { contract, partner } = bid;
+      contract.assign(player, partner);
+      contracts.push(contract);
+    }
+  }
+
+  let highest = (c1, c2) => c1.value >= c2.value ? c1 : c2;
+  let contract = contracts.reduce(highest);
+
+  game.contract = contract;
+  game.order = contract.order;
+
+  await game.onbidded(contract);
 
   return playing;
 }
@@ -54,6 +68,8 @@ export async function auction(game) {
 export async function playing(game) {
   let trick = new Trick();
   let players = game.players;
+  let contract = game.contract;
+  let order = game.order;
 
   game.trick = trick;
 
@@ -61,15 +77,16 @@ export async function playing(game) {
     let card = await game.onplay(player, trick);
 
     if (trick.empty()) {
-      game.order.dominant = card.suit;
+      order.dominant = card.suit;
+    }
+
+    if (contract.partner === card) {
+      contract.partner = player;
+      await game.onmatched(contract);
     }
 
     trick.add(player, card);
     await game.onplayed(player, card, trick);
-
-    if (trick.size() == players.length) {
-      break;
-    }
   }
 
   let winner = trick.winner(game.order);

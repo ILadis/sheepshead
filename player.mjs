@@ -10,15 +10,17 @@ Player.prototype.toString = function() {
 };
 
 Player.sequence = function(group, from) {
-  let index = from ? group.findIndex(player => player == from) : 0;
-  let next = function() {
-    return { value: group[index++ % group.length], done: false };
+  let start = from ? group.findIndex(player => player == from) : 0;
+
+  let next = function*() {
+    let index = start;
+    let count = group.length;
+
+    while (count-- > 0) {
+      yield group[index++ % group.length];
+    }
   };
 
-  next[Symbol.iterator] = function() {
-    return { next };
-  };
-
-  return next;
+  return { [Symbol.iterator]: next };
 };
 

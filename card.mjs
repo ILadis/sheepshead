@@ -4,6 +4,23 @@ export function Card(suit, rank) {
   this.rank = rank;
 }
 
+Card.prototype.points = function(card) {
+  switch (this.rank) {
+    case Ranks.Ace:
+      return 11;
+    case Ranks.Ten:
+      return 10;
+    case Ranks.King:
+      return 4;
+    case Ranks.Officer:
+      return 3;
+    case Ranks.Sergeant:
+      return 2;
+    default:
+      return 0;
+  }
+};
+
 Card.prototype.toString = function() {
   return `[${this.suit.description} ${this.rank.description}]`;
 };
@@ -44,23 +61,6 @@ for (let suit of Suits) {
   Card[suit] = new Object();
   for (let rank of Ranks) {
     Card[suit][rank] = new Card(suit, rank);
-  }
-}
-
-export function Points(card) {
-  switch (card.rank) {
-    case Ranks.Ace:
-      return 11;
-    case Ranks.Ten:
-      return 10;
-    case Ranks.King:
-      return 4;
-    case Ranks.Officer:
-      return 3;
-    case Ranks.Sergeant:
-      return 2;
-    default:
-      return 0;
   }
 }
 

@@ -1,6 +1,4 @@
 
-import { Points } from './card.mjs';
-
 export function Trick() {
   this.plays = new Map();
 };
@@ -16,7 +14,7 @@ Trick.prototype.cards = function() {
 Trick.prototype.points = function() {
   let points = 0;
   for (let card of this.plays.values()) {
-    points += Points(card);
+    points += card.points();
   }
   return points;
 };

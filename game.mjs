@@ -15,13 +15,8 @@ Game.prototype.run = async function() {
   } while (phase);
 };
 
-Game.prototype.onbid = async function(player) {
-  return Contract.solo(Suits.Heart);
-};
-
-Game.prototype.onplay = async function(player, trick) {
-  return player.cards.pop();
-};
+Game.prototype.onbid = async function(player) {};
+Game.prototype.onplay = async function(player, trick) {};
 
 Game.prototype.onbidded = async function(contract) {};
 Game.prototype.onplayed = async function(player, card, trick) {};

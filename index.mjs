@@ -1,10 +1,32 @@
 
 import { Game } from './game.mjs';
+import { Card, Suits, Ranks } from './card.mjs';
+import { Contract } from './contract.mjs';
 
 let game = new Game();
 
+game.onbid = async function(player) {
+  let contract = Contract.normal();
+  let partner = Card[Suits.Leaf][Ranks.Ace];
+  return { contract, partner };
+};
+
+game.onplay = async function(player) {
+  return player.cards.pop();
+};
+
+game.onbidded = async function(contract) {
+  console.log(`Contract #${contract.value} was agreed on`);
+};
+
 game.onplayed = async function(player, card) {
-  console.log(`${player} played ${card} with value ${this.order.valueOf(card)}`);
+  let value = this.order.valueOf(card);
+  console.log(`${player} played ${card} with value ${value}`);
+};
+
+game.onmatched = async function(contract) {
+  let { owner, partner } = contract;
+  console.log(`${owner} found his partner ${partner}`);
 };
 
 game.oncompleted = async function(trick, winner) {

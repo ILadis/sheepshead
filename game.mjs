@@ -4,15 +4,13 @@ import { Suits } from './card.mjs';
 import { Contract } from './contract.mjs';
 
 export function Game() {
+  this.phase = Phases.setup;
 };
 
 Game.prototype.run = async function() {
-  let phase = Phases.setup;
-
   do {
-    this.phase = phase;
-    phase = await phase(this);
-  } while (phase);
+    this.phase = await this.phase(this);
+  } while (this.phase);
 };
 
 Game.prototype.onbid = async function(player) {};
@@ -22,4 +20,6 @@ Game.prototype.onbidded = async function(contract) {};
 Game.prototype.onplayed = async function(player, card, trick) {};
 Game.prototype.onmatched = async function(contract) {};
 Game.prototype.oncompleted = async function(trick, winner) {};
+Game.prototype.onfinished = async function(winner, looser) {};
+Game.prototype.onproceed = async function(player) {};
 

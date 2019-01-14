@@ -12,6 +12,7 @@ export async function setup() {
     players.push(player);
   }
 
+  this.actor = null;
   this.players = players;
   this.sequence = Player.sequence(players);
 
@@ -32,7 +33,7 @@ export async function dealing({ deck, sequence }) {
   do {
     for (let player of sequence) {
       let cards = deck.draw();
-      player.cards.push(...cards);
+      player.give(cards);
     }
   } while (!deck.empty());
 
@@ -43,12 +44,16 @@ export async function auction({ players, sequence }) {
   let contracts = new Array();
 
   for (let player of sequence) {
+    this.actor = player;
+
     let bid = await this.onbid(player);
     if (bid) {
       let { contract, partner } = bid;
       contract.assign(player, partner);
       contracts.push(contract);
     }
+
+    this.actor = null;
   }
 
   let highest = (c1, c2) => c1.value >= c2.value ? c1 : c2;
@@ -67,8 +72,9 @@ export async function playing({ players, contract, sequence }) {
   let order = contract.order;
 
   for (let player of sequence) {
-    let card = await this.onplay(player, trick);
+    this.actor = player;
 
+    let card = await this.onplay(player, trick);
     if (trick.empty()) {
       order.dominant = card.suit;
     }
@@ -80,6 +86,8 @@ export async function playing({ players, contract, sequence }) {
       contract.partner = player;
       await this.onmatched(contract);
     }
+
+    this.actor = null;
   }
 
   let winner = trick.winner(order);
@@ -88,7 +96,7 @@ export async function playing({ players, contract, sequence }) {
   await this.oncompleted(trick, winner);
   this.sequence = Player.sequence(players, winner);
 
-  return winner.cards.length > 0 ? playing : counting;
+  return winner.cards.size > 0 ? playing : counting;
 }
 
 export async function counting({ players, contract }) {

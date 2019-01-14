@@ -2,8 +2,18 @@
 export function Player(name) {
   this.name = name;
   this.points = 0;
-  this.cards = new Array();
+  this.cards = new Set();
 }
+
+Player.prototype.draw = function(card) {
+  return this.cards.delete(card);
+};
+
+Player.prototype.give = function(cards) {
+  for (let card of cards) {
+    this.cards.add(card);
+  }
+};
 
 Player.prototype.toString = function() {
   return `${this.name}`;

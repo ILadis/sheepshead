@@ -13,7 +13,10 @@ game.onbid = async function(player) {
 };
 
 game.onplay = async function(player) {
-  return player.cards.pop();
+  let card = Array.from(player.cards)[0];
+  if (player.draw(card)) {
+    return card;
+  }
 };
 
 game.onbidded = async function(contract) {

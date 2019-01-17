@@ -52,8 +52,6 @@ export async function auction({ players, sequence }) {
       contract.assign(player, partner);
       contracts.push(contract);
     }
-
-    this.actor = null;
   }
 
   let highest = (c1, c2) => c1.value >= c2.value ? c1 : c2;
@@ -86,8 +84,6 @@ export async function playing({ players, contract, sequence }) {
       contract.partner = player;
       await this.onmatched(contract);
     }
-
-    this.actor = null;
   }
 
   let winner = trick.winner(order);
@@ -127,13 +123,15 @@ export async function counting({ players, contract }) {
   }
 
   await this.onfinished(winner, looser);
+
   return proceed;
 }
 
 export async function proceed({ players }) {
   let proceed = true;
   for (let player of players) {
-    proceed = proceed && await this.onproceed(player);
+    this.actor = player;
+    proceed = await this.onproceed(player) && proceed;
   }
 
   if (proceed) {

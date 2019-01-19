@@ -13,13 +13,18 @@ Game.prototype.run = async function() {
   } while (this.phase);
 };
 
-Game.prototype.onbid = async function(player) {};
-Game.prototype.onplay = async function(player, trick) {};
+Game.prototype.onbid =
+Game.prototype.onplay =
+Game.prototype.onproceed = function(...args) {
+  return new Promise((resolve, reject) => {
+    this.promise = { args, resolve, reject };
+  });
+};
 
-Game.prototype.onbidded = async function(contract) {};
-Game.prototype.onplayed = async function(player, card, trick) {};
-Game.prototype.onmatched = async function(contract) {};
-Game.prototype.oncompleted = async function(trick, winner) {};
-Game.prototype.onfinished = async function(winner, looser) {};
-Game.prototype.onproceed = async function(player) {};
+Game.prototype.onbidded =
+Game.prototype.onplayed =
+Game.prototype.onmatched =
+Game.prototype.oncompleted =
+Game.prototype.onfinished = async function(...args) {
+};
 

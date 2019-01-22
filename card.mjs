@@ -64,3 +64,16 @@ for (let suit of Suits) {
   }
 }
 
+Card.byName = function(suit, rank) {
+  let valueOf = v => 
+    String(v).charAt(0).toUpperCase() +
+    String(v).slice(1).toLowerCase();
+
+  let suit = Suits[valueOf(json.suit)];
+  let rank = Ranks[valueOf(json.rank)];
+
+  if (Card[suit] && Card[suit][rank]) {
+    return Card[suit][rank];
+  }
+};
+

@@ -11,7 +11,7 @@ import { Contract } from '../contract.mjs';
 // TODO consider implementing a registry class/object
 const registry = new Map();
 
-// TODO consider moving biolerplate to pre filter
+// TODO consider moving boilerplate to pre filter
 
 export const Games = Resource.create(
   ['POST'], '^/games/?$');

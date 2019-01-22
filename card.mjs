@@ -69,11 +69,11 @@ Card.byName = function(suit, rank) {
     String(v).charAt(0).toUpperCase() +
     String(v).slice(1).toLowerCase();
 
-  let suit = Suits[valueOf(json.suit)];
-  let rank = Ranks[valueOf(json.rank)];
+  let s = Suits[valueOf(suit)];
+  let r = Ranks[valueOf(rank)];
 
-  if (Card[suit] && Card[suit][rank]) {
-    return Card[suit][rank];
+  if (Card[s] && Card[s][r]) {
+    return Card[s][r];
   }
 };
 

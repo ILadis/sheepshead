@@ -29,7 +29,7 @@ Authentication.prototype.authenticate = function(request) {
   let header = request.headers['Authorization'];
   let matches = this.pattern.exec(header);
 
-  if(matches) {
+  if (matches) {
     let token = matches[1];
     return token;
   }

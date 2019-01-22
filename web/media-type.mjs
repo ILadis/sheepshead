@@ -1,5 +1,5 @@
 
-import path from 'path';
+import Path from 'path';
 
 export function MediaType (type, subtype) {
   this.type = type;
@@ -23,7 +23,7 @@ MediaType.prototype.toString = function() {
 };
 
 MediaType.fromFileExt = function(file) {
-  let ext = path.extname(file).substr(1);
+  let ext = Path.extname(file).substr(1);
   return MediaType[ext];
 };
 

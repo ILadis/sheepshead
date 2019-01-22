@@ -23,7 +23,7 @@ Order.prototype.promote = function(suits = [], ranks = []) {
       this.trumps.add(card);
     }
   }
-}
+};
 
 Order.prototype.valueOf = function(card) {
   let value = 1;

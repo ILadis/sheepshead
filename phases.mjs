@@ -46,10 +46,8 @@ export async function auction({ players, sequence }) {
   for (let player of sequence) {
     this.actor = player;
 
-    let bid = await this.onbid(player);
-    if (bid) {
-      let { contract, partner } = bid;
-      contract.assign(player, partner);
+    let contract = await this.onbid(player);
+    if (contract) {
       contracts.push(contract);
     }
   }

@@ -4,7 +4,7 @@ import { Suits } from './card.mjs';
 import { Contract } from './contract.mjs';
 
 export function Game() {
-  this.phase = Phases.setup;
+  this.phase = Phases.joining;
 };
 
 Game.prototype.run = async function() {

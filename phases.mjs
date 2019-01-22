@@ -5,7 +5,7 @@ import { Order } from './order.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 
-export async function setup() {
+export async function joining() {
   let players = new Array();
   for (let index of [1, 2, 3, 4]) {
     let player = await this.onjoin(index);

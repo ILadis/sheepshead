@@ -25,7 +25,17 @@ Resource.prototype.handle = function(request, response, next) {
     return response.end();
   }
 
-  this[request.method](request, response, matches);
+  let promise = this[request.method](request, response, matches);
+
+  promise.catch(error => {
+    if (!response.headersSent) {
+      response.writeHead(500);
+    }
+
+    if (!response.finished) {
+      response.end();
+    }
+  });
 };
 
 Resource.create = function(methods, path) {
@@ -38,7 +48,7 @@ Resource.create = function(methods, path) {
 
 // TODO implement Etag based caching
 Resource.serveFile = function(file, mime) {
-  return (request, response) => {
+  return async (request, response) => {
     response.setHeader('Content-Type', mime);
     response.writeHead(200);
 
@@ -49,7 +59,7 @@ Resource.serveFile = function(file, mime) {
 };
 
 Resource.serveRedirect = function(uri) {
-  return (request, response) => {
+  return async (request, response) => {
     response.setHeader('Location', uri);
     response.writeHead(301);
     response.end();
@@ -57,7 +67,7 @@ Resource.serveRedirect = function(uri) {
 };
 
 Resource.serveNotFound = function() {
-  return (request, response) => {
+  return async (request, response) => {
     response.writeHead(404);
     response.end();
   };

@@ -13,6 +13,7 @@ Game.prototype.run = async function() {
   } while (this.phase);
 };
 
+Game.prototype.onjoin =
 Game.prototype.onbid =
 Game.prototype.onplay =
 Game.prototype.onproceed = function(...args) {

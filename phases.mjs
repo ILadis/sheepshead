@@ -8,7 +8,7 @@ import { Player } from './player.mjs';
 export async function setup() {
   let players = new Array();
   for (let index of [1, 2, 3, 4]) {
-    let player = new Player(`Player #${index}`);
+    let player = await this.onjoin(index);
     players.push(player);
   }
 

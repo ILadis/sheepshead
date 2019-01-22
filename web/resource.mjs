@@ -28,6 +28,14 @@ Resource.prototype.handle = function(request, response, next) {
   this[request.method](request, response, matches);
 };
 
+Resource.create = function(methods, path) {
+  let resource = function() {
+    Resource.call(this, methods, path);
+  };
+  resource.prototype = Object.create(Resource.prototype);
+  return resource;
+};
+
 // TODO implement Etag based caching
 Resource.serveFile = function(file, mime) {
   return (request, response) => {

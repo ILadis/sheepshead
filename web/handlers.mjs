@@ -26,7 +26,7 @@ export function Authentication() {
 };
 
 Authentication.prototype.authenticate = function(request) {
-  let header = request.headers['Authorization'];
+  let header = request.headers['authorization'];
   let matches = this.pattern.exec(header);
 
   if (matches) {

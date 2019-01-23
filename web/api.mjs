@@ -174,7 +174,8 @@ Bid.prototype['POST'] = async function(request, response, path) {
       return response.end();
     }
 
-    var contract = Contract.normal().assign(player, partner);
+    var contract = Contract.normal();
+    contract.assign(player, partner);
   }
 
   game.promise.resolve(contract);

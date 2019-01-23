@@ -8,9 +8,6 @@ import { Card, Suits, Ranks } from '../card.mjs';
 import { Player } from '../player.mjs';
 import { Contract } from '../contract.mjs';
 
-// TODO consider implementing a registry class/object
-const registry = new Map();
-
 // TODO consider moving boilerplate to pre filter
 
 export const Games = Resource.create(
@@ -20,11 +17,14 @@ Games.prototype['POST'] = async function(request, response) {
   let game = new Game();
   game.run();
 
-  let guid = UID.generate();
-  registry.set(guid, game);
+  let guid = request.registry.register(game);
+  var json = JSON.stringify({ guid });
 
   response.setHeader('Location', `/games/${guid}`);
+  response.setHeader('Content-Type', MediaType.json);
+  response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
+  response.write(json);
 
   return response.end();
 };
@@ -33,7 +33,8 @@ export const Join = Resource.create(
   ['POST'], `^/games/${UID}/join/?$`);
 
 Join.prototype['POST'] = async function(request, response, path) {
-  let game = registry.get(path[1]);
+  let guid = path[1];
+  let game = request.registry.lookup(guid);
   if (!game) {
     response.writeHead(404);
     return response.end();
@@ -45,7 +46,7 @@ Join.prototype['POST'] = async function(request, response, path) {
     return response.end();
   }
 
-  let json = JSON.parse(await request.body);
+  var json = JSON.parse(await request.body);
   if (!json.name) {
     response.writeHead(422);
     return response.end();
@@ -53,13 +54,11 @@ Join.prototype['POST'] = async function(request, response, path) {
 
   let name = String(json.name);
   let player = new Player(name);
-
-  let puid = UID.generate();
-  registry.set(puid, player);
+  let puid = request.registry.register(player);
 
   game.promise.resolve(player);
 
-  json = JSON.stringify({ token: puid, name: name });
+  var json = JSON.stringify({ puid, name });
 
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
@@ -73,7 +72,8 @@ export const State = Resource.create(
   ['GET'], `^/games/${UID}/state/?$`);
 
 State.prototype['GET'] = async function(request, response, path) {
-  let game = registry.get(path[1]);
+  let guid = path[1];
+  let game = request.registry.lookup(guid);
   if (!game) {
     response.writeHead(404);
     return response.end();
@@ -97,7 +97,8 @@ export const Cards = Resource.create(
   ['GET'], `^/games/${UID}/self/cards/?$`);
 
 Cards.prototype['GET'] = async function(request, response, path) {
-  let game = registry.get(path[1]);
+  let guid = path[1];
+  let game = request.registry.lookup(guid);
   if (!game) {
     response.writeHead(404);
     return response.end();
@@ -109,7 +110,8 @@ Cards.prototype['GET'] = async function(request, response, path) {
     return response.end();
   }
 
-  let player = registry.get(request.bearer);
+  let puid = request.bearer;
+  let player = request.registry.lookup(puid);
   if (!player || !game.players.includes(player)) {
     response.writeHead(403);
     return response.end();
@@ -132,7 +134,8 @@ export const Bid = Resource.create(
   ['POST'], `^/games/${UID}/self/bid/?$`);
 
 Bid.prototype['POST'] = async function(request, response, path) {
-  let game = registry.get(path[1]);
+  let guid = path[1];
+  let game = request.registry.lookup(guid);
   if (!game) {
     response.writeHead(404);
     return response.end();
@@ -144,7 +147,8 @@ Bid.prototype['POST'] = async function(request, response, path) {
     return response.end();
   }
 
-  let player = registry.get(request.bearer);
+  let puid = request.bearer;
+  let player = request.registry.lookup(puid);
   if (!player || !game.players.includes(player)) {
     response.writeHead(403);
     return response.end();
@@ -183,7 +187,8 @@ export const Play = Resource.create(
   ['POST'], `^/games/${UID}/self/play/?$`);
 
 Play.prototype['POST'] = async function(request, response, path) {
-  let game = registry.get(path[1]);
+  let guid = path[1];
+  let game = request.registry.lookup(guid);
   if (!game) {
     response.writeHead(404);
     return response.end();
@@ -195,7 +200,8 @@ Play.prototype['POST'] = async function(request, response, path) {
     return response.end();
   }
 
-  let player = registry.get(request.bearer);
+  let puid = request.bearer;
+  let player = request.registry.lookup(puid);
   if (!player || !game.players.includes(player)) {
     response.writeHead(403);
     return response.end();

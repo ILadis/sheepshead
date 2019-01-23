@@ -8,6 +8,7 @@ import * as Api from './api.mjs';
 let server = new HttpServer();
 server.register(new Handlers.Payload());
 server.register(new Handlers.Authentication());
+server.register(new Handlers.Registry());
 server.register(new Api.Games());
 server.register(new Api.Join());
 server.register(new Api.State());

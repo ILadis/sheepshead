@@ -1,4 +1,6 @@
 
+import { UID } from './uid.mjs';
+
 export function Payload() {
 }
 
@@ -38,6 +40,25 @@ Authentication.prototype.authenticate = function(request) {
 Authentication.prototype.handle = function(request, response, next) {
   let bearer = this.authenticate(request);
   request.bearer = bearer;
+  next();
+};
+
+export function Registry() {
+  this.registry = new Map();
+}
+
+Registry.prototype.register = function(entity) {
+  let uid = UID.generate();
+  this.registry.set(uid, entity);
+  return uid;
+};
+
+Registry.prototype.lookup = function(uid) {
+  return this.registry.get(uid);
+};
+
+Registry.prototype.handle = function(request, response, next) {
+  request.registry = this;
   next();
 };
 

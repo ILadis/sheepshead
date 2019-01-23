@@ -22,6 +22,7 @@ Game.prototype.onproceed = function(...args) {
   });
 };
 
+Game.prototype.onjoined =
 Game.prototype.onbidded =
 Game.prototype.onplayed =
 Game.prototype.onmatched =

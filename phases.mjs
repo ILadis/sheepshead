@@ -10,6 +10,8 @@ export async function joining() {
   for (let index of [1, 2, 3, 4]) {
     let player = await this.onjoin(index);
     players.push(player);
+
+    await this.onjoined(player);
   }
 
   this.actor = null;

@@ -102,8 +102,15 @@ export async function counting({ players, contract }) {
   let defender = new Set();
   defender.points = 0;
 
+  let candidate;
+  if (!contract.owner) {
+    let highest = (p1, p2) => p1.points >= p2.points ? p1 : p2;
+    candidate = players.reduce(highest);
+  }
+
   for (let player of players) {
     switch (player) {
+      case candidate:
       case contract.owner:
       case contract.partner:
         declarer.add(player);
@@ -116,13 +123,13 @@ export async function counting({ players, contract }) {
     player.points = 0;
   }
 
-  let winner = declarer, looser = defender;
-  if (declarer.points <= defender.points) {
+  let winner = declarer, loser = defender;
+  if (!candidate && declarer.points <= defender.points) {
     winner = defender;
     looser = declarer;
   }
 
-  await this.onfinished(winner, looser);
+  await this.onfinished(winner, loser);
 
   return proceed;
 }

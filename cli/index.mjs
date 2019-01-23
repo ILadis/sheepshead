@@ -25,7 +25,7 @@ game.onbidded = async function(contract) {
 };
 
 game.onplay = function(player) {
-  let { order, trick } = game.contract;
+  let order = game.contract.order;
   let cards = Array.from(player.cards);
 
   let valuable = (c1, c2) => order.valueOf(c1) - order.valueOf(c2);
@@ -49,7 +49,9 @@ game.onplay = function(player) {
 };
 
 game.onplayed = async function(player, card) {
+  let trick = game.trick.cards().join(', ');
   tty.write(`\n${player} played ${card}\n`);
+  tty.write(`Trick now consists of: ${trick}\n`);
 };
 
 game.oncompleted = async function(trick, winner) {

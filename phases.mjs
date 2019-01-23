@@ -69,6 +69,7 @@ export async function playing({ players, contract, sequence }) {
   let trick = new Trick();
   let order = contract.order;
 
+  this.trick = trick;
   for (let player of sequence) {
     this.actor = player;
 

@@ -1,7 +1,5 @@
 
-import { Suits, Ranks } from './card.mjs';
 import { Deck } from './deck.mjs';
-import { Order } from './order.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 

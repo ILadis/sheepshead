@@ -50,9 +50,10 @@ export async function auction({ players, sequence }) {
       continue;
     }
 
-    if (bid.value > highest) {
+    let value = bid.value;
+    if (value > highest) {
       contract = bid;
-      highest = bid.value;
+      highest = value;
     }
   }
 

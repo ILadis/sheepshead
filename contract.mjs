@@ -12,31 +12,43 @@ Contract.prototype.assign = function(owner, partner = null) {
   this.partner = partner;
 };
 
-Contract.normal = function() {
+Contract.normal = function(player, partner) {
   let order = new Order();
   order.promote([Suits.Heart], [Ranks.Sergeant, Ranks.Officer]);
 
-  return new Contract(1, order);
+  let contract = new Contract(1, order);
+  contract.assign(player, partner);
+
+  return contract;
 };
 
-Contract.geier = function(suit) {
+Contract.geier = function(player, suit) {
   let order = new Order();
   order.promote(suit ? [suit] : [], [Ranks.Officer]);
 
-  return new Contract(2, order);
+  let contract = new Contract(2, order);
+  contract.assign(player);
+
+  return contract;
 };
 
-Contract.wenz = function(suit) {
+Contract.wenz = function(player, suit) {
   let order = new Order();
   order.promote(suit ? [suit] : [], [Ranks.Sergeant]);
 
-  return new Contract(3, order);
+  let contract = new Contract(3, order);
+  contract.assign(player);
+
+  return contract;
 };
 
-Contract.solo = function(suit) {
+Contract.solo = function(player, suit) {
   let order = new Order();
   order.promote([suit], [Ranks.Sergeant, Ranks.Officer]);
 
-  return new Contract(4, order);
+  let contract = new Contract(4, order);
+  contract.assign(player);
+
+  return contract;
 };
 

@@ -34,3 +34,9 @@ Player.sequence = function(group, from) {
   return { [Symbol.iterator]: next };
 };
 
+Player.across = function(group, from) {
+  let start = from ? group.findIndex(player => player == from) : 0;
+  let index = (start + group.length/2) % group.length;
+  return group[index];
+};
+

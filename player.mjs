@@ -20,7 +20,7 @@ Player.prototype.toString = function() {
 };
 
 Player.sequence = function(group, from) {
-  let start = from ? group.findIndex(player => player == from) : 0;
+  let start = from ? group.indexOf(from) : 0;
 
   let next = function*() {
     let index = start;
@@ -35,7 +35,7 @@ Player.sequence = function(group, from) {
 };
 
 Player.across = function(group, from) {
-  let start = from ? group.findIndex(player => player == from) : 0;
+  let start = from ? group.indexOf(from) : 0;
   let index = (start + group.length/2) % group.length;
   return group[index];
 };

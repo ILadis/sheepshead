@@ -2,6 +2,7 @@
 import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
+import { Result } from './result.mjs';
 
 export async function joining() {
   let players = new Array();

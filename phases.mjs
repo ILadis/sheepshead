@@ -12,7 +12,6 @@ export async function joining() {
     await this.onjoined(player);
   }
 
-  this.actor = null;
   this.players = players;
   this.sequence = Player.sequence(players);
 
@@ -41,39 +40,38 @@ export async function dealing({ deck, sequence }) {
 }
 
 export async function auction({ players, sequence }) {
-  let contracts = new Array();
+  let contract, highest = 0;
 
   for (let player of sequence) {
     this.actor = player;
 
-    let contract = await this.onbid(player);
-    if (contract) {
-      contracts.push(contract);
+    let bid = await this.onbid(player);
+    if (!bid) {
+      continue;
+    }
+
+    if (bid.value > highest) {
+      contract = bid;
+      highest = bid.value;
     }
   }
 
-  let highest = (c1, c2) => c1.value >= c2.value ? c1 : c2;
-  let contract = contracts.reduce(highest);
-
   this.contract = contract;
-  this.order = contract.order;
-
   await this.onbidded(contract);
 
   return playing;
 }
 
-export async function playing({ players, contract, sequence }) {
+export async function playing({ contract, sequence }) {
   let trick = new Trick();
-  let order = contract.order;
-
   this.trick = trick;
+
   for (let player of sequence) {
     this.actor = player;
 
     let card = await this.onplay(player, trick);
     if (trick.empty()) {
-      order.dominant = card.suit;
+      contract.order.dominate(card.suit);
     }
 
     trick.add(player, card);
@@ -85,49 +83,47 @@ export async function playing({ players, contract, sequence }) {
     }
   }
 
-  let winner = trick.winner(order);
+  return countup;
+}
+
+export async function countup({ players, trick, contract }) {
+  let winner, highest = 0;
+
+  for (let [player, card] of trick.plays) {
+    let value = contract.order.valueOf(card);
+
+    if (value >= highest) {
+      winner = player;
+      highest = value;
+    }
+  }
+
   winner.points += trick.points();
 
   await this.oncompleted(trick, winner);
   this.sequence = Player.sequence(players, winner);
 
-  return winner.cards.size > 0 ? playing : counting;
-}
+  return winner.cards.size > 0 ? playing : aftermath;
+};
 
-export async function counting({ players, contract }) {
-  let declarer = new Set();
-  declarer.points = 0;
-
-  let defender = new Set();
-  defender.points = 0;
-
-  let candidate;
-  if (!contract.owner) {
-    let highest = (p1, p2) => p1.points >= p2.points ? p1 : p2;
-    candidate = players.reduce(highest);
-  }
+export async function aftermath({ players, contract }) {
+  let declarer = new Result();
+  let defender = new Result();
 
   for (let player of players) {
     switch (player) {
-      case candidate:
       case contract.owner:
       case contract.partner:
         declarer.add(player);
-        declarer.points += player.points;
         break;
       default:
         defender.add(player);
-        defender.points += player.points;
+        break;
     }
     player.points = 0;
   }
 
-  let winner = declarer, loser = defender;
-  if (!candidate && declarer.points <= defender.points) {
-    winner = defender;
-    looser = declarer;
-  }
-
+  let { winner, loser } = Result.compare(declarer, defender);
   await this.onfinished(winner, loser);
 
   return proceed;

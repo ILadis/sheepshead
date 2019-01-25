@@ -2,17 +2,31 @@
 import { Card, Ranks, Suits } from './card.mjs';
 
 export function Order() {
-  this.trumps = new Set();
+  this.trumps = new Map();
+  this.dominants = new Map();
 }
 
-Order.prototype.promote = function(suits = [], ranks = []) {
-  this.trumps.clear();
+Order.prototype.dominate = function(suit) {
+  let value = 1;
 
+  this.dominants.clear();
+  for (let rank of Ranks) {
+    let card = Card[suit][rank];
+    if (!this.trumps.has(card)) {
+      this.dominants.set(card, value++);
+    }
+  }
+};
+
+Order.prototype.promote = function(suits = [], ranks = []) {
+  let value = 1;
+
+  this.trumps.clear();
   for (let suit of suits) {
     for (let rank of Ranks) {
       if (!ranks.includes(rank)) {
         let card = Card[suit][rank];
-        this.trumps.add(card);
+        this.trumps.set(card, value++);
       }
     }
   }
@@ -20,29 +34,18 @@ Order.prototype.promote = function(suits = [], ranks = []) {
   for (let rank of ranks) {
     for (let suit of Suits) {
       let card = Card[suit][rank];
-      this.trumps.add(card);
+      this.trumps.set(card, value++);
     }
   }
 };
 
 Order.prototype.valueOf = function(card) {
-  let value = 1;
-
-  if (this.dominant) {
-    for (let rank of Ranks) {
-      let c = Card[this.dominant][rank];
-      if (!this.trumps.has(c) && card == c) {
-        return value;
-      }
-      value++;
-    }
+  if (this.dominants.has(card)) {
+    return this.dominants.get(card);
   }
 
-  for (let c of this.trumps) {
-    if (card == c) {
-      return value;
-    }
-    value++;
+  if (this.trumps.has(card)) {
+    return this.dominants.size + this.trumps.get(card);
   }
 
   return 0;

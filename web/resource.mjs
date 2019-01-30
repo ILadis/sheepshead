@@ -7,11 +7,19 @@ export function Resource(methods, path) {
   this.path = new RegExp(path, 'i');
 };
 
+Resource.create = function(methods, path) {
+  let resource = function() {
+    Resource.call(this, methods, path);
+  };
+  resource.prototype = Object.create(Resource.prototype);
+  return resource;
+};
+
 Resource.prototype.handle = function(request, response, next) {
   let url = URL.parse(request.url);
-  let matches = this.path.exec(url.pathname);
+  request.path = this.path.exec(url.pathname);
 
-  if (!matches) {
+  if (!request.path) {
     return next();
   }
 
@@ -25,25 +33,7 @@ Resource.prototype.handle = function(request, response, next) {
     return response.end();
   }
 
-  let promise = this[request.method](request, response, matches);
-
-  promise.catch(error => {
-    if (!response.headersSent) {
-      response.writeHead(500);
-    }
-
-    if (!response.finished) {
-      response.end();
-    }
-  });
-};
-
-Resource.create = function(methods, path) {
-  let resource = function() {
-    Resource.call(this, methods, path);
-  };
-  resource.prototype = Object.create(Resource.prototype);
-  return resource;
+  this[request.method](request, response);
 };
 
 // TODO implement Etag based caching

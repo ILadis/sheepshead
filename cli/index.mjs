@@ -17,11 +17,14 @@ game.onjoin = async function(index) {
 };
 
 game.onbid = async function(player) {
-  return Contract.normal();
+  let partner = Player.across(game.players, player);
+  let contract = Contract.normal(player, partner);
+  return contract;
 };
 
 game.onbidded = async function(contract) {
   tty.write(`Trumps are: Hearts, Seargants and Officers\n`);
+  tty.write(`Partners are assigned across\n`);
 };
 
 game.onplay = function(player) {
@@ -50,7 +53,8 @@ game.onplay = function(player) {
 
 game.onplayed = async function(player, card) {
   let trick = game.trick.cards().join(', ');
-  tty.write(`\n${player} played ${card}\n`);
+  let value = game.contract.order.valueOf(card);
+  tty.write(`\n${player} played ${card} (${value})\n`);
   tty.write(`Trick now consists of: ${trick}\n`);
 };
 

@@ -1,5 +1,31 @@
 
-import { UID } from './uid.mjs';
+export const Handlers = Object.create(null);
+
+Handlers.chain = function(...handlers) {
+  let callback;
+
+  let chain = function(request, response) {
+    let iterator = handlers.values();
+
+    let next = async function() {
+      let { done, value } = iterator.next();
+      if (!done) {
+        await value.handle(request, response, next);
+      } else if(callback) {
+        callback(request, response);
+      }
+    };
+
+    next();
+  };
+
+  chain.then = function(cb) {
+    callback = cb;
+    return chain;
+  };
+
+  return chain;
+};
 
 export function Payload() {
 }
@@ -47,14 +73,13 @@ export function Registry() {
   this.registry = new Map();
 }
 
-Registry.prototype.register = function(entity) {
-  let uid = UID.generate();
-  this.registry.set(uid, entity);
-  return uid;
+Registry.prototype.register = function(key, value) {
+  this.registry.set(key, value);
+  return key;
 };
 
-Registry.prototype.lookup = function(uid) {
-  return this.registry.get(uid);
+Registry.prototype.lookup = function(key) {
+  return this.registry.get(key);
 };
 
 Registry.prototype.handle = function(request, response, next) {

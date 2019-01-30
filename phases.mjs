@@ -6,6 +6,8 @@ import { Result } from './result.mjs';
 
 export async function joining() {
   let players = new Array();
+  this.players = players;
+
   for (let index of [1, 2, 3, 4]) {
     let player = await this.onjoin(index);
     players.push(player);
@@ -13,7 +15,6 @@ export async function joining() {
     await this.onjoined(player);
   }
 
-  this.players = players;
   this.sequence = Player.sequence(players);
 
   return shuffle;

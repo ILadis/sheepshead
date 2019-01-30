@@ -50,7 +50,7 @@ Payload.prototype.handle = function(request, response, next) {
 };
 
 export function Authentication() {
-  this.pattern = new RegExp('^Bearer ([a-z0-9]+)$', 'i');
+  this.pattern = new RegExp('^Bearer ([a-z0-9\\+/=]+)$', 'i');
 };
 
 Authentication.prototype.authenticate = function(request) {

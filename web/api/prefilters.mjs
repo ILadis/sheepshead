@@ -2,7 +2,7 @@
 export const PreFilters = Object.create(null);
 
 PreFilters.requiresGame = function(phase) {
-  let handle = async (request, response, next) => {
+  let handle = (request, response, next) => {
     let id = Number(request.path.groups.id);
     let game = request.registry.lookup(id);
     if (!game) {
@@ -46,7 +46,7 @@ PreFilters.requiresEntity = function(parser) {
 };
 
 PreFilters.requiresPlayer = function() {
-  let handle = async (request, response, next) => {
+  let handle = (request, response, next) => {
     let token = request.bearer;
     if (!token) {
       response.setHeader('WWW-Authenticate', 'Bearer');

@@ -1,5 +1,6 @@
 
 import Http from 'http';
+import { Handlers } from './handlers.mjs';
 
 export function HttpServer() {
   this.server = new Http.Server();
@@ -24,15 +25,7 @@ HttpServer.prototype.listen = function(port) {
 };
 
 HttpServer.prototype.handle = function(request, response) {
-  let iterator = this.handlers.values();
-
-  let next = function() {
-    let { done, value } = iterator.next();
-    if (!done) {
-      value.handle(request, response, next);
-    }
-  };
-
-  next();
+  let handlers = this.handlers;
+  Handlers.chain(...handlers).call(this, request, response);
 };
 

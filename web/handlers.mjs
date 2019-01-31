@@ -7,10 +7,10 @@ Handlers.chain = function(...handlers) {
   let chain = function(request, response) {
     let iterator = handlers.values();
 
-    let next = async function() {
+    let next = () => {
       let { done, value } = iterator.next();
       if (!done) {
-        await value.handle(request, response, next);
+        value.handle(request, response, next);
       } else if(callback) {
         callback(request, response);
       }
@@ -19,7 +19,7 @@ Handlers.chain = function(...handlers) {
     next();
   };
 
-  chain.then = function(cb) {
+  chain.then = (cb) => {
     callback = cb;
     return chain;
   };

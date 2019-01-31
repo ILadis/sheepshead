@@ -16,10 +16,10 @@ Resource.create = function(methods, path) {
 };
 
 Resource.prototype.handle = function(request, response, next) {
-  let url = URL.parse(request.url);
-  request.path = this.path.exec(url.pathname);
+  let url = URL.parse(request.url, true);
+  let matches = this.path.exec(url.pathname);
 
-  if (!request.path) {
+  if (!matches) {
     return next();
   }
 
@@ -32,6 +32,9 @@ Resource.prototype.handle = function(request, response, next) {
     response.writeHead(501);
     return response.end();
   }
+
+  request.pathparams = matches.groups;
+  request.url = url;
 
   this[request.method](request, response);
 };

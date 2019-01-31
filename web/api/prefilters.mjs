@@ -3,7 +3,7 @@ export const PreFilters = Object.create(null);
 
 PreFilters.requiresGame = function(phase) {
   let handle = (request, response, next) => {
-    let id = Number(request.path.groups.id);
+    let id = Number(request.pathparams.id);
     let game = request.registry.lookup(id);
     if (!game) {
       response.writeHead(404);
@@ -16,28 +16,6 @@ PreFilters.requiresGame = function(phase) {
     }
 
     request.game = game;
-
-    next();
-  };
-
-  return { handle };
-};
-
-PreFilters.requiresEntity = function(parser) {
-  let handle = async (request, response, next) => {
-    let body = await request.body;
-    if (body.length <= 0) {
-      response.writeHead(400);
-      return response.end();
-    }
-
-    let entity = parser.parse(body);
-    if (!entity) {
-      response.writeHead(422);
-      return response.end();
-    }
-
-    request.entity = entity;
 
     next();
   };
@@ -78,6 +56,28 @@ PreFilters.requiresActor = function() {
       response.writeHead(400);
       return response.end();
     }
+
+    next();
+  };
+
+  return { handle };
+};
+
+PreFilters.requiresEntity = function(parser) {
+  let handle = async (request, response, next) => {
+    let body = await request.body;
+    if (body.length <= 0) {
+      response.writeHead(400);
+      return response.end();
+    }
+
+    let entity = parser.parse(body);
+    if (!entity) {
+      response.writeHead(422);
+      return response.end();
+    }
+
+    request.entity = entity;
 
     next();
   };

@@ -1,9 +1,9 @@
 
 import { Resource } from '../resource.mjs';
 import { Handlers } from '../handlers.mjs';
+import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
-import { Token } from './token.mjs';
 import { Parser } from './parser.mjs';
 import { PreFilters } from './prefilters.mjs';
 
@@ -64,7 +64,8 @@ State.prototype['GET'] = Handlers.chain(
   let game = request.game;
 
   let state = game.phase.name;
-  let actor = game.actor ? game.actor.name : undefined;
+  let id = game.players.indexOf(game.actor);
+  let actor = game.actor ? id : undefined;
   // TODO assign player unique number and return this here
 
   let json = JSON.stringify({ state, actor });

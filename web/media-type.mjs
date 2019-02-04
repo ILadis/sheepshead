@@ -31,6 +31,7 @@ MediaType.text = new MediaType('text', 'plain');
 MediaType.html = new MediaType('text', 'html');
 MediaType.css = new MediaType('text', 'css');
 MediaType.mjs = new MediaType('text', 'javascript');
+MediaType.event = new MediaType('text', 'event-stream');
 MediaType.json = new MediaType('application', 'json');
 MediaType.svg = new MediaType('image', 'svg+xml');
 MediaType.ico = new MediaType('image', 'ico');

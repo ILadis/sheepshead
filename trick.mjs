@@ -1,14 +1,12 @@
 
 export function Trick() {
   this.plays = new Map();
+  this.cards = new Set();
 };
 
 Trick.prototype.add = function(player, card) {
   this.plays.set(player, card);
-};
-
-Trick.prototype.cards = function() {
-  return Array.from(this.plays.values());
+  this.cards.add(card);
 };
 
 Trick.prototype.points = function() {

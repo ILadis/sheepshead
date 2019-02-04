@@ -13,15 +13,21 @@ Game.prototype.run = async function() {
   } while (this.phase);
 };
 
+Game.prototype.register = function(event, callback) {
+  let next = this[event];
+
+  this[event] = async (...args) => {
+    callback.call(this, ...args);
+    if (next) {
+      next();
+    }
+  };
+};
+
 Game.prototype.onjoin =
 Game.prototype.onbid =
 Game.prototype.onplay =
-Game.prototype.onproceed = function(...args) {
-  return new Promise((resolve, reject) => {
-    this.promise = { args, resolve, reject };
-  });
-};
-
+Game.prototype.onproceed =
 Game.prototype.onjoined =
 Game.prototype.onbidded =
 Game.prototype.onplayed =

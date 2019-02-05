@@ -6,11 +6,8 @@ export function Game(game) {
 Game.prototype.toJSON = function() {
   let id = this.game.id;
   let phase = this.game.phase.name;
-  let players = `/games/${id}/players`;
-  let actor = this.game.actor ? `/games/${id}/players?id=${this.game.actor.id}` : undefined;
-  let cards = `/games/${id}/cards`;
-  let trick = `/games/${id}/trick`;
-  return { id, phase, _links: { players, actor, cards, trick } };
+  let actor = this.game.actor ? this.game.actor.id : undefined;
+  return { id, phase, actor };
 };
 
 export function Player(player, token) {
@@ -27,7 +24,7 @@ Player.prototype.toJSON = function() {
 };
 
 export function Card(card) {
-  this.card;
+  this.card = card;
 }
 
 Card.prototype.toJSON = function() {

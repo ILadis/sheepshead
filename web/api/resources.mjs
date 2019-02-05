@@ -133,15 +133,14 @@ Players.prototype['GET'] = Handlers.chain(
 ).then((request, response) => {
   let { game, url } = request;
 
-  let id = Number.parseInt(url.query['id']) - 1;
-  let player = Number.isNaN(id) ? game.players : game.players[id];
+  let id = Number.parseInt(url.query['id']);
+  let players = game.players;
 
-  if (!player) {
-    response.writeHead(404);
-    return response.end();
+  if (!Number.isNaN(id)) {
+    players = players.filter(p => p.id == id);
   }
 
-  let entity = Array.isArray(player) ? player.map(p => new Entities.Player(p)) : new Entities.Player(player);
+  let entity = players.map(p => new Entities.Player(p));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -163,7 +162,7 @@ Cards.prototype['GET'] = Handlers.chain(
 
   let cards = Array.from(player.cards);
 
-  let entities = cards.map(card => new Entities.Card(card));
+  let entities = cards.map(c => new Entities.Card(c));
   let json = JSON.stringify(entities);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -210,7 +209,7 @@ Trick.prototype['GET'] = Handlers.chain(
 
   let cards = Array.from(game.trick.cards);
 
-  let entities = cards.map(card => new Entities.Card(card));
+  let entities = cards.map(c => new Entities.Card(c));
   let json = JSON.stringify(entities);
 
   response.setHeader('Content-Type', MediaType.json);

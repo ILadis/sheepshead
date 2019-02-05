@@ -16,11 +16,12 @@ Game.prototype.run = async function() {
 Game.prototype.register = function(event, callback) {
   let next = this[event];
 
-  this[event] = async (...args) => {
-    callback.call(this, ...args);
+  this[event] = (...args) => {
+    let result = callback.call(this, ...args);
     if (next) {
-      next();
+      return next.call(this, ...args);
     }
+    return result;
   };
 };
 

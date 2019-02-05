@@ -11,6 +11,7 @@ server.register(new Handlers.Authentication());
 server.register(new Handlers.Registry());
 server.register(new Api.Games());
 server.register(new Api.State());
+server.register(new Api.Events());
 server.register(new Api.Players());
 server.register(new Api.Cards());
 server.register(new Api.Trick());

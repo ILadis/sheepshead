@@ -28,7 +28,7 @@ Games.prototype['POST'] = (request, response) => {
   game.onjoin =
   game.onplay = function(...args) {
     return new Promise((resolve, reject) => {
-      this.promise = { args, resolve, reject };
+      game.promise = { args, resolve, reject };
     });
   };
 
@@ -80,18 +80,31 @@ Events.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Type', MediaType.event);
   response.writeHead(200);
 
-  let id = game.id;
-
   game.register('onjoined', (...args) => {
-    let player = args[0];
-
-    let entity = new Entities.Player(player);
-    let json = JSON.stringify(entity);
+    let player = new Entities.Player(args[0]);
+    let json = JSON.stringify(player);
 
     response.write('event: onjoined\n');
     response.write(`data: ${json}\n\n`);
   });
-  // TODO implement other event callbacks
+  game.register('onplay', (...args) => {
+    let player = new Entities.Player(args[0]);
+    let action = 'play';
+
+    let json = JSON.stringify({ player, action });
+
+    response.write('event: onturn\n');
+    response.write(`data: ${json}\n\n`);
+  });
+  game.register('onplayed', (...args) => {
+    let player = new Entities.Player(args[0]);
+    let card = new Entities.Card(args[1]);
+
+    let json = JSON.stringify({ player, card });
+
+    response.write('event: onplayed\n');
+    response.write(`data: ${json}\n\n`);
+  });
 });
 
 export const Players = Resource.create(

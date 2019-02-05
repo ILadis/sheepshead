@@ -71,9 +71,14 @@ PreFilters.requiresEntity = function(parser) {
       return response.end();
     }
 
-    let entity = parser.parse(body);
-    if (!entity) {
-      response.writeHead(422);
+    try {
+      var entity = parser.parse(body);
+      if (!entity) {
+        response.writeHead(422);
+        return response.end();
+      }
+    } catch {
+      response.writeHead(400);
       return response.end();
     }
 

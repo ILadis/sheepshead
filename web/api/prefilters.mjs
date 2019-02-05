@@ -3,7 +3,7 @@ export const PreFilters = Object.create(null);
 
 PreFilters.requiresGame = function(phase) {
   let handle = (request, response, next) => {
-    let id = Number(request.pathparams.id);
+    let id = Number(request.pathparams['id']);
     let game = request.registry.lookup(id);
     if (!game) {
       response.writeHead(404);

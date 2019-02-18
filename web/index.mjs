@@ -1,24 +1,26 @@
 
 import { HttpServer } from './http-server.mjs'
 import { Resource } from './resource.mjs'
+import { MediaType } from './media-type.mjs'
+import * as Handlers from './handlers.mjs'
 
-import * as Handlers from './handlers.mjs';
-import * as Api from './api/resources.mjs';
+import Api from './api/resources.mjs';
+import App from './app/resources.mjs';
 
 let server = new HttpServer();
 server.register(new Handlers.Payload());
 server.register(new Handlers.Authentication());
 server.register(new Handlers.Registry());
-server.register(new Api.Games());
-server.register(new Api.State());
-server.register(new Api.Events());
-server.register(new Api.Players());
-server.register(new Api.Cards());
-server.register(new Api.Trick());
+server.registerAll(Api);
+server.registerAll(App);
+
+let index = new Resource(['GET'], '^/$');
+index['GET'] = Resource.serveRedirect('/index.html');
+server.register(index);
 
 let fallback = new Resource(['GET'], '.*');
 fallback['GET'] = Resource.serveNotFound();
-
 server.register(fallback);
+
 server.listen(8090);
 

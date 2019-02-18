@@ -11,6 +11,13 @@ HttpServer.prototype.register = function(handler) {
   this.handlers.push(handler);
 };
 
+HttpServer.prototype.registerAll = function(module) {
+  let handlers = Object.values(module);
+  for (let H of handlers) {
+    this.register(new H());
+  }
+};
+
 HttpServer.prototype.listen = function(port) {
   let server = this.server;
   let promise = new Promise((resolve, reject) => {

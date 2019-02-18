@@ -12,7 +12,7 @@ export async function joining() {
     let player = await this.onjoin(index);
     players.push(player);
 
-    await this.onjoined(player);
+    this.onjoined(player);
   }
 
   this.sequence = Player.sequence(players);
@@ -41,11 +41,12 @@ export async function dealing({ deck, sequence }) {
   return auction;
 }
 
-export async function auction({ players, sequence }) {
+export async function auction({ players, sequence, phase }) {
   let contract, highest = 0;
 
   for (let player of sequence) {
     this.actor = player;
+    this.onturn(player, phase);
 
     let bid = await this.onbid(player);
     if (!bid) {
@@ -60,29 +61,33 @@ export async function auction({ players, sequence }) {
   }
 
   this.contract = contract;
-  await this.onbidded(contract);
+  this.onbidded(contract);
 
   return playing;
 }
 
-export async function playing({ contract, sequence }) {
+export async function playing({ contract, sequence, phase }) {
   let trick = new Trick();
   this.trick = trick;
 
   for (let player of sequence) {
     this.actor = player;
+    this.onturn(player, phase);
 
-    let card = await this.onplay(player, trick);
+    do {
+      var card = await this.onplay(player, trick);
+    } while (!player.draw(card));
+
     if (trick.empty()) {
       contract.order.dominate(card.suit);
     }
 
     trick.add(player, card);
-    await this.onplayed(player, card, trick);
+    this.onplayed(player, card, trick);
 
     if (contract.partner == card) {
       contract.partner = player;
-      await this.onmatched(contract);
+      this.onmatched(contract);
     }
   }
 
@@ -103,7 +108,7 @@ export async function countup({ players, trick, contract }) {
 
   winner.points += trick.points();
 
-  await this.oncompleted(trick, winner);
+  this.oncompleted(trick, winner);
   this.sequence = Player.sequence(players, winner);
 
   return winner.cards.size > 0 ? playing : aftermath;
@@ -127,15 +132,17 @@ export async function aftermath({ players, contract }) {
   }
 
   let { winner, loser } = Result.compare(declarer, defender);
-  await this.onfinished(winner, loser);
+  this.onfinished(winner, loser);
 
   return proceed;
 }
 
-export async function proceed({ players }) {
+export async function proceed({ players, phase }) {
   let proceed = true;
   for (let player of players) {
     this.actor = player;
+    this.onturn(player, phase);
+
     proceed = await this.onproceed(player) && proceed;
   }
 

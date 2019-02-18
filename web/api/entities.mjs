@@ -1,13 +1,36 @@
 
-export function Game(game) {
+export function State(game) {
   this.game = game;
 };
 
-Game.prototype.toJSON = function() {
+State.prototype.toJSON = function() {
   let id = this.game.id;
   let phase = this.game.phase.name;
-  let actor = this.game.actor ? this.game.actor.id : undefined;
+  let player = this.game.actor;
+  let actor = player ? new Player(player) : undefined;
   return { id, phase, actor };
+};
+
+export function Play(player, card) {
+  this.player = player;
+  this.card = card;
+}
+
+Play.prototype.toJSON = function() {
+  let player = new Player(this.player);
+  let card = new Card(this.card);
+  return { player, card };
+};
+
+export function Turn(player, phase) {
+  this.player = player;
+  this.phase = phase;
+}
+
+Turn.prototype.toJSON = function() {
+  let player = new Player(this.player);
+  let phase = this.phase.name;
+  return { player, phase };
 };
 
 export function Player(player, token) {
@@ -17,10 +40,11 @@ export function Player(player, token) {
 
 Player.prototype.toJSON = function() {
   let token = this.token;
-  let id = this.player.id;
   let name = this.player.name;
+  let index = this.player.index;
+  let points = this.player.points;
   let cards = this.player.cards.size;
-  return { token, id, name, cards };
+  return { token, index, name, points, cards };
 };
 
 export function Card(card) {

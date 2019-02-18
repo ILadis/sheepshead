@@ -5,43 +5,38 @@ import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
 import { PreFilters } from './prefilters.mjs';
+import { EventStream } from './event-stream.mjs';
+import { DeferredInput } from './deferred-input.mjs';
 import * as Entities from './entities.mjs';
 
-import * as Phases from '../../phases.mjs';
 import { Game } from '../../game.mjs';
 import { Card } from '../../card.mjs';
 import { Player } from '../../player.mjs';
 import { Contract } from '../../contract.mjs';
+import * as Phases from '../../phases.mjs';
 
 export const Games = Resource.create(
   ['POST'], '^/games$');
 
 Games.prototype['POST'] = (request, response) => {
+  let { registry } = request;
   let game = new Game();
 
-  game.onbid = async (player) => {
-    let partner = Player.across(game.players, player);
-    let contract = Contract.normal(player, partner);
-    return contract;
-  };
+  let events = new EventStream();
+  events.attach(game);
 
-  game.onjoin =
-  game.onplay = function(...args) {
-    return new Promise((resolve, reject) => {
-      game.promise = { args, resolve, reject };
-    });
-  };
+  let input = new DeferredInput();
+  input.attach(game);
+
+  let id = registry.register(1, game);
+  game.id = id;
 
   game.run();
 
-  let id = 1;
-  game.id = id;
-
-  request.registry.register(id, game);
-
-  let entity = new Entities.Game(game);
+  let entity = new Entities.State(game);
   let json = JSON.stringify(entity);
 
+  response.setHeader('Location', `/games/${id}`);
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
@@ -58,7 +53,7 @@ State.prototype['GET'] = Handlers.chain(
 ).then((request, response) => {
   let { game, registry } = request;
 
-  let entity = new Entities.Game(game);
+  let entity = new Entities.State(game);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -75,35 +70,21 @@ export const Events = Resource.create(
 Events.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
-  let { game } = request;
+  let { game, url } = request;
 
+  let offset = Number(url.query['offset']);
+  let events = game.events;
+
+  response.setHeader('Cache-Control', 'no-cache');
   response.setHeader('Content-Type', MediaType.event);
   response.writeHead(200);
 
-  game.register('onjoined', (...args) => {
-    let player = new Entities.Player(args[0]);
-    let json = JSON.stringify(player);
+  let callback = (event) => response.write(event);
+  events.subscribe(callback, offset);
 
-    response.write('event: onjoined\n');
-    response.write(`data: ${json}\n\n`);
-  });
-  game.register('onplay', (...args) => {
-    let player = new Entities.Player(args[0]);
-    let action = 'play';
-
-    let json = JSON.stringify({ player, action });
-
-    response.write('event: onturn\n');
-    response.write(`data: ${json}\n\n`);
-  });
-  game.register('onplayed', (...args) => {
-    let player = new Entities.Player(args[0]);
-    let card = new Entities.Card(args[1]);
-
-    let json = JSON.stringify({ player, card });
-
-    response.write('event: onplayed\n');
-    response.write(`data: ${json}\n\n`);
+  request.on('close', () => {
+    events.unsubscribe(callback);
+    response.end();
   });
 });
 
@@ -115,6 +96,7 @@ Players.prototype['POST'] = Handlers.chain(
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
   var { game, entity, registry } = request;
+  let { id, input, players } = game;
 
   let player = Player.withName(entity.name);
   if (!player) {
@@ -122,17 +104,16 @@ Players.prototype['POST'] = Handlers.chain(
     return response.end();
   }
 
-  let id = game.promise.args[0];
-  player.id = id;
-
   let token = Token.generate();
+  let index = player.index = input.args[0];
 
   registry.register(token, player);
-  game.promise.resolve(player);
+  input.resolve(player);
 
   var entity = new Entities.Player(player, token);
   let json = JSON.stringify(entity);
 
+  response.setHeader('Location', `/games/${id}/players?index=${index}`);
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
@@ -145,12 +126,11 @@ Players.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game, url } = request;
+  let index = Number(url.query['index']);
 
-  let id = Number.parseInt(url.query['id']);
   let players = game.players;
-
-  if (!Number.isNaN(id)) {
-    players = players.filter(p => p.id == id);
+  if (!Number.isNaN(index)) {
+    players = players.filter(p => p.index == index);
   }
 
   let entity = players.map(p => new Entities.Player(p));
@@ -196,6 +176,7 @@ Trick.prototype['POST'] = Handlers.chain(
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
   let { game, player, entity } = request;
+  let input = game.input;
 
   let card = Card.byName(entity.suit, entity.rank);
   if (!card) {
@@ -203,15 +184,10 @@ Trick.prototype['POST'] = Handlers.chain(
     return response.end();
   }
 
-  // TODO use helper to verify requested play
-  if (!player.draw(card)) {
-    response.writeHead(400);
-    return response.end();
-  }
-
-  game.promise.resolve(card);
+  input.resolve(card);
 
   response.writeHead(200);
+
   return response.end();
 });
 
@@ -219,7 +195,6 @@ Trick.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame(Phases.playing)
 ).then((request, response) => {
   let { game } = request;
-
   let cards = Array.from(game.trick.cards);
 
   let entities = cards.map(c => new Entities.Card(c));
@@ -232,4 +207,6 @@ Trick.prototype['GET'] = Handlers.chain(
 
   return response.end();
 });
+
+export default { Games, State, Events, Players, Cards, Trick };
 

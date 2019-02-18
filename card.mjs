@@ -77,3 +77,8 @@ Card.byName = function(suit, rank) {
   }
 };
 
+Card.fromProps = function(props) {
+  let { suit, rank } = props;
+  return Card.byName(suit, rank);
+};
+

@@ -2,6 +2,7 @@
 export function Player(name) {
   this.name = name;
   this.points = 0;
+  this.index = undefined;
   this.cards = new Set();
 }
 
@@ -23,6 +24,14 @@ Player.withName = function(name) {
   if (typeof name === 'string' && name.length) {
     return new Player(name);
   }
+};
+
+Player.fromProps = function(props) {
+  let { name, points, index } = props;
+  let player = Player.withName(name);
+  player.points = points;
+  player.index = index;
+  return player;
 };
 
 Player.sequence = function(group, from) {

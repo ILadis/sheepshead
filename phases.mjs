@@ -146,8 +146,12 @@ export async function proceed({ players, phase }) {
     proceed = await this.onproceed(player) && proceed;
   }
 
-  if (proceed) {
-    return shuffle;
-  }
+  return proceed ? shuffle : cleanup;
+};
+
+export async function cleanup() {
+  this.contract =
+  this.trick =
+  this.actor = null;
 };
 

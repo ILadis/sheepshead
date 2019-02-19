@@ -5,10 +5,11 @@ export function State(game) {
 
 State.prototype.toJSON = function() {
   let id = this.game.id;
-  let phase = this.game.phase.name;
+  let phase = this.game.phase;
+  let state = phase ? phase.name : undefined;
   let player = this.game.actor;
   let actor = player ? new Player(player) : undefined;
-  return { id, phase, actor };
+  return { id, state, actor };
 };
 
 export function Play(player, card) {

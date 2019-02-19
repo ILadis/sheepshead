@@ -67,9 +67,6 @@ export async function auction({ players, sequence, phase }) {
 }
 
 export async function playing({ contract, sequence, phase }) {
-  let trick = new Trick();
-  this.trick = trick;
-
   for (let player of sequence) {
     this.actor = player;
     this.onturn(player, phase);
@@ -77,6 +74,11 @@ export async function playing({ contract, sequence, phase }) {
     do {
       var card = await this.onplay(player, trick);
     } while (!player.draw(card));
+
+    if (!trick) {
+      var trick = new Trick();
+      this.trick = trick;
+    }
 
     if (trick.empty()) {
       contract.order.dominate(card.suit);

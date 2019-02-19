@@ -25,8 +25,8 @@ for (let path of [
 }
 
 function filepath(strings) {
-  let module = URL.parse(import.meta.url);
-  let dir = Path.dirname(module.pathname);
+  let module = URL.fileURLToPath(import.meta.url);
+  let dir = Path.dirname(module);
 
   let path = Path.join(dir, strings.join(''));
 

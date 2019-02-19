@@ -41,7 +41,6 @@ Games.prototype['POST'] = (request, response) => {
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
   response.write(json);
-
   return response.end();
 };
 
@@ -60,7 +59,6 @@ State.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
-
   return response.end();
 });
 
@@ -71,9 +69,9 @@ Events.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game, url } = request;
+  let events = game.events;
 
   let offset = Number(url.query['offset']);
-  let events = game.events;
 
   response.setHeader('Cache-Control', 'no-cache');
   response.setHeader('Content-Type', MediaType.event);
@@ -118,7 +116,6 @@ Players.prototype['POST'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
   response.write(json);
-
   return response.end();
 });
 
@@ -126,9 +123,9 @@ Players.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game, url } = request;
-  let index = Number(url.query['index']);
-
   let players = game.players;
+
+  let index = Number(url.query['index']);
   if (!Number.isNaN(index)) {
     players = players.filter(p => p.index == index);
   }
@@ -140,7 +137,6 @@ Players.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
-
   return response.end();
 });
 
@@ -152,7 +148,6 @@ Cards.prototype['GET'] = Handlers.chain(
   PreFilters.requiresPlayer()
 ).then((request, response) => {
   let { game, player } = request;
-
   let cards = Array.from(player.cards);
 
   let entities = cards.map(c => new Entities.Card(c));
@@ -162,7 +157,6 @@ Cards.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
-
   return response.end();
 });
 
@@ -187,7 +181,6 @@ Trick.prototype['POST'] = Handlers.chain(
   input.resolve(card);
 
   response.writeHead(200);
-
   return response.end();
 });
 
@@ -195,7 +188,14 @@ Trick.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame(Phases.playing)
 ).then((request, response) => {
   let { game } = request;
-  let cards = Array.from(game.trick.cards);
+  let trick = game.trick;
+
+  if (!trick) {
+    response.writeHead(204);
+    return response.end();
+  }
+
+  let cards = Array.from(trick.cards);
 
   let entities = cards.map(c => new Entities.Card(c));
   let json = JSON.stringify(entities);
@@ -204,7 +204,6 @@ Trick.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
-
   return response.end();
 });
 

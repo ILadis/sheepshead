@@ -1,34 +1,48 @@
-import { Client }  from './client.mjs';
-import { Player }  from './player.mjs';
-import * as Views  from './views.mjs';
-//import Presenter from './presenter.mjs';
-//import Repository from './repository.mjs';
+
+import { Client } from './client.mjs';
+import { Player } from './player.mjs';
+import * as Views from './views.mjs';
 
 addEventListener('load', async () => {
-  window.Client = Client;
+  let params = new URLSearchParams(location.search);
+  let id = Number(params.get('id') || 'NaN');
+  let name = String(params.get('name') || 'Player');
 
-  let view = new Views.PlayerList();
-  view.appendTo(document.body);
+  let views = {
+    players: new Views.Players(),
+    cards: new Views.Cards(),
+    trick: new Views.Trick()
+  };
 
-  let client = await Client.forGame(null);
+  views.players.appendTo(document.body);
+  views.cards.appendTo(document.body);
+  views.trick.appendTo(document.body);
 
-  let player = new Player('Player 1');
-  await client.join(player);
-  alert(`we are ${player} with token ${client.token}`);
+  let client = await Client.forGame(id);
 
-  let players = await client.players();
-  alert(`${players} are currently connected`);
+  let self = new Player(name);
+  await client.join(self);
+
+  views.cards.onclick = (card) => {
+    client.play(card);
+  };
 
   let stream = client.listen();
   stream.onjoined = (player) => {
-    alert(`joined: ${player}`);
-    view.add(player);
+    views.players.show(player);
   };
-  stream.onturn = (player, phase) => {
-    alert(`turn: ${player}, ${phase}`);
+
+  stream.onturn = async (player, phase) => {
+    views.players.show(player);
+    views.players.setActive(player.index);
+
+    let cards = await client.cards();
+    views.cards.show(cards);
   };
-  stream.onplayed = (player, card) => {
-    alert(`played: ${player}, ${card}`);
+
+  stream.onplayed = async (player, card) => {
+    let cards = await client.trick();
+    views.trick.show(cards);
   };
 });
 

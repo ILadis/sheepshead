@@ -2,8 +2,6 @@
 import { Player } from './player.mjs';
 import { Card } from './card.mjs';
 
-// TODO implement fetching cards of current trick
-
 export function Client(id, token) {
   this.id = id;
   this.token = token;
@@ -95,12 +93,29 @@ Client.prototype.cards = async function() {
   return cards;
 };
 
+Client.prototype.trick = async function() {
+  let id = this.id;
+  let request = new Request(`/games/${id}/trick`, {
+    method: 'GET',
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  let json = await response.json();
+  let cards = json.map(Card.fromProps);
+
+  return cards;
+};
+
 Client.prototype.play = async function(card) {
   let id = this.id;
   let token = this.token;
   let json = JSON.stringify({
     'suit': card.suit.description.toLowerCase(),
-    'rank': suit.rank.description.toLowerCase()
+    'rank': card.rank.description.toLowerCase()
   });
   let request = new Request(`/games/${id}/trick`, {
     method: 'POST',

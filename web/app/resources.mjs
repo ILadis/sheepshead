@@ -8,6 +8,7 @@ const Resources = Object.create(null);
 
 for (let path of [
   filepath`./index.html`,
+  filepath`./styles.css`,
   filepath`./app.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,

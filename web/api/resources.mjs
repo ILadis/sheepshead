@@ -178,6 +178,12 @@ Trick.prototype['POST'] = Handlers.chain(
     return response.end();
   }
 
+  let rules = input.args[2];
+  if (!rules.isValid(card)) {
+    response.writeHead(400);
+    return response.end();
+  }
+
   input.resolve(card);
 
   response.writeHead(200);

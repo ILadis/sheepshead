@@ -3,6 +3,7 @@ import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 import { Result } from './result.mjs';
+import { Ruleset } from './ruleset.mjs';
 
 export async function joining() {
   let players = new Array();
@@ -12,7 +13,7 @@ export async function joining() {
     let player = await this.onjoin(index);
     players.push(player);
 
-    this.onjoined(player);
+    await this.onjoined(player);
   }
 
   this.sequence = Player.sequence(players);
@@ -46,7 +47,7 @@ export async function auction({ players, sequence, phase }) {
 
   for (let player of sequence) {
     this.actor = player;
-    this.onturn(player, phase);
+    await this.onturn(player, phase);
 
     let bid = await this.onbid(player);
     if (!bid) {
@@ -61,35 +62,37 @@ export async function auction({ players, sequence, phase }) {
   }
 
   this.contract = contract;
-  this.onbidded(contract);
+  await this.onbidded(contract);
 
   return playing;
 }
 
 export async function playing({ contract, sequence, phase }) {
+  let rules = Ruleset.forPlaying(this);
+
+  let trick = new Trick();
+  this.trick = trick;
+
   for (let player of sequence) {
     this.actor = player;
-    this.onturn(player, phase);
+    await this.onturn(player, phase);
 
     do {
-      var card = await this.onplay(player, trick);
-    } while (!player.draw(card));
+      var card = await this.onplay(player, trick, rules);
+    } while (!rules.isValid(card));
 
-    if (!trick) {
-      var trick = new Trick();
-      this.trick = trick;
-    }
+    player.draw(card);
 
     if (trick.empty()) {
       contract.order.dominate(card.suit);
     }
 
     trick.add(player, card);
-    this.onplayed(player, card, trick);
+    await this.onplayed(player, card, trick);
 
     if (contract.partner == card) {
       contract.partner = player;
-      this.onmatched(contract);
+      await this.onmatched(contract);
     }
   }
 
@@ -110,8 +113,8 @@ export async function countup({ players, trick, contract }) {
 
   winner.points += trick.points();
 
-  this.oncompleted(trick, winner);
   this.sequence = Player.sequence(players, winner);
+  await this.oncompleted(trick, winner);
 
   return winner.cards.size > 0 ? playing : aftermath;
 };
@@ -134,7 +137,7 @@ export async function aftermath({ players, contract }) {
   }
 
   let { winner, loser } = Result.compare(declarer, defender);
-  this.onfinished(winner, loser);
+  await this.onfinished(winner, loser);
 
   return proceed;
 }
@@ -143,7 +146,7 @@ export async function proceed({ players, phase }) {
   let proceed = true;
   for (let player of players) {
     this.actor = player;
-    this.onturn(player, phase);
+    await this.onturn(player, phase);
 
     proceed = await this.onproceed(player) && proceed;
   }

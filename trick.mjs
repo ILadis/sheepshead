@@ -17,7 +17,13 @@ Trick.prototype.points = function() {
   return points;
 };
 
+Trick.prototype.lead = function() {
+  for (let card of this.cards) {
+    return card;
+  }
+};
+
 Trick.prototype.empty = function() {
-  return this.plays.size <= 0;
+  return this.cards.size == 0;
 };
 

@@ -1,7 +1,4 @@
 
-import { Player } from './player.mjs';
-import { Card } from './card.mjs';
-
 export function Client(id, token) {
   this.id = id;
   this.token = token;
@@ -29,10 +26,10 @@ Client.forGame = async function(id) {
   return new Client(id);
 };
 
-Client.prototype.join = async function(player) {
+Client.prototype.join = async function(name) {
   let id = this.id;
   var json = JSON.stringify({
-    'name': player.name
+    'name': name
   });
   let request = new Request(`/games/${id}/players`, {
     method: 'POST',
@@ -48,10 +45,9 @@ Client.prototype.join = async function(player) {
   }
 
   var json = await response.json();
-  player.index = json.index;
   this.token = json.token;
 
-  return player;
+  return json;
 };
 
 Client.prototype.players = async function(index) {
@@ -67,9 +63,8 @@ Client.prototype.players = async function(index) {
   }
 
   let json = await response.json();
-  let players = json.map(Player.fromProps);
 
-  return players;
+  return json;
 };
 
 Client.prototype.cards = async function() {
@@ -88,9 +83,8 @@ Client.prototype.cards = async function() {
   }
 
   let json = await response.json();
-  let cards = json.map(Card.fromProps);
 
-  return cards;
+  return json;
 };
 
 Client.prototype.trick = async function() {
@@ -105,17 +99,16 @@ Client.prototype.trick = async function() {
   }
 
   let json = await response.json();
-  let cards = json.map(Card.fromProps);
 
-  return cards;
+  return json;
 };
 
 Client.prototype.play = async function(card) {
   let id = this.id;
   let token = this.token;
   let json = JSON.stringify({
-    'suit': card.suit.description.toLowerCase(),
-    'rank': card.rank.description.toLowerCase()
+    'suit': card.suit,
+    'rank': card.rank
   });
   let request = new Request(`/games/${id}/trick`, {
     method: 'POST',
@@ -146,20 +139,15 @@ Client.prototype.listen = function() {
 
   source.addEventListener('joined', (event) => {
     let json = JSON.parse(event.data);
-    let player = Player.fromProps(json);
-    stream.onjoined(player);
+    stream.onjoined(json);
   });
   source.addEventListener('turn', (event) => {
     let json = JSON.parse(event.data);
-    let player = Player.fromProps(json.player);
-    let phase = json.phase;
-    stream.onturn(player, phase);
+    stream.onturn(json.player, json.phase);
   });
   source.addEventListener('played', (event) => {
     let json = JSON.parse(event.data);
-    let player = Player.fromProps(json.player);
-    let card = Card.fromProps(json.card);
-    stream.onplayed(player, card);
+    stream.onplayed(json.player, json.card);
   });
 
   return stream;

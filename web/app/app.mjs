@@ -1,6 +1,5 @@
 
 import { Client } from './client.mjs';
-import { Player } from './player.mjs';
 import * as Views from './views.mjs';
 
 addEventListener('load', async () => {
@@ -19,9 +18,7 @@ addEventListener('load', async () => {
   views.trick.appendTo(document.body);
 
   let client = await Client.forGame(id);
-
-  let self = new Player(name);
-  await client.join(self);
+  let self = await client.join(name);
 
   views.cards.onclick = (card) => {
     client.play(card);

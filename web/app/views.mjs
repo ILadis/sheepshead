@@ -35,7 +35,7 @@ Players.prototype.show = function(player) {
   let nodes = this.view.children;
   let li = nodes[player.index - 1];
   if (li !== undefined) {
-    li.textContent = `${player.name} (${player.points}P.)`;
+    li.textContent = `${player.name}`;
   }
 };
 
@@ -63,7 +63,7 @@ Cards.prototype.show = function(cards) {
   for (let card of cards) {
     let button = document.createElement('button');
     button.onclick = () => this.onclick(card);
-    button.textContent = card;
+    button.textContent = `${card.suit} ${card.rank}`;
 
     let li = document.createElement('li');
     li.appendChild(button);
@@ -86,7 +86,7 @@ Trick.prototype.show = function(cards) {
 
   for (let card of cards) {
     let li = document.createElement('li');
-    li.textContent = card;
+    li.textContent = `${card.suit} ${card.rank}`;
 
     ul.appendChild(li);
   }

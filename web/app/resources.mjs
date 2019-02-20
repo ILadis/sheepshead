@@ -12,8 +12,6 @@ for (let path of [
   filepath`./app.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,
-  filepath`./../../player.mjs`,
-  filepath`./../../card.mjs`
 ]) {
   let name = Path.basename(path);
   let mime = MediaType.fromFileExt(path);

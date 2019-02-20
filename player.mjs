@@ -26,14 +26,6 @@ Player.withName = function(name) {
   }
 };
 
-Player.fromProps = function(props) {
-  let { name, points, index } = props;
-  let player = Player.withName(name);
-  player.points = points;
-  player.index = index;
-  return player;
-};
-
 Player.sequence = function(group, from) {
   let start = from ? group.indexOf(from) : 0;
 

@@ -5,11 +5,11 @@ export function State(game) {
 
 State.prototype.toJSON = function() {
   let id = this.game.id;
-  let phase = this.game.phase;
-  let state = phase ? phase.name : undefined;
+  let state = this.game.phase;
+  let phase = state ? state.name : undefined;
   let player = this.game.actor;
   let actor = player ? new Player(player) : undefined;
-  return { id, state, actor };
+  return { id, phase, actor };
 };
 
 export function Play(player, card) {
@@ -43,9 +43,8 @@ Player.prototype.toJSON = function() {
   let token = this.token;
   let name = this.player.name;
   let index = this.player.index;
-  let points = this.player.points;
   let cards = this.player.cards.size;
-  return { token, index, name, points, cards };
+  return { token, index, name, cards };
 };
 
 export function Card(card) {

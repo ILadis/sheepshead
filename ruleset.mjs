@@ -21,7 +21,7 @@ Ruleset.forPlaying = function(game) {
     let lead = trick.lead();
 
     if (dominants.has(lead)) {
-      for (let [dominant] of dominants) {
+      for (let dominant of dominants) {
         if (actor.cards.has(dominant) && !dominants.has(card)) {
           return false;
         }
@@ -29,7 +29,7 @@ Ruleset.forPlaying = function(game) {
     }
 
     if (trumps.has(lead)) {
-      for (let [trump] of trumps) {
+      for (let trump of trumps) {
         if (actor.cards.has(trump) && !trumps.has(card)) {
           return false;
         }

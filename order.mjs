@@ -2,31 +2,27 @@
 import { Card, Ranks, Suits } from './card.mjs';
 
 export function Order() {
-  this.trumps = new Map();
-  this.dominants = new Map();
+  this.trumps = new Set();
+  this.dominants = new Set();
 }
 
 Order.prototype.dominate = function(suit) {
-  let value = 1;
-
   this.dominants.clear();
   for (let rank of Ranks) {
     let card = Card[suit][rank];
     if (!this.trumps.has(card)) {
-      this.dominants.set(card, value++);
+      this.dominants.add(card);
     }
   }
 };
 
 Order.prototype.promote = function(suits = [], ranks = []) {
-  let value = 1;
-
   this.trumps.clear();
   for (let suit of suits) {
     for (let rank of Ranks) {
       if (!ranks.includes(rank)) {
         let card = Card[suit][rank];
-        this.trumps.set(card, value++);
+        this.trumps.add(card);
       }
     }
   }
@@ -34,20 +30,28 @@ Order.prototype.promote = function(suits = [], ranks = []) {
   for (let rank of ranks) {
     for (let suit of Suits) {
       let card = Card[suit][rank];
-      this.trumps.set(card, value++);
+      this.trumps.add(card);
     }
   }
 };
 
 Order.prototype.valueOf = function(card) {
-  if (this.dominants.has(card)) {
-    return this.dominants.get(card);
+  let value = 1;
+
+  for (let dominant of this.dominants) {
+    if (dominant == card) {
+      return value;
+    }
+    value++;
   }
 
-  if (this.trumps.has(card)) {
-    return this.dominants.size + this.trumps.get(card);
+  for (let trump of this.trumps) {
+    if (trump == card) {
+      return value;
+    }
+    value++;
   }
 
-  return 0;
+  return 1;
 };
 

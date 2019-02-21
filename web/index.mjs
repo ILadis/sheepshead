@@ -1,7 +1,6 @@
 
 import { HttpServer } from './http-server.mjs'
 import { Resource } from './resource.mjs'
-import { MediaType } from './media-type.mjs'
 import * as Handlers from './handlers.mjs'
 
 import Api from './api/resources.mjs';

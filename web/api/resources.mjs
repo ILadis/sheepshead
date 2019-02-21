@@ -12,7 +12,6 @@ import * as Entities from './entities.mjs';
 import { Game } from '../../game.mjs';
 import { Card } from '../../card.mjs';
 import { Player } from '../../player.mjs';
-import { Contract } from '../../contract.mjs';
 import * as Phases from '../../phases.mjs';
 
 export const Games = Resource.create(

@@ -4,7 +4,7 @@ export function Card(suit, rank) {
   this.rank = rank;
 }
 
-Card.prototype.points = function(card) {
+Card.prototype.points = function() {
   switch (this.rank) {
     case Ranks.Ace:
       return 11;
@@ -22,7 +22,7 @@ Card.prototype.points = function(card) {
 };
 
 Card.prototype.toString = function() {
-  return `[${this.suit.description} ${this.rank.description}]`;
+  return `${this.suit.description} ${this.rank.description}`;
 };
 
 export const Suits = Object.freeze({

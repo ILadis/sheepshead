@@ -1,7 +1,7 @@
 
-import { HttpServer } from './http-server.mjs'
-import { Resource } from './resource.mjs'
-import * as Handlers from './handlers.mjs'
+import { HttpServer } from './http-server.mjs';
+import { Resource } from './resource.mjs';
+import * as Handlers from './handlers.mjs';
 
 import Api from './api/resources.mjs';
 import App from './app/resources.mjs';

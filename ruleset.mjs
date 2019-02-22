@@ -22,16 +22,16 @@ Ruleset.forPlaying = function(game) {
 
     if (dominants.has(lead)) {
       for (let dominant of dominants) {
-        if (actor.cards.has(dominant) && !dominants.has(card)) {
-          return false;
+        if (actor.cards.has(dominant)) {
+          return dominants.has(card);
         }
       }
     }
 
     if (trumps.has(lead)) {
       for (let trump of trumps) {
-        if (actor.cards.has(trump) && !trumps.has(card)) {
-          return false;
+        if (actor.cards.has(trump)) {
+          return trumps.has(card);
         }
       }
     }

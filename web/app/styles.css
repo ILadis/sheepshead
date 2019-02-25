@@ -9,16 +9,14 @@ html, body {
 }
 
 body {
+  font-family: sans-serif;
   background: #ececec;
-}
-
-.active {
-  font-weight: bold;
 }
 
 .card {
   width: 42pt;
   padding: 4.5pt;
+  color: #000;
   box-sizing: border-box;
   outline-style: none;
   border-style: solid;
@@ -26,7 +24,7 @@ body {
   border-color: #000;
   border-radius: 8pt;
   background-color: #fcfcfc;
-  box-shadow: 0 0 0pt 2pt #fcfcfc;
+  box-shadow: 0 0 0 2pt #fcfcfc;
   display: inline-block;
 }
 
@@ -62,25 +60,44 @@ body {
 .card[data-suit=leaf]:after { background-image: url('leaf.svg'); }
 .card[data-suit=acorn]:after { background-image: url('acorn.svg'); }
 
+.active {
+  font-weight: bold;
+}
+
 .trick {
   position: fixed;
-  width: max-content;
-  height: max-content;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
+  top: 45%;
+  text-align: center;
 }
 
 .hand {
   position: fixed;
-  width: max-content;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
+  width: 100%;
   bottom: 0;
+  text-align: center;
 }
 .hand > *:first-child { margin-left: 0; }
 .hand > * { margin-left: -12pt; }
+
+.toast {
+  position: fixed;
+  width: 100%;
+  top: 30%;
+  opacity: 0;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+
+.toast > * {
+  padding: 8pt 24pt;
+  border-style: solid;
+  border-width: 1pt;
+  border-color: #a8a8a8;
+  border-radius: 2pt;
+  background-color: #fff;
+  box-shadow: 0 2pt 6pt 1pt #bfbfbf;
+  display: inline;
+}
+
 

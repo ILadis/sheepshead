@@ -135,7 +135,9 @@ Client.prototype.listen = function() {
   stream.close = source.close.bind(source);
   stream.onjoined =
   stream.onturn =
-  stream.onplayed = (...args) => {};
+  stream.onplayed =
+  stream.oncompleted =
+  stream.onfinished = (...args) => {};
 
   source.addEventListener('joined', (event) => {
     let json = JSON.parse(event.data);
@@ -148,6 +150,14 @@ Client.prototype.listen = function() {
   source.addEventListener('played', (event) => {
     let json = JSON.parse(event.data);
     stream.onplayed(json.player, json.card);
+  });
+  source.addEventListener('completed', (event) => {
+    let json = JSON.parse(event.data);
+    stream.oncompleted(json.winner, json.points);
+  });
+  source.addEventListener('finished', (event) => {
+    let json = JSON.parse(event.data);
+    stream.onfinished(json.winner, json.loser);
   });
 
   return stream;

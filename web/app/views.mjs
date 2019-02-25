@@ -31,7 +31,7 @@ export const Players = View.create(html`
   <li></li>
 </ul>`);
 
-Players.prototype.show = function(player) {
+Players.prototype.setPlayer = function(player) {
   let nodes = this.view.children;
   let li = nodes[player.index - 1];
   if (li !== undefined) {
@@ -40,9 +40,9 @@ Players.prototype.show = function(player) {
 };
 
 Players.prototype.setActive = function(index) {
-  let nodes = this.view.children;
-  for (let i = 1; i <= nodes.length; i++) {
-    let li = nodes[i - 1];
+  let nodes = this.view.children; index--;
+  for (let i = 0; i < nodes.length; i++) {
+    let li = nodes[i];
     li.classList.remove('active');
 
     if (i == index) {
@@ -77,19 +77,44 @@ Hand.prototype.onclick = function() {
 export const Trick = View.create(html`
 <div class="trick"></div>`);
 
-Trick.prototype.setCards = function(cards) {
+Trick.prototype.addCard = function(card) {
   let div = this.view;
-  while (div.firstChild) {
-    div.removeChild(div.firstChild);
+
+  if (div.childElementCount >= 4) {
+    while (div.firstChild) {
+      div.removeChild(div.firstChild);
+    }
   }
 
-  for (let card of cards) {
-    let hr = document.createElement('hr');
-    hr.className = 'card';
-    hr.dataset.suit = card.suit;
-    hr.dataset.rank = card.rank;
+  let hr = document.createElement('hr');
+  hr.className = 'card';
+  hr.dataset.suit = card.suit;
+  hr.dataset.rank = card.rank;
 
-    div.appendChild(hr);
-  }
+  div.appendChild(hr);
+};
+
+export const Toast = View.create(html`
+<div class="toast">
+  <span></span>
+</div>`);
+
+Toast.prototype.showText = function(text, duration = 5000) {
+  let span = this.view.children[0];
+  span.textContent = text;
+
+  let div = this.view;
+  div.style.opacity = 1;
+
+  let dismiss = this.dismiss.bind(this);
+  this.timeout = setTimeout(dismiss, duration);
+};
+
+Toast.prototype.dismiss = function() {
+  clearTimeout(this.timeout);
+  this.timeout = null;
+
+  let div = this.view;
+  div.style.opacity = 0;
 };
 

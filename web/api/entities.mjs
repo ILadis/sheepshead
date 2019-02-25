@@ -34,6 +34,17 @@ Turn.prototype.toJSON = function() {
   return { player, phase };
 };
 
+export function Result(result) {
+  this.result = result;
+};
+
+Result.prototype.toJSON = function() {
+  let owner = Array.from(this.result.players);
+  let players = owner.map(p => new Player(p));
+  let points = this.result.points;
+  return { players, points };
+};
+
 export function Player(player, token) {
   this.player = player;
   this.token = token;

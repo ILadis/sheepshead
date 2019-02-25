@@ -10,9 +10,11 @@ addEventListener('load', async () => {
   let views = {
     players: new Views.Players(),
     hand: new Views.Hand(),
-    trick: new Views.Trick()
+    trick: new Views.Trick(),
+    toast: new Views.Toast()
   };
 
+  views.toast.appendTo(document.body);
   views.players.appendTo(document.body);
   views.trick.appendTo(document.body);
   views.hand.appendTo(document.body);
@@ -26,11 +28,11 @@ addEventListener('load', async () => {
 
   let stream = client.listen();
   stream.onjoined = (player) => {
-    views.players.show(player);
+    views.players.setPlayer(player);
   };
 
   stream.onturn = async (player, phase) => {
-    views.players.show(player);
+    views.players.setPlayer(player);
     views.players.setActive(player.index);
 
     let cards = await client.cards();
@@ -38,8 +40,17 @@ addEventListener('load', async () => {
   };
 
   stream.onplayed = async (player, card) => {
-    let cards = await client.trick();
-    views.trick.setCards(cards);
+    views.trick.addCard(card);
+  };
+
+  stream.oncompleted = (winner, points) => {
+    views.toast.showText(`${winner.name} wins +${points}`);
+  };
+
+  stream.onfinished = (winner, loser) => {
+    let names = winner.players.map(p => p.name).join(' and ');
+    let points = winner.points;
+    views.toast.showText(`${names} won with ${points} Points`);
   };
 });
 

@@ -51,44 +51,45 @@ Players.prototype.setActive = function(index) {
   }
 };
 
-export const Cards = View.create(html`
-<ul></ul>`);
+export const Hand = View.create(html`
+<div class="hand"></div>`);
 
-Cards.prototype.show = function(cards) {
-  let ul = this.view;
-  while (ul.firstChild) {
-    ul.removeChild(ul.firstChild);
+Hand.prototype.setCards = function(cards) {
+  let div = this.view;
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
   }
 
   for (let card of cards) {
     let button = document.createElement('button');
+    button.className = 'card';
+    button.dataset.suit = card.suit;
+    button.dataset.rank = card.rank;
     button.onclick = () => this.onclick(card);
-    button.textContent = `${card.suit} ${card.rank}`;
 
-    let li = document.createElement('li');
-    li.appendChild(button);
-
-    ul.appendChild(li);
+    div.appendChild(button);
   }
 };
 
-Cards.prototype.onclick = function() {
+Hand.prototype.onclick = function() {
 };
 
 export const Trick = View.create(html`
-<ul></ul>`);
+<div class="trick"></div>`);
 
-Trick.prototype.show = function(cards) {
-  let ul = this.view;
-  while (ul.firstChild) {
-    ul.removeChild(ul.firstChild);
+Trick.prototype.setCards = function(cards) {
+  let div = this.view;
+  while (div.firstChild) {
+    div.removeChild(div.firstChild);
   }
 
   for (let card of cards) {
-    let li = document.createElement('li');
-    li.textContent = `${card.suit} ${card.rank}`;
+    let hr = document.createElement('hr');
+    hr.className = 'card';
+    hr.dataset.suit = card.suit;
+    hr.dataset.rank = card.rank;
 
-    ul.appendChild(li);
+    div.appendChild(hr);
   }
 };
 

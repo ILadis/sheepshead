@@ -9,6 +9,10 @@ const Resources = Object.create(null);
 for (let path of [
   filepath`./index.html`,
   filepath`./styles.css`,
+  filepath`./bell.svg`,
+  filepath`./heart.svg`,
+  filepath`./leaf.svg`,
+  filepath`./acorn.svg`,
   filepath`./app.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,

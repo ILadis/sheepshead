@@ -9,18 +9,18 @@ addEventListener('load', async () => {
 
   let views = {
     players: new Views.Players(),
-    cards: new Views.Cards(),
+    hand: new Views.Hand(),
     trick: new Views.Trick()
   };
 
   views.players.appendTo(document.body);
-  views.cards.appendTo(document.body);
   views.trick.appendTo(document.body);
+  views.hand.appendTo(document.body);
 
   let client = await Client.forGame(id);
   let self = await client.join(name);
 
-  views.cards.onclick = (card) => {
+  views.hand.onclick = (card) => {
     client.play(card);
   };
 
@@ -34,12 +34,12 @@ addEventListener('load', async () => {
     views.players.setActive(player.index);
 
     let cards = await client.cards();
-    views.cards.show(cards);
+    views.hand.setCards(cards);
   };
 
   stream.onplayed = async (player, card) => {
     let cards = await client.trick();
-    views.trick.show(cards);
+    views.trick.setCards(cards);
   };
 });
 

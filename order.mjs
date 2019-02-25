@@ -52,6 +52,6 @@ Order.prototype.valueOf = function(card) {
     value++;
   }
 
-  return 1;
+  return 0;
 };
 

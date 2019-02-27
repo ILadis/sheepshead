@@ -28,8 +28,19 @@ body {
   display: inline-block;
 }
 
+.card:not([data-rank]):not([data-suit]) {
+  background-image: url(back.svg);
+  background-size: 6pt;
+  background-position: center;
+}
+
+.card:not([data-rank]):not([data-suit]):after,
+.card:not([data-rank]):not([data-suit]):before {
+  visibility: hidden;
+}
+
 .card:before {
-  content: '';
+  content: '\00a0';
   font-family: serif;
   font-size: 22pt;
   font-weight: 700;

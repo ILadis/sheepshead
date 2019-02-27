@@ -26,7 +26,7 @@ Client.forGame = async function(id) {
   return new Client(id);
 };
 
-Client.prototype.join = async function(name) {
+Client.prototype.joinGame = async function(name) {
   let id = this.id;
   var json = JSON.stringify({
     'name': name
@@ -50,7 +50,7 @@ Client.prototype.join = async function(name) {
   return json;
 };
 
-Client.prototype.players = async function(index) {
+Client.prototype.fetchPlayers = async function(index) {
   let id = this.id;
   let query = index ? `?index=${index}` : '';
   let request = new Request(`/games/${id}/players${query}`, {
@@ -67,7 +67,7 @@ Client.prototype.players = async function(index) {
   return json;
 };
 
-Client.prototype.cards = async function() {
+Client.prototype.fetchCards = async function() {
   let id = this.id;
   let token = this.token;
   let request = new Request(`/games/${id}/cards`, {
@@ -87,7 +87,7 @@ Client.prototype.cards = async function() {
   return json;
 };
 
-Client.prototype.trick = async function() {
+Client.prototype.fetchTrick = async function() {
   let id = this.id;
   let request = new Request(`/games/${id}/trick`, {
     method: 'GET',
@@ -103,7 +103,7 @@ Client.prototype.trick = async function() {
   return json;
 };
 
-Client.prototype.play = async function(card) {
+Client.prototype.playCard = async function(card) {
   let id = this.id;
   let token = this.token;
   let json = JSON.stringify({
@@ -127,7 +127,7 @@ Client.prototype.play = async function(card) {
   return true;
 };
 
-Client.prototype.listen = function() {
+Client.prototype.listenStream = function() {
   let id = this.id;
   let source = new EventSource(`/games/${id}/events?offset=1`);
 

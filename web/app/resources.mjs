@@ -13,6 +13,7 @@ for (let path of [
   filepath`./heart.svg`,
   filepath`./leaf.svg`,
   filepath`./acorn.svg`,
+  filepath`./back.svg`,
   filepath`./app.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,

@@ -20,13 +20,13 @@ addEventListener('load', async () => {
   views.hand.appendTo(document.body);
 
   let client = await Client.forGame(id);
-  let self = await client.join(name);
+  let self = await client.joinGame(name);
 
   views.hand.onclick = (card) => {
-    client.play(card);
+    client.playCard(card);
   };
 
-  let stream = client.listen();
+  let stream = client.listenStream();
   stream.onjoined = (player) => {
     views.players.setPlayer(player);
   };
@@ -35,7 +35,7 @@ addEventListener('load', async () => {
     views.players.setPlayer(player);
     views.players.setActive(player.index);
 
-    let cards = await client.cards();
+    let cards = await client.fetchCards();
     views.hand.setCards(cards);
   };
 
@@ -48,9 +48,9 @@ addEventListener('load', async () => {
   };
 
   stream.onfinished = (winner, loser) => {
-    let names = winner.players.map(p => p.name).join(' and ');
-    let points = winner.points;
-    views.toast.showText(`${names} won with ${points} Points`);
+    let { players, points } = winner;
+    let names = players.map(p => p.name).join(' and ');
+    views.toast.showText(`${names} won with ${points} points`);
   };
 });
 

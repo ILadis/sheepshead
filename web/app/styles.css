@@ -71,10 +71,6 @@ body {
 .card[data-suit=leaf]:after { background-image: url('leaf.svg'); }
 .card[data-suit=acorn]:after { background-image: url('acorn.svg'); }
 
-.active {
-  font-weight: bold;
-}
-
 .trick {
   position: fixed;
   width: 100%;
@@ -84,12 +80,49 @@ body {
 
 .hand {
   position: fixed;
-  width: 100%;
-  bottom: 0;
-  text-align: center;
+  white-space: nowrap;
 }
-.hand > *:first-child { margin-left: 0; }
-.hand > * { margin-left: -12pt; }
+.hand .card:first-of-type { margin-left: 0; }
+.hand .card { margin-left: -12pt; }
+
+.hand span {
+  position: absolute;
+  top: -18pt;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.hand span.active {
+  font-weight: 700;
+}
+
+.hand.top {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%) rotateZ(180deg);
+  margin-top: -18pt;
+}
+
+.hand.bottom {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) rotateZ(0deg);
+  margin-bottom: 8pt;
+}
+
+.hand.left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%) translateX(-50%) rotateZ(90deg) translateY(-50%);
+  margin-left: -18pt;
+}
+
+.hand.right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%) translateX(50%) rotateZ(-90deg) translateY(-50%);
+  margin-right: -18pt;
+}
 
 .toast {
   position: fixed;
@@ -102,13 +135,14 @@ body {
 
 .toast > * {
   padding: 8pt 24pt;
+  max-width: 80%;
   border-style: solid;
   border-width: 1pt;
   border-color: #a8a8a8;
   border-radius: 2pt;
   background-color: #fff;
   box-shadow: 0 2pt 6pt 1pt #bfbfbf;
-  display: inline;
+  display: inline-block;
 }
 
 

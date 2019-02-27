@@ -7,50 +7,77 @@ addEventListener('load', async () => {
   let id = Number(params.get('id') || 'NaN');
   let name = String(params.get('name') || 'Player');
 
-  let views = {
-    players: new Views.Players(),
-    hand: new Views.Hand(),
-    trick: new Views.Trick(),
-    toast: new Views.Toast()
-  };
+  let toast = new Views.Toast();
+  let trick = new Views.Trick();
+  let hand = new Views.Hand();
+  let left = new Views.Hand('left');
+  let right = new Views.Hand('right');
+  let top = new Views.Hand('top');
+  let hands = { top, left, right, bottom: hand };
 
-  views.toast.appendTo(document.body);
-  views.players.appendTo(document.body);
-  views.trick.appendTo(document.body);
-  views.hand.appendTo(document.body);
+  toast.appendTo(document.body);
+  trick.appendTo(document.body);
+  hand.appendTo(document.body);
+  left.appendTo(document.body);
+  right.appendTo(document.body);
+  top.appendTo(document.body);
 
   let client = await Client.forGame(id);
   let self = await client.joinGame(name);
 
-  views.hand.onclick = (card) => {
+  self.positionOf = function(other) {
+    let index = this.index;
+    for (let position of ['left', 'top', 'right']) {
+      if ((++index % 4 || 4) === other.index) {
+        return position;
+      }
+    }
+    return 'bottom';
+  };
+
+  hand.onclick = (card) => {
     client.playCard(card);
   };
 
   let stream = client.listenStream();
   stream.onjoined = (player) => {
-    views.players.setPlayer(player);
+    let name = player.name;
+    toast.showText(`${name} joined the game`);
+
+    let position = self.positionOf(player);
+    hands[position].setPlayer(player);
   };
 
   stream.onturn = async (player, phase) => {
-    views.players.setPlayer(player);
-    views.players.setActive(player.index);
+    let name = player.name;
+    toast.showText(`It's ${name} turn`);
+
+    let active = self.positionOf(player);
+    for (let position in hands) {
+      hands[position].setActive(active == position);
+    }
 
     let cards = await client.fetchCards();
-    views.hand.setCards(cards);
+    hand.setCards(cards);
+    hand.setPlayer(self);
   };
 
   stream.onplayed = async (player, card) => {
-    views.trick.addCard(card);
+    trick.addCard(card);
+
+    let position = self.positionOf(player);
+    hands[position].setCards(player.cards);
+    hands[position].setPlayer(player);
   };
 
   stream.oncompleted = (winner, points) => {
-    views.toast.showText(`${winner.name} wins +${points}`);
+    toast.showText(`${winner.name} wins +${points}`);
   };
 
   stream.onfinished = (winner, loser) => {
     let { players, points } = winner;
     let names = players.map(p => p.name).join(' and ');
-    views.toast.showText(`${names} won with ${points} points`);
+    toast.showText(`${names} won with ${points} points`);
   };
 });
 

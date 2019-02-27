@@ -14,6 +14,12 @@ View.create = function(template) {
   return view;
 };
 
+View.tillEvent = function(element, type) {
+  return new Promise(resolve => {
+    element.addEventListener(type, resolve, { once: true });
+  });
+};
+
 View.prototype.postConstruct = function() {
 };
 
@@ -51,11 +57,15 @@ Hand.prototype.setActive = function(active) {
   }
 };
 
-Hand.prototype.setCards = function(cards) {
+Hand.prototype.clearCards = function() {
   let buttons = this.view.querySelectorAll('button');
   for (let i = 0; i < buttons.length; i++) {
     this.view.removeChild(buttons[i]);
   }
+};
+
+Hand.prototype.setCards = function(cards) {
+  this.clearCards();
 
   if (!Array.isArray(cards)) {
     cards = new Array(cards);
@@ -64,11 +74,12 @@ Hand.prototype.setCards = function(cards) {
   for (let card of cards) {
     let button = document.createElement('button');
     button.className = 'card';
+    button.onclick = this.onclick.bind(this, card);
+
     if (card && card.suit && card.rank) {
       button.dataset.suit = card.suit;
       button.dataset.rank = card.rank;
     }
-    button.onclick = () => this.onclick(card);
 
     this.view.appendChild(button);
   }
@@ -120,18 +131,19 @@ Toast.prototype.makeText = function(text, duration = 2000) {
   this.show();
 };
 
-Toast.prototype.show = function() {
+Toast.prototype.show = async function() {
   let next = this.queue[0];
   if (!next) {
     return;
   }
 
-  let span = this.view.children[0];
+  let span = this.view.querySelector('span');
   span.textContent = next.text;
 
   let div = this.view;
   div.style.opacity = 1;
 
+  // TODO not working with chrome
   div.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);

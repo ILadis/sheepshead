@@ -42,7 +42,7 @@ addEventListener('load', async () => {
   let stream = client.listenStream();
   stream.onjoined = (player) => {
     let name = player.name;
-    toast.showText(`${name} joined the game`);
+    toast.makeText(`${name} joined the game`);
 
     let position = self.positionOf(player);
     hands[position].setPlayer(player);
@@ -50,7 +50,7 @@ addEventListener('load', async () => {
 
   stream.onturn = async (player, phase) => {
     let name = player.name;
-    toast.showText(`It's ${name} turn`);
+    toast.makeText(`It's ${name} turn`);
 
     let active = self.positionOf(player);
     for (let position in hands) {
@@ -71,13 +71,13 @@ addEventListener('load', async () => {
   };
 
   stream.oncompleted = (winner, points) => {
-    toast.showText(`${winner.name} wins +${points}`);
+    toast.makeText(`${winner.name} wins +${points}`);
   };
 
   stream.onfinished = (winner, loser) => {
     let { players, points } = winner;
     let names = players.map(p => p.name).join(' and ');
-    toast.showText(`${names} won with ${points} points`);
+    toast.makeText(`${names} won with ${points} points`, 5000);
   };
 });
 

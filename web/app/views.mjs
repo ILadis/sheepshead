@@ -107,17 +107,35 @@ export const Toast = View.create(html`
   <span></span>
 </div>`);
 
-Toast.prototype.showText = function(text, duration = 2000) {
-  this.dismiss();
+Toast.prototype.postConstruct = function() {
+  this.queue = new Array();
+};
+
+Toast.prototype.makeText = function(text, duration = 2000) {
+  this.queue.push({ text, duration });
+  if (this.queue.length > 1) {
+    return;
+  }
+
+  this.show();
+};
+
+Toast.prototype.show = function() {
+  let next = this.queue[0];
+  if (!next) {
+    return;
+  }
 
   let span = this.view.children[0];
-  span.textContent = text;
+  span.textContent = next.text;
 
   let div = this.view;
   div.style.opacity = 1;
 
-  let dismiss = this.dismiss.bind(this);
-  this.timeout = setTimeout(dismiss, duration);
+  div.ontransitionend = () => {
+    let dismiss = this.dismiss.bind(this);
+    this.timeout = setTimeout(dismiss, next.duration);
+  };
 };
 
 Toast.prototype.dismiss = function() {
@@ -126,5 +144,10 @@ Toast.prototype.dismiss = function() {
 
   let div = this.view;
   div.style.opacity = 0;
+
+  div.ontransitionend = () => {
+    this.queue.shift();
+    this.show();
+  };
 };
 

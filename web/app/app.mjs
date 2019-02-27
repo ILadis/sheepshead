@@ -49,8 +49,12 @@ addEventListener('load', async () => {
   };
 
   stream.onturn = async (player, phase) => {
+    if (phase != 'playing') {
+      return;
+    }
+
     let name = player.name;
-    toast.makeText(`It's ${name} turn`);
+    toast.makeText(`It's ${name}'s turn`);
 
     let active = self.positionOf(player);
     for (let position in hands) {

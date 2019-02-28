@@ -149,6 +149,9 @@ Cards.prototype['GET'] = Handlers.chain(
   let { game, player } = request;
   let cards = Array.from(player.cards);
 
+  let order = game.contract.order;
+  cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
+
   let entities = cards.map(c => new Entities.Card(c));
   let json = JSON.stringify(entities);
 

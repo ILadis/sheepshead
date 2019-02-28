@@ -55,3 +55,27 @@ Order.prototype.valueOf = function(card) {
   return 0;
 };
 
+Order.prototype.orderOf = function(card) {
+  let value = 1;
+
+  for (let suit of Suits) {
+    for (let rank of Ranks) {
+      let c = Card[suit][rank];
+      if (card == c && !this.trumps.has(c)) {
+        return value;
+      }
+      value++
+    }
+  }
+
+  for (let trump of this.trumps) {
+    if (trump == card) {
+      return value;
+    }
+    value++;
+  }
+
+  return 0;
+};
+
+

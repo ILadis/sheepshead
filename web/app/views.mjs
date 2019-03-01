@@ -131,7 +131,9 @@ Toast.prototype.makeText = function(text, duration = 2000) {
   this.show();
 };
 
-Toast.prototype.show = async function() {
+Toast.prototype.show = function() {
+  clearTimeout(this.timeout);
+
   let next = this.queue[0];
   if (!next) {
     return;
@@ -143,7 +145,6 @@ Toast.prototype.show = async function() {
   let div = this.view;
   div.style.opacity = 1;
 
-  // TODO not working with chrome
   div.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
@@ -152,7 +153,6 @@ Toast.prototype.show = async function() {
 
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
-  this.timeout = null;
 
   let div = this.view;
   div.style.opacity = 0;

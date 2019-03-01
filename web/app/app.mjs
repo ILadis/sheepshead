@@ -1,4 +1,5 @@
 
+import './polyfill.mjs';
 import { Client } from './client.mjs';
 import * as Views from './views.mjs';
 
@@ -54,7 +55,7 @@ addEventListener('load', async () => {
     }
 
     let name = player.name;
-    toast.makeText(`It's ${name}'s turn`);
+    toast.makeText(`It's ${name}'s turn`, 1000);
 
     let active = self.positionOf(player);
     for (let position in hands) {

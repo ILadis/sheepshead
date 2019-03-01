@@ -1,4 +1,5 @@
 
+import '../polyfill.mjs';
 import { HttpServer } from './http-server.mjs';
 import { Resource } from './resource.mjs';
 import * as Handlers from './handlers.mjs';

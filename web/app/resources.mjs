@@ -17,6 +17,7 @@ for (let path of [
   filepath`./app.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,
+  filepath`../../polyfill.mjs`,
 ]) {
   let name = Path.basename(path);
   let mime = MediaType.fromFileExt(path);

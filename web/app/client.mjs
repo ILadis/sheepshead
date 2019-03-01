@@ -132,6 +132,7 @@ Client.prototype.listenStream = function() {
   let source = new EventSource(`/games/${id}/events?offset=1`);
 
   let stream = Object.create(null);
+  stream.offset = 0;
   stream.close = source.close.bind(source);
   stream.onjoined =
   stream.onturn =
@@ -139,26 +140,20 @@ Client.prototype.listenStream = function() {
   stream.oncompleted =
   stream.onfinished = (...args) => {};
 
-  source.addEventListener('joined', (event) => {
-    let json = JSON.parse(event.data);
-    stream.onjoined(json);
-  });
-  source.addEventListener('turn', (event) => {
-    let json = JSON.parse(event.data);
-    stream.onturn(json.player, json.phase);
-  });
-  source.addEventListener('played', (event) => {
-    let json = JSON.parse(event.data);
-    stream.onplayed(json.player, json.card);
-  });
-  source.addEventListener('completed', (event) => {
-    let json = JSON.parse(event.data);
-    stream.oncompleted(json.winner, json.points);
-  });
-  source.addEventListener('finished', (event) => {
-    let json = JSON.parse(event.data);
-    stream.onfinished(json.winner, json.loser);
-  });
+  let handler = function(event) {
+    let id = Number.parseInt(event.lastEventId);
+    let data = JSON.parse(event.data);
+    if (id > stream.offset) {
+      stream.offset = id;
+      stream['on' + event.type](data);
+    }
+  };
+
+  source.addEventListener('joined', handler);
+  source.addEventListener('turn', handler);
+  source.addEventListener('played', handler);
+  source.addEventListener('completed', handler);
+  source.addEventListener('finished', handler);
 
   return stream;
 };

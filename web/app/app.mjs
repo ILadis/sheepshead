@@ -49,7 +49,7 @@ addEventListener('load', async () => {
     hands[position].setPlayer(player);
   };
 
-  stream.onturn = async (player, phase) => {
+  stream.onturn = async ({ player, phase }) => {
     if (phase != 'playing') {
       return;
     }
@@ -67,7 +67,7 @@ addEventListener('load', async () => {
     hand.setPlayer(self);
   };
 
-  stream.onplayed = async (player, card) => {
+  stream.onplayed = async ({ player, card }) => {
     trick.addCard(card);
 
     let position = self.positionOf(player);
@@ -75,11 +75,11 @@ addEventListener('load', async () => {
     hands[position].setPlayer(player);
   };
 
-  stream.oncompleted = (winner, points) => {
+  stream.oncompleted = ({ winner, points }) => {
     toast.makeText(`${winner.name} wins +${points}`);
   };
 
-  stream.onfinished = (winner, loser) => {
+  stream.onfinished = ({ winner, loser }) => {
     let { players, points } = winner;
     let names = players.map(p => p.name).join(' and ');
     toast.makeText(`${names} won with ${points} points`, 5000);

@@ -43,13 +43,17 @@ export async function dealing({ deck, sequence }) {
 }
 
 export async function auction({ players, sequence, phase }) {
-  let contract, highest = 0;
+  let rules = Ruleset.forBidding(this);
 
+  let contract, highest = 0;
   for (let player of sequence) {
     this.actor = player;
     await this.onturn(player, phase);
 
-    let bid = await this.onbid(player);
+    do {
+      var bid = await this.onbid(player, rules);
+    } while (bid && !rules.isValid(bid));
+
     if (!bid) {
       continue;
     }
@@ -58,11 +62,13 @@ export async function auction({ players, sequence, phase }) {
     if (value > highest) {
       contract = bid;
       highest = value;
+
+      await this.oncontested(player);
     }
   }
 
   this.contract = contract;
-  await this.onbidded(contract);
+  await this.onsettled(contract);
 
   return playing;
 }

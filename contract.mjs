@@ -1,5 +1,5 @@
 
-import { Suits, Ranks } from './card.mjs';
+import { Card, Suit, Rank } from './card.mjs';
 import { Order } from './order.mjs';
 
 export function Contract(value, order) {
@@ -12,9 +12,11 @@ Contract.prototype.assign = function(owner, partner = null) {
   this.partner = partner;
 };
 
-Contract.normal = function(player, partner) {
+Contract.normal = function(player, suit) {
+  let partner = Card[suit][Rank.ace];
+
   let order = new Order();
-  order.promote([Suits.Heart], [Ranks.Sergeant, Ranks.Officer]);
+  order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
 
   let contract = new Contract(1, order);
   contract.assign(player, partner);
@@ -24,7 +26,7 @@ Contract.normal = function(player, partner) {
 
 Contract.geier = function(player, suit) {
   let order = new Order();
-  order.promote(suit ? [suit] : [], [Ranks.Officer]);
+  order.promote(suit ? [suit] : [], [Rank.officer]);
 
   let contract = new Contract(2, order);
   contract.assign(player);
@@ -34,7 +36,7 @@ Contract.geier = function(player, suit) {
 
 Contract.wenz = function(player, suit) {
   let order = new Order();
-  order.promote(suit ? [suit] : [], [Ranks.Sergeant]);
+  order.promote(suit ? [suit] : [], [Rank.sergeant]);
 
   let contract = new Contract(3, order);
   contract.assign(player);
@@ -44,7 +46,7 @@ Contract.wenz = function(player, suit) {
 
 Contract.solo = function(player, suit) {
   let order = new Order();
-  order.promote([suit], [Ranks.Sergeant, Ranks.Officer]);
+  order.promote([suit], [Rank.sergeant, Rank.officer]);
 
   let contract = new Contract(4, order);
   contract.assign(player);

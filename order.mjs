@@ -1,5 +1,5 @@
 
-import { Card, Ranks, Suits } from './card.mjs';
+import { Card, Rank, Suit } from './card.mjs';
 
 export function Order() {
   this.trumps = new Set();
@@ -8,7 +8,7 @@ export function Order() {
 
 Order.prototype.dominate = function(suit) {
   this.dominants.clear();
-  for (let rank of Ranks) {
+  for (let rank of Rank) {
     let card = Card[suit][rank];
     if (!this.trumps.has(card)) {
       this.dominants.add(card);
@@ -19,7 +19,7 @@ Order.prototype.dominate = function(suit) {
 Order.prototype.promote = function(suits = [], ranks = []) {
   this.trumps.clear();
   for (let suit of suits) {
-    for (let rank of Ranks) {
+    for (let rank of Rank) {
       if (!ranks.includes(rank)) {
         let card = Card[suit][rank];
         this.trumps.add(card);
@@ -28,7 +28,7 @@ Order.prototype.promote = function(suits = [], ranks = []) {
   }
 
   for (let rank of ranks) {
-    for (let suit of Suits) {
+    for (let suit of Suit) {
       let card = Card[suit][rank];
       this.trumps.add(card);
     }
@@ -58,8 +58,8 @@ Order.prototype.valueOf = function(card) {
 Order.prototype.orderOf = function(card) {
   let value = 1;
 
-  for (let suit of Suits) {
-    for (let rank of Ranks) {
+  for (let suit of Suit) {
+    for (let rank of Rank) {
       let c = Card[suit][rank];
       if (card == c && !this.trumps.has(c)) {
         return value;

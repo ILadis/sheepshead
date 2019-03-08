@@ -6,74 +6,55 @@ export function Card(suit, rank) {
 
 Card.prototype.points = function() {
   switch (this.rank) {
-    case Ranks.Ace:
+    case Rank.ace:
       return 11;
-    case Ranks.Ten:
+    case Rank.ten:
       return 10;
-    case Ranks.King:
+    case Rank.king:
       return 4;
-    case Ranks.Officer:
+    case Rank.officer:
       return 3;
-    case Ranks.Sergeant:
+    case Rank.sergeant:
       return 2;
     default:
       return 0;
   }
 };
 
-Card.prototype.toString = function() {
-  return `${this.suit.description} ${this.rank.description}`;
+export const Suit = Object.create(null);
+Suit.bell = Symbol('Bell');
+Suit.heart = Symbol('Heart');
+Suit.leaf = Symbol('Leaf');
+Suit.acorn = Symbol('Acorn');
+
+Suit[Symbol.iterator] = function*() {
+  let values = Object.values(Suit);
+  for (let value of values) {
+    yield value;
+  }
 };
 
-export const Suits = Object.freeze({
-  Bell: Symbol('Bell'),
-  Heart: Symbol('Heart'),
-  Leaf: Symbol('Leaf'),
-  Acorn: Symbol('Acorn'),
+export const Rank = Object.create(null);
+Rank.seven = Symbol('Seven');
+Rank.eight = Symbol('Eight');
+Rank.nine = Symbol('Nine');
+Rank.sergeant = Symbol('Sergeant');
+Rank.officer = Symbol('Officer');
+Rank.king = Symbol('King');
+Rank.ten = Symbol('Ten');
+Rank.ace = Symbol('Ace');
 
-  [Symbol.iterator]: function*() {
-    let suits = Object.values(Suits);
-    for (let suit of suits) {
-      yield suit;
-    }
+Rank[Symbol.iterator] = function*() {
+  let values = Object.values(Rank);
+  for (let value of values) {
+    yield value;
   }
-});
+};
 
-export const Ranks = Object.freeze({
-  Seven: Symbol('Seven'),
-  Eight: Symbol('Eight'),
-  Nine: Symbol('Nine'),
-  Sergeant: Symbol('Sergeant'),
-  Officer: Symbol('Officer'),
-  King: Symbol('King'),
-  Ten: Symbol('Ten'),
-  Ace: Symbol('Ace'),
-
-  [Symbol.iterator]: function*() {
-    let ranks = Object.values(Ranks);
-    for (let rank of ranks) {
-      yield rank;
-    }
-  }
-});
-
-for (let suit of Suits) {
-  Card[suit] = new Object();
-  for (let rank of Ranks) {
+for (let suit of Suit) {
+  Card[suit] = Object.create(null);
+  for (let rank of Rank) {
     Card[suit][rank] = new Card(suit, rank);
   }
 }
-
-Card.byName = function(suit, rank) {
-  let valueOf = v => 
-    String(v).charAt(0).toUpperCase() +
-    String(v).slice(1).toLowerCase();
-
-  let s = Suits[valueOf(suit)];
-  let r = Ranks[valueOf(rank)];
-
-  if (Card[s] && Card[s][r]) {
-    return Card[s][r];
-  }
-};
 

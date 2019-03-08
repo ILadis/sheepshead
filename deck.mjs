@@ -1,13 +1,13 @@
 
-import { Card, Suits, Ranks } from './card.mjs';
+import { Card, Suit, Rank } from './card.mjs';
 
 export function Deck() {
   this.cards = new Array();
 }
 
 Deck.prototype.fill = function() {
-  for (let suit of Suits) {
-    for (let rank of Ranks) {
+  for (let suit of Suit) {
+    for (let rank of Rank) {
       let card = Card[suit][rank];
       this.cards.push(card);
     }

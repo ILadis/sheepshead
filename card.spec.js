@@ -1,173 +1,134 @@
 
 import Assert from 'assert';
-import { Card, Suits, Ranks } from './card.mjs';
+import { Card, Suit, Rank } from './card.mjs';
 
 describe('Card', () => {
-  it('should hold instances for all suits and ranks', () => {
-    for (let suit of Suits) {
-      for (let rank of Ranks) {
-        Assert.ok(Card[suit][rank] instanceof Card);
+  it('should hold instances for all Suit and Rank', () => {
+    for (let suit of Suit) {
+      for (let rank of Rank) {
+        Assert.ok(Card[suit][rank]);
       }
     }
   });
 
   describe('#points()', () => {
     it('should return 11 for any ace', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Ace];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.ace];
         let points = card.points();
         Assert.equal(points, 11);
       }
     });
 
     it('should return 10 for any ten', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Ten];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.ten];
         let points = card.points();
         Assert.equal(points, 10);
       }
     });
 
     it('should return 4 for any king', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.King];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.king];
         let points = card.points();
         Assert.equal(points, 4);
       }
     });
 
     it('should return 3 for any officer', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Officer];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.officer];
         let points = card.points();
         Assert.equal(points, 3);
       }
     });
 
     it('should return 2 for any sergeant', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Sergeant];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.sergeant];
         let points = card.points();
         Assert.equal(points, 2);
       }
     });
 
     it('should return 0 for any nine', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Nine];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.nine];
         let points = card.points();
         Assert.equal(points, 0);
       }
     });
 
     it('should return 0 for any eight', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Eight];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.eight];
         let points = card.points();
         Assert.equal(points, 0);
       }
     });
 
     it('should return 0 for any seven', () => {
-      for (let suit of Suits) {
-        let card = Card[suit][Ranks.Seven];
+      for (let suit of Suit) {
+        let card = Card[suit][Rank.seven];
         let points = card.points();
         Assert.equal(points, 0);
       }
     });
   });
-
-  describe('#byName()', () => {
-    it('should return card matching suit/rank name', () => {
-      var card = Card.byName('Leaf', 'Ace');
-      Assert.equal(card, Card[Suits.Leaf][Ranks.Ace]);
-
-      var card = Card.byName('Heart', 'Nine');
-      Assert.equal(card, Card[Suits.Heart][Ranks.Nine]);
-
-      var card = Card.byName('Acorn', 'Ten');
-      Assert.equal(card, Card[Suits.Acorn][Ranks.Ten]);
-    });
-
-    it('should return undefined for invalid suit name', () => {
-      let card = Card.byName('Spade', 'Ace');
-      Assert.equal(card, undefined);
-    });
-
-    it('should return undefined for invalid rank name', () => {
-      let card = Card.byName('Leaf', 'Queen');
-      Assert.equal(card, undefined);
-    });
-
-    it('should ignore case of suit name', () => {
-      let names = ['Leaf', 'leaf', 'lEAf', 'lEaF'];
-      for (let name of names) {
-        let card = Card.byName(name, 'Ace');
-        Assert.equal(card, Card[Suits.Leaf][Ranks.Ace]);
-      }
-    });
-
-    it('should ignore case of rank name', () => {
-      let names = ['Ace', 'aCE', 'ACE', 'acE', 'ace'];
-      for (let name of names) {
-        let card = Card.byName('Leaf', name);
-        Assert.equal(card, Card[Suits.Leaf][Ranks.Ace]);
-      }
-    });
-  });
 });
 
-describe('Suits', () => {
+describe('Suit', () => {
   it('should be iterable', () => {
-    Assert.ok(Suits[Symbol.iterator]);
+    Assert.ok(Suit[Symbol.iterator]);
   });
 
-  it('should hold symbols of all suits', () => {
-    Assert.equal(typeof Suits.Bell, 'symbol');
-    Assert.equal(typeof Suits.Heart, 'symbol');
-    Assert.equal(typeof Suits.Leaf, 'symbol');
-    Assert.equal(typeof Suits.Acorn, 'symbol');
+  it('should hold symbols of all Suit', () => {
+    Assert.equal(typeof Suit.bell, 'symbol');
+    Assert.equal(typeof Suit.heart, 'symbol');
+    Assert.equal(typeof Suit.leaf, 'symbol');
+    Assert.equal(typeof Suit.acorn, 'symbol');
   });
 
   describe('#iterator', () => {
-    it('should yield suits in natural order', () => {
-      let it = Suits[Symbol.iterator]();
-      Assert.equal(it.next().value, Suits.Bell);
-      Assert.equal(it.next().value, Suits.Heart);
-      Assert.equal(it.next().value, Suits.Leaf);
-      Assert.equal(it.next().value, Suits.Acorn);
+    it('should yield Suit in natural order', () => {
+      let it = Suit[Symbol.iterator]();
+      Assert.equal(it.next().value, Suit.bell);
+      Assert.equal(it.next().value, Suit.heart);
+      Assert.equal(it.next().value, Suit.leaf);
+      Assert.equal(it.next().value, Suit.acorn);
       Assert.ok(it.next().done);
     });
   });
 });
 
-describe('Ranks', () => {
+describe('Rank', () => {
   it('should be iterable', () => {
-    Assert.ok(Ranks[Symbol.iterator]);
+    Assert.ok(Rank[Symbol.iterator]);
   });
 
-  it('should hold symbols of all ranks', () => {
-    Assert.equal(typeof Ranks.Seven, 'symbol');
-    Assert.equal(typeof Ranks.Eight, 'symbol');
-    Assert.equal(typeof Ranks.Nine, 'symbol');
-    Assert.equal(typeof Ranks.Sergeant, 'symbol');
-    Assert.equal(typeof Ranks.Officer, 'symbol');
-    Assert.equal(typeof Ranks.King, 'symbol');
-    Assert.equal(typeof Ranks.Ten, 'symbol');
-    Assert.equal(typeof Ranks.Ace, 'symbol');
+  it('should hold symbols of all Rank', () => {
+    Assert.equal(typeof Rank.seven, 'symbol');
+    Assert.equal(typeof Rank.eight, 'symbol');
+    Assert.equal(typeof Rank.nine, 'symbol');
+    Assert.equal(typeof Rank.sergeant, 'symbol');
+    Assert.equal(typeof Rank.officer, 'symbol');
+    Assert.equal(typeof Rank.king, 'symbol');
+    Assert.equal(typeof Rank.ten, 'symbol');
+    Assert.equal(typeof Rank.ace, 'symbol');
   });
 
   describe('#iterator', () => {
-    it('should yield ranks in natural order', () => {
-      let it = Ranks[Symbol.iterator]();
-      Assert.equal(it.next().value, Ranks.Seven);
-      Assert.equal(it.next().value, Ranks.Eight);
-      Assert.equal(it.next().value, Ranks.Nine);
-      Assert.equal(it.next().value, Ranks.Sergeant);
-      Assert.equal(it.next().value, Ranks.Officer);
-      Assert.equal(it.next().value, Ranks.King);
-      Assert.equal(it.next().value, Ranks.Ten);
-      Assert.equal(it.next().value, Ranks.Ace);
+    it('should yield Rank in natural order', () => {
+      let it = Rank[Symbol.iterator]();
+      Assert.equal(it.next().value, Rank.seven);
+      Assert.equal(it.next().value, Rank.eight);
+      Assert.equal(it.next().value, Rank.nine);
+      Assert.equal(it.next().value, Rank.sergeant);
+      Assert.equal(it.next().value, Rank.officer);
+      Assert.equal(it.next().value, Rank.king);
+      Assert.equal(it.next().value, Rank.ten);
+      Assert.equal(it.next().value, Rank.ace);
       Assert.ok(it.next().done);
     });
   });

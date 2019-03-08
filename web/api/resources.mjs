@@ -10,8 +10,10 @@ import { DeferredInput } from './deferred-input.mjs';
 import * as Entities from './entities.mjs';
 
 import { Game } from '../../game.mjs';
-import { Card } from '../../card.mjs';
+import { Card, Suit, Rank } from '../../card.mjs';
 import { Player } from '../../player.mjs';
+import { Contract } from '../../contract.mjs';
+import { Order } from '../../order.mjs';
 import * as Phases from '../../phases.mjs';
 
 export const Games = Resource.create(
@@ -93,14 +95,16 @@ Players.prototype['POST'] = Handlers.chain(
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
   var { game, entity, registry } = request;
-  let { id, input, players } = game;
+  let id = game.id;
+  let input = game.input
 
-  let player = Player.withName(entity.name);
-  if (!player) {
+  let name = String(entity.name);
+  if (!name.length) {
     response.writeHead(422);
     return response.end();
   }
 
+  let player = new Player(name);
   let token = Token.generate();
   let index = player.index = input.args[0];
 
@@ -139,17 +143,18 @@ Players.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Cards = Resource.create(
+export const Hand = Resource.create(
   ['GET'], '^/games/(?<id>\\d+)/cards$');
 
-Cards.prototype['GET'] = Handlers.chain(
+Hand.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame(),
   PreFilters.requiresPlayer()
 ).then((request, response) => {
   let { game, player } = request;
+  let contract = game.contract;
   let cards = Array.from(player.cards);
 
-  let order = game.contract.order;
+  let order = contract ? contract.order : new Order();
   cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
 
   let entities = cards.map(c => new Entities.Card(c));
@@ -159,6 +164,51 @@ Cards.prototype['GET'] = Handlers.chain(
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
+  return response.end();
+});
+
+export const Auction = Resource.create(
+  ['POST'], '^/games/(?<id>\\d+)/auction$');
+
+Auction.prototype['POST'] = Handlers.chain(
+  PreFilters.requiresGame(Phases.auction),
+  PreFilters.requiresPlayer(),
+  PreFilters.requiresActor(),
+  PreFilters.requiresEntity(JSON)
+).then((request, response) => {
+  let { game, player, entity, url } = request;
+  let input = game.input;
+
+  let abstain = Boolean(url.query['abstain'] != undefined);
+  if (abstain) {
+    input.resolve();
+
+    response.writeHead(200);
+    return response.end();
+  }
+
+  let valueOf = (value) => String(value).toLowerCase();
+
+  let factory = Contract[valueOf(entity.name)];
+  let suit = Suit[valueOf(entity.suit)];
+
+  if(!factory) {
+    response.writeHead(422);
+    return response.end();
+  }
+
+  // TODO verify presence of suit, if required by contract
+
+  let contract = factory(player, suit);
+  let rules = input.args[1];
+  if (!rules.isValid(contract)) {
+    response.writeHead(400);
+    return response.end();
+  }
+
+  input.resolve(contract);
+
+  response.writeHead(200);
   return response.end();
 });
 
@@ -174,12 +224,17 @@ Trick.prototype['POST'] = Handlers.chain(
   let { game, player, entity } = request;
   let input = game.input;
 
-  let card = Card.byName(entity.suit, entity.rank);
-  if (!card) {
+  let valueOf = (value) => String(value).toLowerCase();
+
+  let rank = Rank[valueOf(entity.rank)];
+  let suit = Suit[valueOf(entity.suit)];
+
+  if (!suit || !rank) {
     response.writeHead(422);
     return response.end();
   }
 
+  let card = Card[suit][rank];
   let rules = input.args[2];
   if (!rules.isValid(card)) {
     response.writeHead(400);
@@ -215,5 +270,13 @@ Trick.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export default { Games, State, Events, Players, Cards, Trick };
+export default {
+  Games,
+  State,
+  Events,
+  Players,
+  Auction,
+  Hand,
+  Trick
+};
 

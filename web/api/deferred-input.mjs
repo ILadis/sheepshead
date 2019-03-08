@@ -1,5 +1,5 @@
 
-import { Player } from '../../player.mjs';
+import { Suit } from '../../card.mjs';
 import { Contract } from '../../contract.mjs';
 
 export function DeferredInput() {
@@ -8,12 +8,8 @@ export function DeferredInput() {
 
 DeferredInput.prototype.attach = function(game) {
   game.input = this;
-  game.onbid = async (player) => {
-    let partner = Player.across(game.players, player);
-    let contract = Contract.normal(player, partner);
-    return contract;
-  };
 
+  game.onbid =
   game.onjoin =
   game.onplay = (...args) => {
     return new Promise((resolve, reject) => {
@@ -23,7 +19,7 @@ DeferredInput.prototype.attach = function(game) {
   };
 
   game.onproceed = async (player) => {
-    return false;
+    return true;
   };
 };
 

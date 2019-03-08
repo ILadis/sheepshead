@@ -16,16 +16,6 @@ Player.prototype.give = function(cards) {
   }
 };
 
-Player.prototype.toString = function() {
-  return `${this.name}`;
-};
-
-Player.withName = function(name) {
-  if (typeof name === 'string' && name.length) {
-    return new Player(name);
-  }
-};
-
 Player.sequence = function(group, from) {
   let start = from ? group.indexOf(from) : 0;
 

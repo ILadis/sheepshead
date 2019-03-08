@@ -70,7 +70,7 @@ export async function auction({ players, sequence, phase }) {
   this.contract = contract;
   await this.onsettled(contract);
 
-  return playing;
+  return contract ? playing : proceed;
 }
 
 export async function playing({ contract, sequence, phase }) {

@@ -10,6 +10,8 @@ html, body {
 
 body {
   font-family: sans-serif;
+  font-size: 11pt;
+  color: #3c3c3c;
   background: #ececec;
 }
 
@@ -128,14 +130,18 @@ body {
   position: fixed;
   width: 100%;
   top: 30%;
-  opacity: 0;
   text-align: center;
+  outline-style: none;
+  border-style: none;
+  opacity: 0;
   transition: opacity 0.3s;
 }
 
-.toast > * {
+.toast:before {
+  content: attr(data-text);
   padding: 8pt 24pt;
   max-width: 80%;
+  color: #3c3c3c;
   border-style: solid;
   border-width: 1pt;
   border-color: #a8a8a8;

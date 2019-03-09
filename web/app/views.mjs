@@ -114,9 +114,7 @@ Trick.prototype.addCard = function(card) {
 };
 
 export const Toast = View.create(html`
-<div class="toast">
-  <span></span>
-</div>`);
+<hr class="toast">`);
 
 Toast.prototype.postConstruct = function() {
   this.queue = new Array();
@@ -139,13 +137,9 @@ Toast.prototype.show = function() {
     return;
   }
 
-  let span = this.view.querySelector('span');
-  span.textContent = next.text;
-
-  let div = this.view;
-  div.style.opacity = 1;
-
-  div.ontransitionend = () => {
+  this.view.dataset.text = next.text;
+  this.view.style.opacity = 1;
+  this.view.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
   };
@@ -154,10 +148,8 @@ Toast.prototype.show = function() {
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  let div = this.view;
-  div.style.opacity = 0;
-
-  div.ontransitionend = () => {
+  this.view.style.opacity = 0;
+  this.view.ontransitionend = () => {
     this.queue.shift();
     this.show();
   };

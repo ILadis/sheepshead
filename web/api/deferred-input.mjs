@@ -1,7 +1,4 @@
 
-import { Suit } from '../../card.mjs';
-import { Contract } from '../../contract.mjs';
-
 export function DeferredInput() {
   this.promise = null;
 }

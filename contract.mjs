@@ -24,9 +24,9 @@ Contract.normal = function(player, suit) {
   return contract;
 };
 
-Contract.geier = function(player, suit) {
+Contract.geier = function(player) {
   let order = new Order();
-  order.promote(suit ? [suit] : [], [Rank.officer]);
+  order.promote([], [Rank.officer]);
 
   let contract = new Contract(2, order);
   contract.assign(player);
@@ -34,9 +34,9 @@ Contract.geier = function(player, suit) {
   return contract;
 };
 
-Contract.wenz = function(player, suit) {
+Contract.wenz = function(player) {
   let order = new Order();
-  order.promote(suit ? [suit] : [], [Rank.sergeant]);
+  order.promote([], [Rank.sergeant]);
 
   let contract = new Contract(3, order);
   contract.assign(player);
@@ -52,5 +52,24 @@ Contract.solo = function(player, suit) {
   contract.assign(player);
 
   return contract;
+};
+
+Contract[Symbol.iterator] = function*() {
+  for (let label in Contract) {
+    let factory = Contract[label];
+
+    if (factory.length == 2) {
+      for (let suit of Suit) {
+        let contract = (player) => factory(player, suit);
+        contract.label = label;
+        contract.suit = suit;
+        yield contract;
+      }
+    } else {
+      let contract = (player) => factory(player);
+      contract.label = label;
+      yield contract;
+    }
+  }
 };
 

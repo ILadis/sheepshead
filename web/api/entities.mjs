@@ -5,11 +5,22 @@ export function State(game) {
 
 State.prototype.toJSON = function() {
   let id = this.game.id;
-  let state = this.game.phase;
-  let phase = state ? state.name : undefined;
-  let player = this.game.actor;
-  let actor = player ? new Player(player) : undefined;
+  let phase = this.game.phase;
+  phase = phase ? phase.name : undefined;
+  let actor = this.game.actor;
+  actor = actor ? new Player(actor) : undefined;
   return { id, phase, actor };
+};
+
+export function Contract(contract) {
+  this.contract = contract;
+}
+
+Contract.prototype.toJSON = function() {
+  let label = this.contract.label;
+  let suit = this.contract.suit;
+  suit = suit ? suit.description.toLowerCase() : undefined;
+  return { label, suit };
 };
 
 export function Play(player, card) {
@@ -39,8 +50,8 @@ export function Result(result) {
 };
 
 Result.prototype.toJSON = function() {
-  let owner = Array.from(this.result.players);
-  let players = owner.map(p => new Player(p));
+  let players = Array.from(this.result.players);
+  players = players.map(p => new Player(p));
   let points = this.result.points;
   return { players, points };
 };

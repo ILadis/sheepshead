@@ -167,6 +167,27 @@ Hand.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
+export const Contracts = Resource.create(
+  ['GET'], '^/games/(?<id>\\d+)/contracts');
+
+Contracts.prototype['GET'] = Handlers.chain(
+  PreFilters.requiresGame(),
+).then((request, response) => {
+  let entities = new Array();
+
+  for (let contract of Contract) {
+    entities.push(new Entities.Contract(contract));
+  }
+
+  let json = JSON.stringify(entities);
+
+  response.setHeader('Content-Type', MediaType.json);
+  response.setHeader('Content-Length', Buffer.byteLength(json));
+  response.writeHead(200);
+  response.write(json);
+  return response.end();
+});
+
 export const Auction = Resource.create(
   ['POST'], '^/games/(?<id>\\d+)/auction$');
 
@@ -176,20 +197,18 @@ Auction.prototype['POST'] = Handlers.chain(
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game, player, entity, url } = request;
+  let { game, player, entity } = request;
   let input = game.input;
 
-  let abstain = Boolean(url.query['abstain'] != undefined);
-  if (abstain) {
+  if (!entity.label && !entity.suit) {
     input.resolve();
-
     response.writeHead(200);
     return response.end();
   }
 
   let valueOf = (value) => String(value).toLowerCase();
 
-  let factory = Contract[valueOf(entity.name)];
+  let factory = Contract[valueOf(entity.label)];
   let suit = Suit[valueOf(entity.suit)];
 
   if(!factory) {
@@ -275,6 +294,7 @@ export default {
   State,
   Events,
   Players,
+  Contracts,
   Auction,
   Hand,
   Trick

@@ -74,7 +74,7 @@ Hand.prototype.setCards = function(cards) {
   for (let card of cards) {
     let button = document.createElement('button');
     button.className = 'card';
-    button.onclick = this.onclick.bind(this, card);
+    button.onclick = () => this.onclick(card);
 
     if (card && card.suit && card.rank) {
       button.dataset.suit = card.suit;
@@ -114,7 +114,7 @@ Trick.prototype.addCard = function(card) {
 };
 
 export const Toast = View.create(html`
-<hr class="toast">`);
+<div class="toast"></div>`);
 
 Toast.prototype.postConstruct = function() {
   this.queue = new Array();
@@ -153,5 +153,34 @@ Toast.prototype.dismiss = function() {
     this.queue.shift();
     this.show();
   };
+};
+
+export const Dialog = View.create(html`
+<div class="dialog">
+  <ul></ul>
+</div>`);
+
+Dialog.prototype.setTitle = function(title) {
+  this.view.dataset.title = title;
+};
+
+Dialog.prototype.addOption = function(label, data) {
+  let li = document.createElement('li');
+  li.textContent = label;
+  li.onclick = () => this.onclick(data);
+
+  let ul = this.view.querySelector('ul');
+  ul.appendChild(li);
+};
+
+Dialog.prototype.show = function() {
+  this.view.style.opacity = 1;
+};
+
+Dialog.prototype.dismiss = function() {
+  this.view.style.opacity = 0;
+};
+
+Dialog.prototype.onclick = function() {
 };
 

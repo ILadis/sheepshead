@@ -31,9 +31,10 @@ Client.prototype.joinGame = async function(name) {
   var json = JSON.stringify({
     'name': name
   });
+
   let request = new Request(`/games/${id}/players`, {
     method: 'POST',
-    body: `${json}`,
+    body: json,
     headers: {
       'Content-Type': 'application/json'
     }
@@ -50,9 +51,26 @@ Client.prototype.joinGame = async function(name) {
   return json;
 };
 
+Client.prototype.fetchContracts = async function() {
+  let id = this.id;
+  let request = new Request(`/games/${id}/contracts`, {
+    method: 'GET'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  let json = await response.json();
+
+  return json;
+};
+
 Client.prototype.fetchPlayers = async function(index) {
   let id = this.id;
   let query = index ? `?index=${index}` : '';
+
   let request = new Request(`/games/${id}/players${query}`, {
     method: 'GET'
   });
@@ -70,6 +88,7 @@ Client.prototype.fetchPlayers = async function(index) {
 Client.prototype.fetchCards = async function() {
   let id = this.id;
   let token = this.token;
+
   let request = new Request(`/games/${id}/cards`, {
     method: 'GET',
     headers: {
@@ -103,6 +122,35 @@ Client.prototype.fetchTrick = async function() {
   return json;
 };
 
+Client.prototype.bidContract = async function(contract) {
+  let id = this.id;
+  let token = this.token;
+  if (contract) {
+    var json = JSON.stringify({
+      'label': contract.label,
+      'suit': contract.suit
+    });
+  } else {
+    var json = '{}';
+  }
+
+  let request = new Request(`/games/${id}/auction`, {
+    method: 'POST',
+    body: json,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  return true;
+};
+
 Client.prototype.playCard = async function(card) {
   let id = this.id;
   let token = this.token;
@@ -110,9 +158,10 @@ Client.prototype.playCard = async function(card) {
     'suit': card.suit,
     'rank': card.rank
   });
+
   let request = new Request(`/games/${id}/trick`, {
     method: 'POST',
-    body: `${json}`,
+    body: json,
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`

@@ -151,4 +151,41 @@ body {
   display: inline-block;
 }
 
+.dialog {
+  position: fixed;
+  padding: 14pt 10pt 10pt 24pt;
+  top: 10%;
+  left: 50%;
+  min-width: 200pt;
+  border-style: solid;
+  border-width: 1pt;
+  border-color: #a8a8a8;
+  border-radius: 2pt;
+  background-color: #fff;
+  box-shadow: 0 2pt 6pt 1pt #bfbfbf;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.dialog:before {
+  content: attr(data-title);
+  font-size: 13pt;
+  display: block;
+}
+
+.dialog ul {
+  margin: 10pt 0 0 -14pt;
+  list-style: none;
+}
+
+.dialog ul li {
+  padding: 4pt 0 4pt 14pt;
+}
+
+.dialog ul li:hover {
+  background-color: #ececec;
+  transition: background-color: 0.6s;
+}
+
 

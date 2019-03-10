@@ -8,6 +8,7 @@ addEventListener('load', async () => {
   let id = Number(params.get('id') || 'NaN');
   let name = String(params.get('name') || 'Player');
 
+  let dialog = new Views.Dialog();
   let toast = new Views.Toast();
   let trick = new Views.Trick();
   let hand = new Views.Hand();
@@ -16,8 +17,9 @@ addEventListener('load', async () => {
   let top = new Views.Hand('top');
   let hands = { top, left, right, bottom: hand };
 
-  toast.appendTo(document.body);
   trick.appendTo(document.body);
+  dialog.appendTo(document.body);
+  toast.appendTo(document.body);
   hand.appendTo(document.body);
   left.appendTo(document.body);
   right.appendTo(document.body);
@@ -28,17 +30,35 @@ addEventListener('load', async () => {
 
   self.positionOf = function(other) {
     let index = this.index;
-    for (let position of ['left', 'top', 'right']) {
+    for (let position of ['left', 'top', 'right', 'bottom']) {
       if ((++index % 4 || 4) === other.index) {
         return position;
       }
     }
-    return 'bottom';
+  };
+  self.isSameAs = function(other) {
+    return this.index == other.index;
+  };
+
+  dialog.setTitle('Choose what to play');
+  dialog.addOption('skip');
+  dialog.onclick = async (contract) => {
+    try {
+      await client.bidContract(contract);
+      dialog.dismiss();
+    } catch { }
   };
 
   hand.onclick = (card) => {
     client.playCard(card);
   };
+
+  let contracts = await client.fetchContracts();
+  for (let contract of contracts) {
+    let { label, suit } = contract;
+    label += suit ? ` (${suit})` : '';
+    dialog.addOption(label, contract);
+  }
 
   let stream = client.listenStream();
   stream.onjoined = (player) => {
@@ -50,7 +70,7 @@ addEventListener('load', async () => {
   };
 
   stream.onturn = async ({ player, phase }) => {
-    if (phase != 'playing') {
+    if (phase == 'proceed') {
       return;
     }
 
@@ -65,6 +85,10 @@ addEventListener('load', async () => {
     let cards = await client.fetchCards();
     hand.setCards(cards);
     hand.setPlayer(self);
+
+    if (phase == 'auction' && self.isSameAs(player)) {
+      dialog.show();
+    }
   };
 
   stream.onplayed = async ({ player, card }) => {
@@ -81,8 +105,8 @@ addEventListener('load', async () => {
 
   stream.onfinished = ({ winner, loser }) => {
     let { players, points } = winner;
-    let names = players.map(p => p.name).join(' and ');
-    toast.makeText(`${names} won with ${points} points`, 5000);
+    players = players.map(p => p.name).join(' and ');
+    toast.makeText(`${players} won with ${points} points`, 5000);
   };
 });
 

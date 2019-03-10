@@ -111,7 +111,7 @@ export async function countup({ players, trick, contract }) {
   for (let [player, card] of trick.plays) {
     let value = contract.order.valueOf(card);
 
-    if (value >= highest) {
+    if (value > highest) {
       winner = player;
       highest = value;
     }
@@ -153,6 +153,8 @@ export async function proceed({ players, phase }) {
   for (let player of players) {
     this.actor = player;
     await this.onturn(player, phase);
+
+    player.cards.clear();
 
     proceed = await this.onproceed(player) && proceed;
   }

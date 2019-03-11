@@ -65,7 +65,9 @@ Contract[Symbol.iterator] = function*() {
         contract.suit = suit;
         yield contract;
       }
-    } else {
+    }
+
+    if (factory.length == 1) {
       let contract = (player) => factory(player);
       contract.label = label;
       yield contract;

@@ -175,8 +175,16 @@ Contracts.prototype['GET'] = Handlers.chain(
 ).then((request, response) => {
   let entities = new Array();
 
-  for (let contract of Contract) {
-    entities.push(new Entities.Contract(contract));
+  for (let [label, factory] of Contract) {
+    switch (factory.length) {
+    case 1:
+      entities.push(new Entities.Contract({ label }));
+      break;
+    case 2:
+      for (let suit of Suit) {
+        entities.push(new Entities.Contract({ label, suit }));
+      }
+    }
   }
 
   let json = JSON.stringify(entities);
@@ -211,12 +219,10 @@ Auction.prototype['POST'] = Handlers.chain(
   let factory = Contract[valueOf(entity.label)];
   let suit = Suit[valueOf(entity.suit)];
 
-  if(!factory) {
+  if(!factory || factory.length == 2 && !suit) {
     response.writeHead(422);
     return response.end();
   }
-
-  // TODO verify presence of suit, if required by contract
 
   let contract = factory(player, suit);
   let rules = input.args[1];

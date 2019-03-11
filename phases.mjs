@@ -123,7 +123,7 @@ export async function countup({ players, trick, contract }) {
   await this.oncompleted(trick, winner);
 
   return winner.cards.size > 0 ? playing : aftermath;
-};
+}
 
 export async function aftermath({ players, contract }) {
   let declarer = new Result();
@@ -131,15 +131,13 @@ export async function aftermath({ players, contract }) {
 
   for (let player of players) {
     switch (player) {
-      case contract.owner:
-      case contract.partner:
-        declarer.add(player);
-        break;
-      default:
-        defender.add(player);
-        break;
+    case contract.owner:
+    case contract.partner:
+      declarer.add(player);
+      break;
+    default:
+      defender.add(player);
     }
-    player.points = 0;
   }
 
   let { winner, loser } = Result.compare(declarer, defender);
@@ -151,20 +149,21 @@ export async function aftermath({ players, contract }) {
 export async function proceed({ players, phase }) {
   let proceed = true;
   for (let player of players) {
+    player.cards.clear();
+    player.points = 0;
+
     this.actor = player;
     await this.onturn(player, phase);
-
-    player.cards.clear();
 
     proceed = await this.onproceed(player) && proceed;
   }
 
   return proceed ? shuffle : cleanup;
-};
+}
 
 export async function cleanup() {
   this.contract =
   this.trick =
   this.actor = null;
-};
+}
 

@@ -70,24 +70,32 @@ addEventListener('load', async () => {
   };
 
   stream.onturn = async ({ player, phase }) => {
-    if (phase == 'proceed') {
-      return;
+    if (phase != 'proceed') {
+      let name = player.name;
+      toast.makeText(`It's ${name}'s turn`, 1000);
     }
-
-    let name = player.name;
-    toast.makeText(`It's ${name}'s turn`, 1000);
 
     let active = self.positionOf(player);
     for (let position in hands) {
       hands[position].setActive(active == position);
     }
 
+    if (!self.isSameAs(player)) {
+      hands[active].setCards(player.cards);
+    }
+
     let cards = await client.fetchCards();
     hand.setCards(cards);
-    hand.setPlayer(self);
 
     if (phase == 'auction' && self.isSameAs(player)) {
       dialog.show();
+    }
+  };
+
+  stream.oncontested = (player) => {
+    if (!self.isSameAs(player)) {
+      let name = player.name;
+      toast.makeText(`${name} wants to play`);
     }
   };
 

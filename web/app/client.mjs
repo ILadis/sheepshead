@@ -183,11 +183,6 @@ Client.prototype.listenStream = function() {
   let stream = Object.create(null);
   stream.offset = 0;
   stream.close = source.close.bind(source);
-  stream.onjoined =
-  stream.onturn =
-  stream.onplayed =
-  stream.oncompleted =
-  stream.onfinished = (...args) => {};
 
   let handler = function(event) {
     let id = Number.parseInt(event.lastEventId);
@@ -198,11 +193,17 @@ Client.prototype.listenStream = function() {
     }
   };
 
-  source.addEventListener('joined', handler);
-  source.addEventListener('turn', handler);
-  source.addEventListener('played', handler);
-  source.addEventListener('completed', handler);
-  source.addEventListener('finished', handler);
+  for (let event of [
+    'joined',
+    'turn',
+    'contested',
+    'played',
+    'completed',
+    'finished'
+  ]) {
+    stream['on' + event] = (...args) => {};
+    source.addEventListener(event, handler);
+  }
 
   return stream;
 };

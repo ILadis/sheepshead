@@ -139,6 +139,7 @@ Toast.prototype.show = function() {
 
   this.view.dataset.text = next.text;
   this.view.style.opacity = 1;
+  this.view.style.visibility = 'visible';
   this.view.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
@@ -150,6 +151,7 @@ Toast.prototype.dismiss = function() {
 
   this.view.style.opacity = 0;
   this.view.ontransitionend = () => {
+    this.view.style.visibility = 'hidden';
     this.queue.shift();
     this.show();
   };

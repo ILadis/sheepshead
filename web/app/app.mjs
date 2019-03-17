@@ -49,18 +49,18 @@ addEventListener('load', async () => {
     } catch { }
   };
 
+  let contracts = await client.fetchContracts();
+  for (let contract of contracts) {
+    let { name, suit } = contract;
+    let label = name + (suit ? ` (${suit})` : '');
+    dialog.addOption(label, contract);
+  }
+
   hand.onclick = (card) => {
     client.playCard(card);
   };
 
-  let contracts = await client.fetchContracts();
-  for (let contract of contracts) {
-    let { label, suit } = contract;
-    label += suit ? ` (${suit})` : '';
-    dialog.addOption(label, contract);
-  }
-
-  let stream = client.listenStream();
+  let stream = client.listenEvents();
   stream.onjoined = (player) => {
     let name = player.name;
     toast.makeText(`${name} joined the game`);
@@ -85,6 +85,7 @@ addEventListener('load', async () => {
     }
 
     let cards = await client.fetchCards();
+    hand.setPlayer(self);
     hand.setCards(cards);
 
     if (phase == 'auction' && self.isSameAs(player)) {

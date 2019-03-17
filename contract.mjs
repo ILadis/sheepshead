@@ -16,7 +16,7 @@ Contract.prototype.assign = function(owner, partner = null) {
   this.partner = partner;
 };
 
-Contract.normal = function(player, suit) {
+Contract.normal = function normal(player, suit) {
   let partner = Card[suit][Rank.ace];
 
   let order = new Order();
@@ -29,7 +29,7 @@ Contract.normal = function(player, suit) {
   return contract;
 };
 
-Contract.geier = function(player) {
+Contract.geier = function geier(player) {
   let order = new Order();
   order.promote([], [Rank.officer]);
 
@@ -40,7 +40,7 @@ Contract.geier = function(player) {
   return contract;
 };
 
-Contract.wenz = function(player) {
+Contract.wenz = function wenz(player) {
   let order = new Order();
   order.promote([], [Rank.sergeant]);
 
@@ -51,7 +51,7 @@ Contract.wenz = function(player) {
   return contract;
 };
 
-Contract.solo = function(player, suit) {
+Contract.solo = function solo(player, suit) {
   let order = new Order();
   order.promote([suit], [Rank.sergeant, Rank.officer]);
 
@@ -63,9 +63,8 @@ Contract.solo = function(player, suit) {
 };
 
 Contract[Symbol.iterator] = function*() {
-  for (let label in Contract) {
-    let factory = Contract[label];
-    yield [label, factory];
+  for (let name in Contract) {
+    yield Contract[name];
   }
 };
 

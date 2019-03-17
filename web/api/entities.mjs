@@ -12,15 +12,16 @@ State.prototype.toJSON = function() {
   return { id, phase, actor };
 };
 
-export function Contract(contract) {
-  this.contract = contract;
+export function Contract(factory, suit) {
+  this.factory = factory;
+  this.suit = suit;
 }
 
 Contract.prototype.toJSON = function() {
-  let label = this.contract.label;
-  let suit = this.contract.suit;
+  let name = this.factory.name;
+  let suit = this.suit;
   suit = suit ? suit.description.toLowerCase() : undefined;
-  return { label, suit };
+  return { name, suit };
 };
 
 export function Play(player, card) {

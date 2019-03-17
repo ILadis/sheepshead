@@ -37,7 +37,6 @@ Games.prototype['POST'] = (request, response) => {
   let entity = new Entities.State(game);
   let json = JSON.stringify(entity);
 
-  response.setHeader('Location', `/games/${id}`);
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
@@ -95,7 +94,6 @@ Players.prototype['POST'] = Handlers.chain(
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
   var { game, entity, registry } = request;
-  let id = game.id;
   let input = game.input
 
   let name = String(entity.name);
@@ -104,9 +102,9 @@ Players.prototype['POST'] = Handlers.chain(
     return response.end();
   }
 
-  let player = new Player(name);
   let token = Token.generate();
-  let index = player.index = input.args[0];
+  let index = input.args[0];
+  let player = new Player(name, index);
 
   registry.register(token, player);
   input.resolve(player);
@@ -114,7 +112,6 @@ Players.prototype['POST'] = Handlers.chain(
   var entity = new Entities.Player(player, token);
   let json = JSON.stringify(entity);
 
-  response.setHeader('Location', `/games/${id}/players?index=${index}`);
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(201);
@@ -175,14 +172,14 @@ Contracts.prototype['GET'] = Handlers.chain(
 ).then((request, response) => {
   let entities = new Array();
 
-  for (let [label, factory] of Contract) {
+  for (let factory of Contract) {
     switch (factory.length) {
     case 1:
-      entities.push(new Entities.Contract({ label }));
+      entities.push(new Entities.Contract(factory));
       break;
     case 2:
       for (let suit of Suit) {
-        entities.push(new Entities.Contract({ label, suit }));
+        entities.push(new Entities.Contract(factory, suit));
       }
     }
   }
@@ -208,7 +205,7 @@ Auction.prototype['POST'] = Handlers.chain(
   let { game, player, entity } = request;
   let input = game.input;
 
-  if (!entity.label && !entity.suit) {
+  if (!entity.name && !entity.suit) {
     input.resolve();
     response.writeHead(200);
     return response.end();
@@ -216,7 +213,7 @@ Auction.prototype['POST'] = Handlers.chain(
 
   let valueOf = (value) => String(value).toLowerCase();
 
-  let factory = Contract[valueOf(entity.label)];
+  let factory = Contract[valueOf(entity.name)];
   let suit = Suit[valueOf(entity.suit)];
 
   if(!factory || factory.length == 2 && !suit) {

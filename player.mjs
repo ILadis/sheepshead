@@ -1,8 +1,8 @@
 
-export function Player(name) {
+export function Player(name, index) {
   this.name = name;
+  this.index = index;
   this.points = 0;
-  this.index = undefined;
   this.cards = new Set();
 }
 
@@ -29,11 +29,5 @@ Player.sequence = function(group, from) {
   };
 
   return { [Symbol.iterator]: next };
-};
-
-Player.across = function(group, from) {
-  let start = from ? group.indexOf(from) : 0;
-  let index = (start + group.length/2) % group.length;
-  return group[index];
 };
 

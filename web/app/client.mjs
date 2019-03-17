@@ -127,7 +127,7 @@ Client.prototype.bidContract = async function(contract) {
   let token = this.token;
   if (contract) {
     var json = JSON.stringify({
-      'label': contract.label,
+      'name': contract.name,
       'suit': contract.suit
     });
   } else {
@@ -176,7 +176,7 @@ Client.prototype.playCard = async function(card) {
   return true;
 };
 
-Client.prototype.listenStream = function() {
+Client.prototype.listenEvents = function() {
   let id = this.id;
   let source = new EventSource(`/games/${id}/events?offset=1`);
 

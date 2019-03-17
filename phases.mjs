@@ -147,7 +147,9 @@ export async function aftermath({ players, contract }) {
 }
 
 export async function proceed({ players, phase }) {
-  let proceed = true;
+  this.contract =
+  this.trick = null;
+
   for (let player of players) {
     player.cards.clear();
     player.points = 0;
@@ -155,15 +157,12 @@ export async function proceed({ players, phase }) {
     this.actor = player;
     await this.onturn(player, phase);
 
-    proceed = await this.onproceed(player) && proceed;
+    let proceed = await this.onproceed(player);
+    if (!proceed) {
+      return;
+    }
   }
 
-  return proceed ? shuffle : cleanup;
-}
-
-export async function cleanup() {
-  this.contract =
-  this.trick =
-  this.actor = null;
+  return shuffle;
 }
 

@@ -6,8 +6,9 @@ export function DeferredInput() {
 DeferredInput.prototype.attach = function(game) {
   game.input = this;
 
-  game.onbid =
   game.onjoin =
+  game.onattend =
+  game.onbid =
   game.onplay = (...args) => {
     return new Promise((resolve, reject) => {
       this.promise = { resolve, reject };

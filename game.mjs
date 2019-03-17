@@ -12,12 +12,14 @@ Game.prototype.run = async function() {
 };
 
 Game.prototype.onjoin =
+Game.prototype.onattend =
 Game.prototype.onbid =
 Game.prototype.onplay =
 Game.prototype.onproceed =
 Game.prototype.onturn =
 Game.prototype.onjoined =
-Game.prototype.oncontested =
+Game.prototype.onattendant =
+Game.prototype.onbidded =
 Game.prototype.onsettled =
 Game.prototype.onplayed =
 Game.prototype.onmatched =

@@ -40,22 +40,6 @@ addEventListener('load', async () => {
     return this.index == other.index;
   };
 
-  dialog.setTitle('Choose what to play');
-  dialog.addOption('skip');
-  dialog.onclick = async (contract) => {
-    try {
-      await client.bidContract(contract);
-      dialog.dismiss();
-    } catch { }
-  };
-
-  let contracts = await client.fetchContracts();
-  for (let contract of contracts) {
-    let { name, suit } = contract;
-    let label = name + (suit ? ` (${suit})` : '');
-    dialog.addOption(label, contract);
-  }
-
   hand.onclick = (card) => {
     client.playCard(card);
   };
@@ -88,8 +72,39 @@ addEventListener('load', async () => {
     hand.setPlayer(self);
     hand.setCards(cards);
 
-    if (phase == 'auction' && self.isSameAs(player)) {
+    if (phase == 'attendance' && self.isSameAs(player)) {
+      dialog.setTitle('Participate in auction?');
       dialog.show();
+
+      let options = dialog.withOptions();
+      options.add('Yes', true);
+      options.add('No', false);
+      options.onclick = async (attend) => {
+        try {
+          await client.attendAuction(attend);
+          dialog.dismiss();
+        } catch { }
+      };
+    }
+
+    if (phase == 'auction' && self.isSameAs(player)) {
+      dialog.setTitle('Choose what to play');
+      dialog.show();
+
+      let options = dialog.withOptions();
+      let contracts = await client.fetchContracts();
+      for (let contract of contracts) {
+        let { name, suit } = contract;
+        let label = name + (suit ? ` (${suit})` : '');
+        options.add(label, contract);
+      }
+
+      options.onclick = async (contract) => {
+        try {
+          await client.bidContract(contract);
+          dialog.dismiss();
+        } catch { }
+      };
     }
   };
 

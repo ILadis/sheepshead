@@ -39,14 +39,32 @@ export async function dealing({ deck, sequence }) {
     }
   } while (!deck.empty());
 
+  return attendance;
+}
+
+export async function attendance({ sequence, phase}) {
+  let attendants = new Set();
+  this.attendants = attendants;
+
+  for (let player of sequence) {
+    this.actor = player;
+    await this.onturn(player, phase);
+
+    let attend = await this.onattend(player);
+    if (attend) {
+      attendants.add(player)
+      await this.onattendant(player);
+    }
+  }
+
   return auction;
 }
 
-export async function auction({ players, sequence, phase }) {
+export async function auction({ attendants, phase}) {
   let rules = Ruleset.forBidding(this);
 
   let contract, highest = 0;
-  for (let player of sequence) {
+  for (let player of attendants) {
     this.actor = player;
     await this.onturn(player, phase);
 
@@ -63,7 +81,7 @@ export async function auction({ players, sequence, phase }) {
       contract = bid;
       highest = value;
 
-      await this.oncontested(player);
+      await this.onbidded(player);
     }
   }
 

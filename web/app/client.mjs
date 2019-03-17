@@ -1,7 +1,6 @@
 
-export function Client(id, token) {
+export function Client(id) {
   this.id = id;
-  this.token = token;
 }
 
 Client.forGame = async function(id) {
@@ -70,7 +69,6 @@ Client.prototype.fetchContracts = async function() {
 Client.prototype.fetchPlayers = async function(index) {
   let id = this.id;
   let query = index ? `?index=${index}` : '';
-
   let request = new Request(`/games/${id}/players${query}`, {
     method: 'GET'
   });
@@ -88,7 +86,6 @@ Client.prototype.fetchPlayers = async function(index) {
 Client.prototype.fetchCards = async function() {
   let id = this.id;
   let token = this.token;
-
   let request = new Request(`/games/${id}/cards`, {
     method: 'GET',
     headers: {
@@ -122,16 +119,35 @@ Client.prototype.fetchTrick = async function() {
   return json;
 };
 
+Client.prototype.attendAuction = async function(attend) {
+  let id = this.id;
+  let token = this.token;
+  let request = new Request(`/games/${id}/auction/attend`, {
+    method: attend ? 'POST' : 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  return true;
+};
+
 Client.prototype.bidContract = async function(contract) {
   let id = this.id;
   let token = this.token;
+  var json = '{}';
+
   if (contract) {
     var json = JSON.stringify({
       'name': contract.name,
       'suit': contract.suit
     });
-  } else {
-    var json = '{}';
   }
 
   let request = new Request(`/games/${id}/auction`, {

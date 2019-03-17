@@ -166,13 +166,24 @@ Dialog.prototype.setTitle = function(title) {
   this.view.dataset.title = title;
 };
 
-Dialog.prototype.addOption = function(label, data) {
-  let li = document.createElement('li');
-  li.textContent = label;
-  li.onclick = () => this.onclick(data);
+Dialog.prototype.withOptions = function() {
+  while (this.view.firstChild) {
+    this.view.firstChild.remove();
+  }
 
-  let ul = this.view.querySelector('ul');
-  ul.appendChild(li);
+  let ul = document.createElement('ul');
+  this.view.appendChild(ul);
+
+  let onlick = () => {};
+  let add = function(label, data) {
+    let li = document.createElement('li');
+    li.textContent = label;
+    li.onclick = () => this.onclick(data);
+
+    ul.appendChild(li);
+  };
+
+  return { add, onclick };
 };
 
 Dialog.prototype.show = function() {
@@ -181,8 +192,5 @@ Dialog.prototype.show = function() {
 
 Dialog.prototype.dismiss = function() {
   this.view.style.opacity = 0;
-};
-
-Dialog.prototype.onclick = function() {
 };
 

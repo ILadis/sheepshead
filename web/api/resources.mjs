@@ -193,6 +193,37 @@ Contracts.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
+export const Attendance = Resource.create(
+  ['POST', 'DELETE'], '^/games/(?<id>\\d+)/auction/attend$');
+
+Attendance.prototype['POST'] = Handlers.chain(
+  PreFilters.requiresGame(Phases.attendance),
+  PreFilters.requiresPlayer(),
+  PreFilters.requiresActor()
+).then((request, response) => {
+  let { game } = request;
+  let input = game.input;
+
+  input.resolve(true);
+
+  response.writeHead(201);
+  return response.end();
+});
+
+Attendance.prototype['DELETE'] = Handlers.chain(
+  PreFilters.requiresGame(Phases.attendance),
+  PreFilters.requiresPlayer(),
+  PreFilters.requiresActor()
+).then((request, response) => {
+  let { game } = request;
+  let input = game.input;
+
+  input.resolve(false);
+
+  response.writeHead(204);
+  return response.end();
+});
+
 export const Auction = Resource.create(
   ['POST'], '^/games/(?<id>\\d+)/auction$');
 
@@ -204,12 +235,6 @@ Auction.prototype['POST'] = Handlers.chain(
 ).then((request, response) => {
   let { game, player, entity } = request;
   let input = game.input;
-
-  if (!entity.name && !entity.suit) {
-    input.resolve();
-    response.writeHead(200);
-    return response.end();
-  }
 
   let valueOf = (value) => String(value).toLowerCase();
 
@@ -298,6 +323,7 @@ export default {
   Events,
   Players,
   Contracts,
+  Attendance,
   Auction,
   Hand,
   Trick

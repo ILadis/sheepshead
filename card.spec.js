@@ -3,7 +3,7 @@ import Assert from 'assert';
 import { Card, Suit, Rank } from './card.mjs';
 
 describe('Card', () => {
-  it('should hold instances for all Suit and Rank', () => {
+  it('should hold instances for all suits and ranks', () => {
     for (let suit of Suit) {
       for (let rank of Rank) {
         Assert.ok(Card[suit][rank]);
@@ -83,7 +83,7 @@ describe('Suit', () => {
     Assert.ok(Suit[Symbol.iterator]);
   });
 
-  it('should hold symbols of all Suit', () => {
+  it('should hold symbols of all suits', () => {
     Assert.equal(typeof Suit.bell, 'symbol');
     Assert.equal(typeof Suit.heart, 'symbol');
     Assert.equal(typeof Suit.leaf, 'symbol');
@@ -91,7 +91,7 @@ describe('Suit', () => {
   });
 
   describe('#iterator', () => {
-    it('should yield Suit in natural order', () => {
+    it('should yield suits in natural order', () => {
       let it = Suit[Symbol.iterator]();
       Assert.equal(it.next().value, Suit.bell);
       Assert.equal(it.next().value, Suit.heart);
@@ -107,7 +107,7 @@ describe('Rank', () => {
     Assert.ok(Rank[Symbol.iterator]);
   });
 
-  it('should hold symbols of all Rank', () => {
+  it('should hold symbols of all ranks', () => {
     Assert.equal(typeof Rank.seven, 'symbol');
     Assert.equal(typeof Rank.eight, 'symbol');
     Assert.equal(typeof Rank.nine, 'symbol');
@@ -119,7 +119,7 @@ describe('Rank', () => {
   });
 
   describe('#iterator', () => {
-    it('should yield Rank in natural order', () => {
+    it('should yield ranks in natural order', () => {
       let it = Rank[Symbol.iterator]();
       Assert.equal(it.next().value, Rank.seven);
       Assert.equal(it.next().value, Rank.eight);

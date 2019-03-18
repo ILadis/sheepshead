@@ -95,7 +95,7 @@ describe('Order', () => {
   });
 
   describe('#valueOf()', () => {
-    describe('with heart/sergeant tump, leaf dominant', () => {
+    describe('with heart/sergeant trump, leaf dominant', () => {
       let order = new Order();
       order.promote([Suit.heart], [Rank.sergeant]);
       order.dominate(Suit.leaf);
@@ -121,7 +121,7 @@ describe('Order', () => {
       });
     });
 
-    describe('with heart/sergeant/officer tump', () => {
+    describe('with heart/sergeant/officer trump', () => {
       let order = new Order();
       order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
 

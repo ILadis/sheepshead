@@ -14,12 +14,6 @@ View.create = function(template) {
   return view;
 };
 
-View.tillEvent = function(element, type) {
-  return new Promise(resolve => {
-    element.addEventListener(type, resolve, { once: true });
-  });
-};
-
 View.prototype.postConstruct = function() {
 };
 
@@ -32,6 +26,30 @@ function html(strings) {
   template.innerHTML = strings.join('');
   return template;
 }
+
+export const Shell = View.create(html`
+<div class="shell">
+  <header>
+    <h1></h1>
+  </header>
+  <main></main>
+</div>`);
+
+Shell.prototype.setTitle = function(title) {
+  let h1 = this.view.querySelector('header > h1');
+  h1.textContent = title;
+  document.title = title;
+};
+
+Shell.prototype.setContents = function(...views) {
+  let main = this.view.querySelector('main');
+  while (main.firstChild) {
+    main.firstChild.remove();
+  }
+  for (let view of views) {
+    view.appendTo(main);
+  }
+};
 
 export const Hand = View.create(html`
 <div class="hand">
@@ -74,7 +92,7 @@ Hand.prototype.setCards = function(cards) {
   for (let card of cards) {
     let button = document.createElement('button');
     button.className = 'card';
-    button.onclick = () => this.onclick(card);
+    button.onclick = () => this.onCardClicked(card);
 
     if (card && card.suit && card.rank) {
       button.dataset.suit = card.suit;
@@ -85,7 +103,7 @@ Hand.prototype.setCards = function(cards) {
   }
 };
 
-Hand.prototype.onclick = function() {
+Hand.prototype.onCardClicked = function(card) {
 };
 
 export const Trick = View.create(html`
@@ -174,16 +192,16 @@ Dialog.prototype.withOptions = function() {
   let ul = document.createElement('ul');
   this.view.appendChild(ul);
 
-  let onlick = () => {};
-  let add = function(label, data) {
+  let onItemSelected = () => {};
+  let addItem = function(label, data) {
     let li = document.createElement('li');
     li.textContent = label;
-    li.onclick = () => this.onclick(data);
+    li.onclick = () => this.onItemSelected(data);
 
     ul.appendChild(li);
   };
 
-  return { add, onclick };
+  return { addItem, onItemSelected };
 };
 
 Dialog.prototype.show = function() {

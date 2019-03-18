@@ -15,6 +15,23 @@ body {
   background: #ececec;
 }
 
+.shell header {
+  padding: 12pt 18pt;
+  width: 100%;
+  background-color: #397535;
+  box-shadow: 0 4pt 5pt 0 #fcfcfc;
+}
+
+.shell header h1 {
+  font-size: 14pt;
+  font-weight: 500;
+  color: #fff;
+}
+
+.shell main {
+  position: relative;
+}
+
 .card {
   width: 42pt;
   padding: 4.5pt;
@@ -74,21 +91,21 @@ body {
 .card[data-suit=acorn]:after { background-image: url('acorn.svg'); }
 
 .trick {
-  position: fixed;
+  position: relative;
   width: 100%;
   top: 45%;
   text-align: center;
 }
 
 .hand {
-  position: fixed;
+  position: relative;
   white-space: nowrap;
 }
 .hand .card:first-of-type { margin-left: 0; }
 .hand .card { margin-left: -12pt; }
 
 .hand span {
-  position: absolute;
+  position: relative;
   top: -18pt;
   left: 50%;
   transform: translateX(-50%);

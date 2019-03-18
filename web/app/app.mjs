@@ -8,6 +8,7 @@ addEventListener('load', async () => {
   let id = Number(params.get('id') || 'NaN');
   let name = String(params.get('name') || 'Player');
 
+  let shell = new Views.Shell();
   let dialog = new Views.Dialog();
   let toast = new Views.Toast();
   let trick = new Views.Trick();
@@ -17,13 +18,10 @@ addEventListener('load', async () => {
   let top = new Views.Hand('top');
   let hands = { top, left, right, bottom: hand };
 
-  trick.appendTo(document.body);
-  dialog.appendTo(document.body);
-  toast.appendTo(document.body);
-  hand.appendTo(document.body);
-  left.appendTo(document.body);
-  right.appendTo(document.body);
-  top.appendTo(document.body);
+  shell.appendTo(document.body);
+
+  shell.setTitle('Sheepshead');
+  shell.setContents(trick, dialog, toast, hand, left, right, top);
 
   let client = await Client.forGame(id);
   let self = await client.joinGame(name);
@@ -40,7 +38,7 @@ addEventListener('load', async () => {
     return this.index == other.index;
   };
 
-  hand.onclick = (card) => {
+  hand.onCardClicked = (card) => {
     client.playCard(card);
   };
 
@@ -77,9 +75,9 @@ addEventListener('load', async () => {
       dialog.show();
 
       let options = dialog.withOptions();
-      options.add('Yes', true);
-      options.add('No', false);
-      options.onclick = async (attend) => {
+      options.addItem('Yes', true);
+      options.addItem('No', false);
+      options.onItemSelected = async (attend) => {
         try {
           await client.attendAuction(attend);
           dialog.dismiss();
@@ -96,10 +94,10 @@ addEventListener('load', async () => {
       for (let contract of contracts) {
         let { name, suit } = contract;
         let label = name + (suit ? ` (${suit})` : '');
-        options.add(label, contract);
+        options.addItem(label, contract);
       }
 
-      options.onclick = async (contract) => {
+      options.onItemSelected = async (contract) => {
         try {
           await client.bidContract(contract);
           dialog.dismiss();

@@ -21,7 +21,7 @@ addEventListener('load', async () => {
   shell.appendTo(document.body);
 
   shell.setTitle('Sheepshead');
-  shell.setContents(trick, dialog, toast, hand, left, right, top);
+  shell.setContents(hand, left, right, top, trick, dialog, toast);
 
   let client = await Client.forGame(id);
   let self = await client.joinGame(name);

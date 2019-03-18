@@ -13,13 +13,22 @@ body {
   font-size: 11pt;
   color: #3c3c3c;
   background: #ececec;
+  overflow: hidden;
+}
+
+.shell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .shell header {
+  position: relative;
   padding: 12pt 18pt;
-  width: 100%;
   background-color: #397535;
-  box-shadow: 0 4pt 5pt 0 #fcfcfc;
+  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  z-index: 2;
 }
 
 .shell header h1 {
@@ -30,6 +39,8 @@ body {
 
 .shell main {
   position: relative;
+  flex-grow: 1;
+  z-index: 1;
 }
 
 .card {
@@ -91,21 +102,21 @@ body {
 .card[data-suit=acorn]:after { background-image: url('acorn.svg'); }
 
 .trick {
-  position: relative;
+  position: absolute;
   width: 100%;
   top: 45%;
   text-align: center;
 }
 
 .hand {
-  position: relative;
+  position: absolute;
   white-space: nowrap;
 }
 .hand .card:first-of-type { margin-left: 0; }
 .hand .card { margin-left: -12pt; }
 
 .hand span {
-  position: relative;
+  position: absolute;
   top: -18pt;
   left: 50%;
   transform: translateX(-50%);
@@ -144,7 +155,7 @@ body {
 }
 
 .toast {
-  position: fixed;
+  position: absolute;
   width: 100%;
   top: 30%;
   text-align: center;
@@ -169,11 +180,11 @@ body {
 }
 
 .dialog {
-  position: fixed;
+  position: absolute;
   padding: 14pt 10pt 10pt 24pt;
+  min-width: 160pt;
   top: 10%;
   left: 50%;
-  min-width: 200pt;
   border-style: solid;
   border-width: 1pt;
   border-color: #a8a8a8;

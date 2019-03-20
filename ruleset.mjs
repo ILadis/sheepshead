@@ -18,25 +18,21 @@ Ruleset.forBidding = function(game) {
     let { trumps } = contract.order;
     let partner = contract.partner;
 
-    if (contract.owner == partner) {
-      return false;
+    if (!partner) {
+      return true;
     }
 
     if (actor.cards.has(partner)) {
       return false;
     }
 
-    if (partner) {
-      for (let card of actor.cards) {
-        if (card.suit == partner.suit && !trumps.has(card)) {
-          return true;
-        }
+    for (let card of actor.cards) {
+      if (card.suit == partner.suit && !trumps.has(card)) {
+        return true;
       }
-
-      return false;
     }
 
-    return true;
+    return false;
   });
 };
 
@@ -49,7 +45,14 @@ Ruleset.forPlaying = function(game) {
     }
 
     let { trumps, dominants } = contract.order;
-    let lead = trick.lead();
+    let partner = contract.partner;
+    let lead = trick.lead() || card;
+
+    if (actor.cards.has(partner)) {
+      if (lead.suit == partner.suit) {
+        return card == partner;
+      }
+    }
 
     if (dominants.has(lead)) {
       for (let dominant of dominants) {

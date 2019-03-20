@@ -31,3 +31,9 @@ Player.sequence = function(group, from) {
   return { [Symbol.iterator]: next };
 };
 
+Player.next = function(group, from) {
+  let index = from ? group.indexOf(from) : 0;
+  let next = ++index % group.length;
+  return group[next];
+};
+

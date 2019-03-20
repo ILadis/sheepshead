@@ -13,25 +13,25 @@ export async function joining() {
     let player = await this.onjoin(index);
     players.push(player);
 
+    if (!head) {
+      var head = player;
+      this.head = head;
+    }
+
     await this.onjoined(player);
   }
-
-  this.sequence = Player.sequence(players);
-
-  return shuffle;
-}
-
-export async function shuffle() {
-  let deck = new Deck();
-  deck.fill();
-  deck.shuffle();
-
-  this.deck = deck;
 
   return dealing;
 }
 
-export async function dealing({ deck, sequence }) {
+export async function dealing({ players, head }) {
+  let sequence = Player.sequence(players, head);
+  this.sequence = sequence;
+
+  let deck = new Deck();
+  deck.fill();
+  deck.shuffle();
+
   do {
     for (let player of sequence) {
       let cards = deck.draw();
@@ -164,8 +164,8 @@ export async function aftermath({ players, contract }) {
   return proceed;
 }
 
-export async function proceed({ players, phase }) {
-  this.contract =
+export async function proceed({ players, head, phase }) {
+  this.contract = null;
   this.trick = null;
 
   for (let player of players) {
@@ -181,6 +181,9 @@ export async function proceed({ players, phase }) {
     }
   }
 
-  return shuffle;
+  let next = Player.next(players, head);
+  this.head = next;
+
+  return dealing;
 }
 

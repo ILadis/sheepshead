@@ -57,17 +57,19 @@ Result.prototype.toJSON = function() {
   return { players, points };
 };
 
-export function Player(player, token) {
+export function Player(player, actor, token) {
   this.player = player;
+  this.actor = actor;
   this.token = token;
 }
 
 Player.prototype.toJSON = function() {
   let token = this.token;
+  let actor = this.actor;
   let name = this.player.name;
   let index = this.player.index;
   let cards = this.player.cards.size;
-  return { token, index, name, cards };
+  return { token, actor, index, name, cards };
 };
 
 export function Card(card) {

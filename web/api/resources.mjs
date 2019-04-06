@@ -109,7 +109,7 @@ Players.prototype['POST'] = Handlers.chain(
   registry.register(token, player);
   input.resolve(player);
 
-  var entity = new Entities.Player(player, token);
+  var entity = new Entities.Player(player, false, token);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -123,6 +123,7 @@ Players.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game, url } = request;
+  let actor = game.actor;
   let players = game.players;
 
   let index = Number(url.query['index']);
@@ -130,7 +131,7 @@ Players.prototype['GET'] = Handlers.chain(
     players = players.filter(p => p.index == index);
   }
 
-  let entity = players.map(p => new Entities.Player(p));
+  let entity = players.map(p => new Entities.Player(p, p == actor));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);

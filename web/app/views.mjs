@@ -41,7 +41,7 @@ Shell.prototype.setTitle = function(title) {
   document.title = title;
 };
 
-Shell.prototype.setContents = function(...views) {
+Shell.prototype.setContents = function(views) {
   let main = this.view.querySelector('main');
   while (main.firstChild) {
     main.firstChild.remove();

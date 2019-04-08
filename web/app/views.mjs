@@ -42,13 +42,18 @@ Shell.prototype.setTitle = function(title) {
 };
 
 Shell.prototype.setContents = function(views) {
-  let main = this.view.querySelector('main');
-  while (main.firstChild) {
-    main.firstChild.remove();
+  let sections = this.view.querySelectorAll('main > section');
+  for (let i = 0; i < sections.length; i++) {
+    sections[i].remove();
   }
+
+  let section = document.createElement('section');
   for (let view of views) {
-    view.appendTo(main);
+    view.appendTo(section);
   }
+
+  let main = this.view.querySelector('main');
+  main.appendChild(section);
 };
 
 export const Hand = View.create(html`
@@ -78,7 +83,7 @@ Hand.prototype.setActive = function(active) {
 Hand.prototype.clearCards = function() {
   let buttons = this.view.querySelectorAll('button');
   for (let i = 0; i < buttons.length; i++) {
-    this.view.removeChild(buttons[i]);
+    buttons[i].remove();
   }
 };
 
@@ -116,7 +121,7 @@ Trick.prototype.clearCards = function(atCount = 4) {
   }
 
   for (let i = 0; i < hrs.length; i++) {
-    this.view.removeChild(hrs[i]);
+    hrs[i].remove();
   }
 };
 
@@ -155,24 +160,26 @@ Toast.prototype.show = function() {
     return;
   }
 
-  this.view.dataset.text = next.text;
-  this.view.style.opacity = 1;
-  this.view.style.visibility = 'visible';
   this.view.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
   };
+
+  this.view.dataset.text = next.text;
+  this.view.style.opacity = 1;
+  this.view.style.visibility = 'visible';
 };
 
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  this.view.style.opacity = 0;
   this.view.ontransitionend = () => {
     this.view.style.visibility = 'hidden';
     this.queue.shift();
     this.show();
   };
+
+  this.view.style.opacity = 0;
 };
 
 export const Dialog = View.create(html`

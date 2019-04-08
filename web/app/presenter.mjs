@@ -71,7 +71,6 @@ Presenter.prototype.showAttendance = function() {
   options.onItemSelected = async (attend) => {
     try {
       await this.client.attendAuction(attend);
-      dialog.dismiss();
     } catch { }
   };
 };
@@ -93,7 +92,6 @@ Presenter.prototype.showBidding = async function() {
   options.onItemSelected = async (contract) => {
     try {
       await this.client.bidContract(contract);
-      dialog.dismiss();
     } catch { }
   };
 };
@@ -103,9 +101,12 @@ Presenter.prototype.onJoined = function(player) {
 };
 
 Presenter.prototype.onTurn = function({ player, phase }) {
-  this.showToast(`It's ${player.name}'s turn`, 1000);
+  let dialog = this.views.dialog;
+  dialog.dismiss();
 
+  this.showToast(`It's ${player.name}'s turn`, 1000);
   this.showHands();
+
   if (!this.isSelf(player)) {
     return;
   }

@@ -22,5 +22,5 @@ let fallback = new Resource(['GET'], '.*');
 fallback['GET'] = Resource.serveNotFound();
 server.register(fallback);
 
-server.listen(8090);
+server.listen(process.env.PORT || 8090);
 

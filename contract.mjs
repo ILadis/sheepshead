@@ -2,69 +2,73 @@
 import { Card, Suit, Rank } from './card.mjs';
 import { Order } from './order.mjs';
 
-export function Contract(value) {
+export function Contract(value, order, partner = null) {
   this.value = value;
+  this.order = order;
+  this.partner = partner;
 }
 
-Contract.prototype.dictate = function(order, suit = null) {
-  this.order = order;
-  this.suit = suit;
-};
-
-Contract.prototype.assign = function(owner, partner = null) {
+Contract.prototype.assign = function(owner) {
   this.owner = owner;
-  this.partner = partner;
 };
 
-Contract.normal = function normal(player, suit) {
-  let partner = Card[suit][Rank.ace];
-
-  let order = new Order();
-  order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
-
-  let contract = new Contract(1);
-  contract.dictate(order, suit);
-  contract.assign(player, partner);
-
-  return contract;
+Contract.normal = {
+  get bell() {
+    let order = new Order();
+    order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
+    let partner = Card[Suit.bell][Rank.ace];
+    return new Contract(1, order, partner);
+  },
+  get leaf() {
+    let order = new Order();
+    order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
+    let partner = Card[Suit.leaf][Rank.ace];
+    return new Contract(1, order, partner);
+  },
+  get acorn() {
+    let order = new Order();
+    order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
+    let partner = Card[Suit.acorn][Rank.ace];
+    return new Contract(1, order, partner);
+  }
 };
 
-Contract.geier = function geier(player) {
-  let order = new Order();
-  order.promote([], [Rank.officer]);
-
-  let contract = new Contract(2);
-  contract.dictate(order);
-  contract.assign(player);
-
-  return contract;
+Contract.geier = {
+  get default() {
+    let order = new Order();
+    order.promote([], [Rank.officer]);
+    return new Contract(2, order);
+  }
 };
 
-Contract.wenz = function wenz(player) {
-  let order = new Order();
-  order.promote([], [Rank.sergeant]);
-
-  let contract = new Contract(3);
-  contract.dictate(order);
-  contract.assign(player);
-
-  return contract;
+Contract.wenz = {
+  get default() {
+    let order = new Order();
+    order.promote([], [Rank.sergeant]);
+    return new Contract(3, order);
+  }
 };
 
-Contract.solo = function solo(player, suit) {
-  let order = new Order();
-  order.promote([suit], [Rank.sergeant, Rank.officer]);
-
-  let contract = new Contract(4);
-  contract.dictate(order, suit);
-  contract.assign(player);
-
-  return contract;
-};
-
-Contract[Symbol.iterator] = function*() {
-  for (let name in Contract) {
-    yield Contract[name];
+Contract.solo = {
+  get bell() {
+    let order = new Order();
+    order.promote([Suit.bell], [Rank.sergeant, Rank.officer]);
+    return new Contract(4, order);
+  },
+  get heart() {
+    let order = new Order();
+    order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
+    return new Contract(4, order);
+  },
+  get leaf() {
+    let order = new Order();
+    order.promote([Suit.leaf], [Rank.sergeant, Rank.officer]);
+    return new Contract(4, order);
+  },
+  get acorn() {
+    let order = new Order();
+    order.promote([Suit.acorn], [Rank.sergeant, Rank.officer]);
+    return new Contract(4, order);
   }
 };
 

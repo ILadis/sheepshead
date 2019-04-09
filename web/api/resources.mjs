@@ -152,7 +152,11 @@ Hand.prototype['GET'] = Handlers.chain(
   let contract = game.contract;
   let cards = Array.from(player.cards);
 
-  let order = contract ? contract.order : new Order();
+  if (!contract) {
+    contract = Contract['normal']['acorn'];
+  }
+
+  let order = contract.order;
   cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
 
   let entities = cards.map(c => new Entities.Card(c));
@@ -169,18 +173,23 @@ export const Contracts = Resource.create(
   ['GET'], '^/games/(?<id>\\d+)/contracts');
 
 Contracts.prototype['GET'] = Handlers.chain(
-  PreFilters.requiresGame(),
+  PreFilters.requiresGame(Phases.auction),
+  PreFilters.requiresPlayer(),
+  PreFilters.requiresActor()
 ).then((request, response) => {
+  let { game, player } = request;
+  let input = game.input;
+
   let entities = new Array();
 
-  for (let factory of Contract) {
-    switch (factory.length) {
-    case 1:
-      entities.push(new Entities.Contract(factory));
-      break;
-    case 2:
-      for (let suit of Suit) {
-        entities.push(new Entities.Contract(factory, suit));
+  for (let name in Contract) {
+    for (let variant in Contract[name]) {
+      let contract = Contract[name][variant];
+      contract.assign(player);
+
+      let rules = input.args[1];
+      if (rules.isValid(contract)) {
+        entities.push(new Entities.Contract(name, variant));
       }
     }
   }
@@ -237,17 +246,19 @@ Auction.prototype['POST'] = Handlers.chain(
   let { game, player, entity } = request;
   let input = game.input;
 
-  let valueOf = (value) => String(value).toLowerCase();
-
-  let factory = Contract[valueOf(entity.name)];
-  let suit = Suit[valueOf(entity.suit)];
-
-  if(!factory || factory.length == 2 && !suit) {
+  var contract = Contract[entity.name];
+  if (!contract) {
     response.writeHead(422);
     return response.end();
   }
 
-  let contract = factory(player, suit);
+  var contract = contract[entity.variant];
+  if (!contract) {
+    response.writeHead(422);
+    return response.end();
+  }
+  contract.assign(player);
+
   let rules = input.args[1];
   if (!rules.isValid(contract)) {
     response.writeHead(400);
@@ -272,10 +283,8 @@ Trick.prototype['POST'] = Handlers.chain(
   let { game, player, entity } = request;
   let input = game.input;
 
-  let valueOf = (value) => String(value).toLowerCase();
-
-  let rank = Rank[valueOf(entity.rank)];
-  let suit = Suit[valueOf(entity.suit)];
+  let rank = Rank[entity.rank];
+  let suit = Suit[entity.suit];
 
   if (!suit || !rank) {
     response.writeHead(422);

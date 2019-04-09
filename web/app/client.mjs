@@ -27,9 +27,7 @@ Client.forGame = async function(id) {
 
 Client.prototype.joinGame = async function(name) {
   let id = this.id;
-  var json = JSON.stringify({
-    'name': name
-  });
+  var json = JSON.stringify({ name });
 
   let request = new Request(`/games/${id}/players`, {
     method: 'POST',
@@ -52,8 +50,12 @@ Client.prototype.joinGame = async function(name) {
 
 Client.prototype.fetchContracts = async function() {
   let id = this.id;
+  let token = this.token;
   let request = new Request(`/games/${id}/contracts`, {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   });
 
   let response = await fetch(request);
@@ -141,14 +143,7 @@ Client.prototype.attendAuction = async function(attend) {
 Client.prototype.bidContract = async function(contract) {
   let id = this.id;
   let token = this.token;
-  var json = '{}';
-
-  if (contract) {
-    var json = JSON.stringify({
-      'name': contract.name,
-      'suit': contract.suit
-    });
-  }
+  var json = JSON.stringify(contract);
 
   let request = new Request(`/games/${id}/auction`, {
     method: 'POST',
@@ -170,10 +165,7 @@ Client.prototype.bidContract = async function(contract) {
 Client.prototype.playCard = async function(card) {
   let id = this.id;
   let token = this.token;
-  let json = JSON.stringify({
-    'suit': card.suit,
-    'rank': card.rank
-  });
+  let json = JSON.stringify(card);
 
   let request = new Request(`/games/${id}/trick`, {
     method: 'POST',

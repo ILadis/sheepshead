@@ -43,7 +43,7 @@ export async function dealing({ players, head }) {
 }
 
 export async function attendance({ sequence, phase}) {
-  let attendants = new Set();
+  let attendants = new Array();
   this.attendants = attendants;
 
   for (let player of sequence) {
@@ -52,7 +52,7 @@ export async function attendance({ sequence, phase}) {
 
     let attend = await this.onattend(player);
     if (attend) {
-      attendants.add(player)
+      attendants.push(player)
       await this.onattendant(player);
     }
   }
@@ -70,11 +70,7 @@ export async function auction({ attendants, phase}) {
 
     do {
       var bid = await this.onbid(player, rules);
-    } while (bid && !rules.isValid(bid));
-
-    if (!bid) {
-      continue;
-    }
+    } while (!rules.isValid(bid));
 
     let value = bid.value;
     if (value > highest) {

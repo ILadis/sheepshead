@@ -84,8 +84,8 @@ Presenter.prototype.showBidding = async function() {
   let options = dialog.withOptions();
   let contracts = await this.client.fetchContracts();
   for (let contract of contracts) {
-    let { name, suit } = contract;
-    let label = name + (suit ? ` (${suit})` : '');
+    let { name, variant } = contract;
+    let label = `${name} (${variant})`;
     options.addItem(label, contract);
   }
 

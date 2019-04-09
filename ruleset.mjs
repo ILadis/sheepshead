@@ -9,9 +9,14 @@ Ruleset.prototype.isValid = function(...args) {
 
 Ruleset.forBidding = function(game) {
   return new Ruleset((contract) => {
-    let { actor } = game;
+    let { actor, attendants } = game;
 
     if (contract.owner != actor) {
+      return false;
+    }
+
+    let index = attendants.indexOf(actor);
+    if (contract.value <= index) {
       return false;
     }
 

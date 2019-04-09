@@ -104,9 +104,7 @@ Presenter.prototype.onTurn = function({ player, phase }) {
   let dialog = this.views.dialog;
   dialog.dismiss();
 
-  this.showToast(`It's ${player.name}'s turn`, 1000);
   this.showHands();
-
   if (!this.isSelf(player)) {
     return;
   }

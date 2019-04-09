@@ -51,12 +51,12 @@ body {
   overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 570pt) {
   .shell section {
     top: 50%;
     left: 50%;
-    margin: -250pt;
-    width: 500pt;
+    margin: -250pt -275pt;
+    width: 570pt;
     height: 500pt;
     border-radius: 3pt;
     box-shadow: 0 1pt 3pt 1pt #bfbfbf;

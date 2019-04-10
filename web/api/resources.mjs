@@ -68,8 +68,7 @@ export const Events = Resource.create(
 Events.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
-  let { game, url } = request;
-  let events = game.events;
+  let { game: { events }, url } = request;
 
   let offset = Number(url.query['offset']);
 
@@ -93,8 +92,7 @@ Players.prototype['POST'] = Handlers.chain(
   PreFilters.requiresGame(Phases.joining),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  var { game, entity, registry } = request;
-  let input = game.input
+  var { game: { input }, entity, registry } = request;
 
   let name = String(entity.name);
   if (!name.length) {
@@ -122,9 +120,7 @@ Players.prototype['POST'] = Handlers.chain(
 Players.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
-  let { game, url } = request;
-  let actor = game.actor;
-  let players = game.players;
+  let { game: { actor, players }, url } = request;
 
   let index = Number(url.query['index']);
   if (!Number.isNaN(index)) {
@@ -148,14 +144,13 @@ Hand.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame(),
   PreFilters.requiresPlayer()
 ).then((request, response) => {
-  let { game, player } = request;
-  let contract = game.contract;
-  let cards = Array.from(player.cards);
+  let { game: { contract }, player } = request;
 
   if (!contract) {
     contract = Contract['normal']['acorn'];
   }
 
+  let cards = Array.from(player.cards);
   let order = contract.order;
   cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
 
@@ -177,9 +172,9 @@ Contracts.prototype['GET'] = Handlers.chain(
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
 ).then((request, response) => {
-  let { game, player } = request;
-  let input = game.input;
+  let { game: { input }, player } = request;
 
+  let rules = input.args[1];
   let entities = new Array();
 
   for (let name in Contract) {
@@ -187,7 +182,6 @@ Contracts.prototype['GET'] = Handlers.chain(
       let contract = Contract[name][variant];
       contract.assign(player);
 
-      let rules = input.args[1];
       if (rules.isValid(contract)) {
         entities.push(new Entities.Contract(name, variant));
       }
@@ -211,8 +205,7 @@ Attendance.prototype['POST'] = Handlers.chain(
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
 ).then((request, response) => {
-  let { game } = request;
-  let input = game.input;
+  let { game: { input } } = request;
 
   input.resolve(true);
 
@@ -225,8 +218,7 @@ Attendance.prototype['DELETE'] = Handlers.chain(
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
 ).then((request, response) => {
-  let { game } = request;
-  let input = game.input;
+  let { game: { input } } = request;
 
   input.resolve(false);
 
@@ -243,8 +235,7 @@ Auction.prototype['POST'] = Handlers.chain(
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game, player, entity } = request;
-  let input = game.input;
+  let { game: { input }, player, entity } = request;
 
   var contract = Contract[entity.name];
   if (!contract) {
@@ -280,8 +271,7 @@ Trick.prototype['POST'] = Handlers.chain(
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game, player, entity } = request;
-  let input = game.input;
+  let { game: { input }, player, entity } = request;
 
   let rank = Rank[entity.rank];
   let suit = Suit[entity.suit];
@@ -307,8 +297,7 @@ Trick.prototype['POST'] = Handlers.chain(
 Trick.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame(Phases.playing)
 ).then((request, response) => {
-  let { game } = request;
-  let trick = game.trick;
+  let { game: { trick } } = request;
 
   if (!trick) {
     response.writeHead(204);

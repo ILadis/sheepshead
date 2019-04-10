@@ -17,8 +17,7 @@ Player.prototype.give = function(cards) {
 };
 
 Player.sequence = function(group, from) {
-  let start = from ? group.indexOf(from) : 0;
-
+  let start = group.indexOf(from);
   let next = function*() {
     let index = start;
     let count = group.length;
@@ -32,7 +31,7 @@ Player.sequence = function(group, from) {
 };
 
 Player.next = function(group, from) {
-  let index = from ? group.indexOf(from) : 0;
+  let index = group.indexOf(from);
   let next = ++index % group.length;
   return group[next];
 };

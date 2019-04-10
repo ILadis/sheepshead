@@ -17,7 +17,8 @@ export async function joining() {
     await this.onjoined(player);
   }
 
-  this.head = players[0];
+  let next = Player.next(players);
+  this.head = next;
 
   return dealing;
 }

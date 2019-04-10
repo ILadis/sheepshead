@@ -47,27 +47,27 @@ Ruleset.forPlaying = function(game) {
       return false;
     }
 
-    let partner = contract.partner;
+    let { trumps, dominants } = contract.order;
     let lead = trick.lead() || card;
+    if (trumps.has(lead)) {
+      for (let trump of trumps) {
+        if (actor.cards.has(trump)) {
+          return trumps.has(card);
+        }
+      }
+    }
+
+    let partner = contract.partner;
     if (actor.cards.has(partner)) {
       if (lead.suit == partner.suit) {
         return card == partner;
       }
     }
 
-    let { trumps, dominants } = contract.order;
     if (dominants.has(lead)) {
       for (let dominant of dominants) {
         if (actor.cards.has(dominant)) {
           return dominants.has(card);
-        }
-      }
-    }
-
-    if (trumps.has(lead)) {
-      for (let trump of trumps) {
-        if (actor.cards.has(trump)) {
-          return trumps.has(card);
         }
       }
     }

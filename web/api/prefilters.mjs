@@ -1,7 +1,7 @@
 
 export const PreFilters = Object.create(null);
 
-PreFilters.requiresGame = function(phase) {
+PreFilters.requiresGame = function(...phases) {
   let handle = (request, response, next) => {
     let id = Number(request.pathparams['id']);
     let game = request.registry.lookup(id);
@@ -10,7 +10,7 @@ PreFilters.requiresGame = function(phase) {
       return response.end();
     }
 
-    if (phase && game.phase != phase) {
+    if (phases.length && !phases.includes(game.phase)) {
       response.writeHead(400);
       return response.end();
     }

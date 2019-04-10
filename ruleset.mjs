@@ -9,20 +9,18 @@ Ruleset.prototype.isValid = function(...args) {
 
 Ruleset.forBidding = function(game) {
   return new Ruleset((contract) => {
-    let { actor, attendants } = game;
+    let { auction, actor } = game;
+    let highest = auction.bids.size;
+    if (auction.bids.has(actor)) {
+      let lead = auction.lead();
+      highest = lead.value;
+    }
 
-    if (contract.owner != actor) {
+    if (contract.value <= highest) {
       return false;
     }
 
-    let index = attendants.indexOf(actor);
-    if (contract.value <= index) {
-      return false;
-    }
-
-    let { trumps } = contract.order;
     let partner = contract.partner;
-
     if (!partner) {
       return true;
     }
@@ -31,6 +29,7 @@ Ruleset.forBidding = function(game) {
       return false;
     }
 
+    let { trumps } = contract.order;
     for (let card of actor.cards) {
       if (card.suit == partner.suit && !trumps.has(card)) {
         return true;
@@ -44,21 +43,19 @@ Ruleset.forBidding = function(game) {
 Ruleset.forPlaying = function(game) {
   return new Ruleset((card) => {
     let { actor, contract, trick } = game;
-
     if (!actor.cards.has(card)) {
       return false;
     }
 
-    let { trumps, dominants } = contract.order;
     let partner = contract.partner;
     let lead = trick.lead() || card;
-
     if (actor.cards.has(partner)) {
       if (lead.suit == partner.suit) {
         return card == partner;
       }
     }
 
+    let { trumps, dominants } = contract.order;
     if (dominants.has(lead)) {
       for (let dominant of dominants) {
         if (actor.cards.has(dominant)) {

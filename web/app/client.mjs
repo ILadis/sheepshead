@@ -121,25 +121,6 @@ Client.prototype.fetchTrick = async function() {
   return json;
 };
 
-Client.prototype.attendAuction = async function(attend) {
-  let id = this.id;
-  let token = this.token;
-  let request = new Request(`/games/${id}/auction/attend`, {
-    method: attend ? 'POST' : 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  });
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw response;
-  }
-
-  return true;
-};
-
 Client.prototype.bidContract = async function(contract) {
   let id = this.id;
   let token = this.token;

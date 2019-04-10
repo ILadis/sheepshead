@@ -2,6 +2,7 @@
 import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
+import { Auction } from './auction.mjs';
 import { Result } from './result.mjs';
 import { Ruleset } from './ruleset.mjs';
 
@@ -13,13 +14,10 @@ export async function joining() {
     let player = await this.onjoin(index);
     players.push(player);
 
-    if (!head) {
-      var head = player;
-      this.head = head;
-    }
-
     await this.onjoined(player);
   }
+
+  this.head = players[0];
 
   return dealing;
 }
@@ -43,48 +41,72 @@ export async function dealing({ players, head }) {
 }
 
 export async function attendance({ sequence, phase}) {
-  let attendants = new Array();
-  this.attendants = attendants;
+  let rules = Ruleset.forBidding(this);
+
+  let auction = new Auction();
+  this.auction = auction;
 
   for (let player of sequence) {
     this.actor = player;
     await this.onturn(player, phase);
 
-    let attend = await this.onattend(player);
-    if (attend) {
-      attendants.push(player)
-      await this.onattendant(player);
+    do {
+      var contract = await this.onbid(player, rules);
+    } while (contract && !rules.isValid(contract));
+
+    if (contract) {
+      contract.assign(player);
+      auction.bid(contract);
+
+      await this.oncontested(player);
     }
   }
 
-  return auction;
+  let lead = auction.lead();
+  if (!lead) {
+    return proceed;
+  }
+
+  await this.onbidded(lead);
+
+  return bidding;
 }
 
-export async function auction({ attendants, phase}) {
+export async function bidding({ auction, phase }) {
   let rules = Ruleset.forBidding(this);
 
-  let contract, highest = 0;
-  for (let player of attendants) {
-    this.actor = player;
-    await this.onturn(player, phase);
+  do {
+    let lead = auction.lead();
 
-    do {
-      var bid = await this.onbid(player, rules);
-    } while (!rules.isValid(bid));
+    for (let player of auction.bidders()) {
+      if (player == lead.owner) {
+        continue;
+      }
 
-    let value = bid.value;
-    if (value > highest) {
-      contract = bid;
-      highest = value;
+      this.actor = player;
+      await this.onturn(player, phase);
 
-      await this.onbidded(player);
+      do {
+        var contract = await this.onbid(player, rules);
+      } while (contract && !rules.isValid(contract));
+
+      if (contract) {
+        contract.assign(player);
+        auction.bid(contract);
+
+        await this.onbidded(contract);
+      } else {
+        auction.concede(player);
+      }
     }
-  }
+  } while (!auction.settled());
 
-  this.contract = contract;
+  let lead = auction.lead();
+  this.contract = lead;
+
   await this.onsettled(contract);
 
-  return contract ? playing : proceed;
+  return playing;
 }
 
 export async function playing({ contract, sequence, phase }) {

@@ -58,24 +58,7 @@ Presenter.prototype.showToast = function(text, duration) {
   this.views.toast.makeText(text, duration);
 }
 
-Presenter.prototype.showAttendance = function() {
-  let dialog = this.views.dialog;
-
-  dialog.setTitle('Participate in auction?');
-  dialog.show();
-
-  let options = dialog.withOptions();
-  options.addItem('Yes', true);
-  options.addItem('No', false);
-
-  options.onItemSelected = async (attend) => {
-    try {
-      await this.client.attendAuction(attend);
-    } catch { }
-  };
-};
-
-Presenter.prototype.showBidding = async function() {
+Presenter.prototype.showContracts = async function() {
   let dialog = this.views.dialog;
 
   dialog.setTitle('Choose what to play');
@@ -84,7 +67,7 @@ Presenter.prototype.showBidding = async function() {
   let options = dialog.withOptions();
   let contracts = await this.client.fetchContracts();
   for (let contract of contracts) {
-    let { name, variant } = contract;
+    let { name = 'concede', variant = 'default' } = contract;
     let label = `${name} (${variant})`;
     options.addItem(label, contract);
   }
@@ -111,10 +94,8 @@ Presenter.prototype.onTurn = function({ player, phase }) {
 
   switch (phase) {
   case 'attendance':
-    this.showAttendance();
-    break;
-  case 'auction':
-    this.showBidding();
+  case 'bidding':
+    this.showContracts();
     break;
   }
 };

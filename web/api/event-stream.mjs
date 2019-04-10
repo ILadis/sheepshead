@@ -16,7 +16,7 @@ EventStream.prototype.attach = function(game) {
     let player = new Entities.Turn(args[0], args[1]);
     this.publish('turn', player);
   };
-  game.onattendant = (...args) => {
+  game.oncontested = (...args) => {
     let player = new Entities.Player(args[0]);
     this.publish('contested', player);
   };

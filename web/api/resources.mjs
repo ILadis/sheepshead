@@ -168,7 +168,7 @@ export const Contracts = Resource.create(
   ['GET'], '^/games/(?<id>\\d+)/contracts');
 
 Contracts.prototype['GET'] = Handlers.chain(
-  PreFilters.requiresGame(Phases.auction),
+  PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
 ).then((request, response) => {
@@ -177,11 +177,11 @@ Contracts.prototype['GET'] = Handlers.chain(
   let rules = input.args[1];
   let entities = new Array();
 
+  entities.push(new Entities.Contract());
+
   for (let name in Contract) {
     for (let variant in Contract[name]) {
       let contract = Contract[name][variant];
-      contract.assign(player);
-
       if (rules.isValid(contract)) {
         entities.push(new Entities.Contract(name, variant));
       }
@@ -197,45 +197,22 @@ Contracts.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Attendance = Resource.create(
-  ['POST', 'DELETE'], '^/games/(?<id>\\d+)/auction/attend$');
-
-Attendance.prototype['POST'] = Handlers.chain(
-  PreFilters.requiresGame(Phases.attendance),
-  PreFilters.requiresPlayer(),
-  PreFilters.requiresActor()
-).then((request, response) => {
-  let { game: { input } } = request;
-
-  input.resolve(true);
-
-  response.writeHead(201);
-  return response.end();
-});
-
-Attendance.prototype['DELETE'] = Handlers.chain(
-  PreFilters.requiresGame(Phases.attendance),
-  PreFilters.requiresPlayer(),
-  PreFilters.requiresActor()
-).then((request, response) => {
-  let { game: { input } } = request;
-
-  input.resolve(false);
-
-  response.writeHead(204);
-  return response.end();
-});
-
 export const Auction = Resource.create(
   ['POST'], '^/games/(?<id>\\d+)/auction$');
 
 Auction.prototype['POST'] = Handlers.chain(
-  PreFilters.requiresGame(Phases.auction),
+  PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
   let { game: { input }, player, entity } = request;
+
+  if (!entity.name && !entity.variant) {
+    input.resolve();
+    response.writeHead(200);
+    return response.end();
+  }
 
   var contract = Contract[entity.name];
   if (!contract) {
@@ -248,7 +225,6 @@ Auction.prototype['POST'] = Handlers.chain(
     response.writeHead(422);
     return response.end();
   }
-  contract.assign(player);
 
   let rules = input.args[1];
   if (!rules.isValid(contract)) {
@@ -322,7 +298,6 @@ export default {
   Events,
   Players,
   Contracts,
-  Attendance,
   Auction,
   Hand,
   Trick

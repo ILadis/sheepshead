@@ -6,10 +6,6 @@ export function Presenter(shell, client) {
   this.client = client;
 }
 
-Presenter.prototype.showError = function(error) {
-  alert(error);
-};
-
 Presenter.prototype.showGame = function(self) {
   let views = {
     bottom: new View.Hand(),

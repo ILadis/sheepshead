@@ -1,6 +1,5 @@
 
 import { Resource } from '../resource.mjs';
-import { Handlers } from '../handlers.mjs';
 import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
@@ -48,7 +47,7 @@ Resources.games['POST'] = (request, response) => {
 Resources.state = new Resource(
   ['GET'], '^/api/games/(?<id>\\d+)$');
 
-Resources.state['GET'] = Handlers.chain(
+Resources.state['GET'] = PreFilters.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game } = request;
@@ -66,7 +65,7 @@ Resources.state['GET'] = Handlers.chain(
 Resources.events = new Resource(
   ['GET'], '^/api/games/(?<id>\\d+)/events$');
 
-Resources.events['GET'] = Handlers.chain(
+Resources.events['GET'] = PreFilters.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game: { events }, url } = request;
@@ -89,7 +88,7 @@ Resources.events['GET'] = Handlers.chain(
 Resources.players = new Resource(
   ['GET', 'POST'], '^/api/games/(?<id>\\d+)/players$');
 
-Resources.players['POST'] = Handlers.chain(
+Resources.players['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.joining),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
@@ -118,7 +117,7 @@ Resources.players['POST'] = Handlers.chain(
   return response.end();
 });
 
-Resources.players['GET'] = Handlers.chain(
+Resources.players['GET'] = PreFilters.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game: { actor, players }, url } = request;
@@ -141,7 +140,7 @@ Resources.players['GET'] = Handlers.chain(
 Resources.hand = new Resource(
   ['GET'], '^/api/games/(?<id>\\d+)/cards$');
 
-Resources.hand['GET'] = Handlers.chain(
+Resources.hand['GET'] = PreFilters.chain(
   PreFilters.requiresGame(),
   PreFilters.requiresPlayer()
 ).then((request, response) => {
@@ -169,7 +168,7 @@ Resources.hand['GET'] = Handlers.chain(
 Resources.contracts = new Resource(
   ['GET'], '^/api/games/(?<id>\\d+)/contracts$');
 
-Resources.contracts['GET'] = Handlers.chain(
+Resources.contracts['GET'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
@@ -202,7 +201,7 @@ Resources.contracts['GET'] = Handlers.chain(
 Resources.auction = new Resource(
   ['POST'], '^/api/games/(?<id>\\d+)/auction$');
 
-Resources.auction['POST'] = Handlers.chain(
+Resources.auction['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor(),
@@ -243,7 +242,7 @@ Resources.auction['POST'] = Handlers.chain(
 Resources.trick = new Resource(
   ['GET', 'POST'], '^/api/games/(?<id>\\d+)/trick$');
 
-Resources.trick['POST'] = Handlers.chain(
+Resources.trick['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.playing),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor(),
@@ -272,7 +271,7 @@ Resources.trick['POST'] = Handlers.chain(
   return response.end();
 });
 
-Resources.trick['GET'] = Handlers.chain(
+Resources.trick['GET'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.playing)
 ).then((request, response) => {
   let { game: { trick } } = request;

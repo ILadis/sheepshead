@@ -1,6 +1,31 @@
 
 export const PreFilters = Object.create(null);
 
+PreFilters.chain = function(...filters) {
+  let callback, chain = function(request, response) {
+    let iterator = filters.values();
+
+    let next = () => {
+      let { done, value } = iterator.next();
+      if (!done) {
+        value.handle(request, response, next);
+      } else if (callback) {
+        callback(request, response);
+      }
+    };
+
+    next();
+  };
+
+  chain.then = (cb) => {
+    callback = cb;
+    return chain;
+  };
+
+  return chain;
+};
+
+
 PreFilters.requiresGame = function(...phases) {
   let handle = (request, response, next) => {
     let id = Number(request.pathparams['id']);

@@ -1,6 +1,5 @@
 
 import Http from 'http';
-import { Handlers } from './handlers.mjs';
 
 export function HttpServer() {
   this.server = new Http.Server();
@@ -12,9 +11,9 @@ HttpServer.prototype.register = function(handler) {
 };
 
 HttpServer.prototype.registerAll = function(module) {
-  let handlers = Object.values(module);
-  for (let H of handlers) {
-    this.register(new H());
+  for (let key in module) {
+    let handler = module[key];
+    this.register(handler);
   }
 };
 
@@ -32,7 +31,14 @@ HttpServer.prototype.listen = function(port) {
 };
 
 HttpServer.prototype.handle = function(request, response) {
-  let handlers = this.handlers;
-  Handlers.chain(...handlers).call(this, request, response);
+  let iterator = this.handlers.values();
+  let next = () => {
+    let { done, value } = iterator.next();
+    if (!done) {
+      value.handle(request, response, next);
+    }
+  };
+
+  next();
 };
 

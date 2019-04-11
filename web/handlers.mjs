@@ -2,16 +2,14 @@
 export const Handlers = Object.create(null);
 
 Handlers.chain = function(...handlers) {
-  let callback;
-
-  let chain = function(request, response) {
+  let callback, chain = function(request, response) {
     let iterator = handlers.values();
 
     let next = () => {
       let { done, value } = iterator.next();
       if (!done) {
         value.handle(request, response, next);
-      } else if(callback) {
+      } else if (callback) {
         callback(request, response);
       }
     };

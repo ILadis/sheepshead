@@ -7,14 +7,6 @@ export function Resource(methods, path) {
   this.path = new RegExp(path, 'i');
 };
 
-Resource.create = function(methods, path) {
-  let resource = function() {
-    Resource.call(this, methods, path);
-  };
-  resource.prototype = Object.create(Resource.prototype);
-  return resource;
-};
-
 Resource.prototype.handle = function(request, response, next) {
   let url = URL.parse(request.url, true);
   let matches = this.path.exec(url.pathname);
@@ -39,7 +31,6 @@ Resource.prototype.handle = function(request, response, next) {
   this[request.method](request, response);
 };
 
-// TODO implement Etag based caching
 Resource.serveFile = function(file, mime) {
   return async (request, response) => {
     response.setHeader('Content-Type', mime);

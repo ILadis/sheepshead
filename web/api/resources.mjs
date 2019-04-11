@@ -15,10 +15,12 @@ import { Player } from '../../player.mjs';
 import { Contract } from '../../contract.mjs';
 import * as Phases from '../../phases.mjs';
 
-export const Games = Resource.create(
-  ['POST'], '^/games$');
+const Resources = Object.create(null);
 
-Games.prototype['POST'] = (request, response) => {
+Resources.games = new Resource(
+  ['POST'], '^/api/games$');
+
+Resources.games['POST'] = (request, response) => {
   let { registry } = request;
   let game = new Game();
 
@@ -43,10 +45,10 @@ Games.prototype['POST'] = (request, response) => {
   return response.end();
 };
 
-export const State = Resource.create(
-  ['GET'], '^/games/(?<id>\\d+)$');
+Resources.state = new Resource(
+  ['GET'], '^/api/games/(?<id>\\d+)$');
 
-State.prototype['GET'] = Handlers.chain(
+Resources.state['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game } = request;
@@ -61,10 +63,10 @@ State.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Events = Resource.create(
-  ['GET'], '^/games/(?<id>\\d+)/events$');
+Resources.events = new Resource(
+  ['GET'], '^/api/games/(?<id>\\d+)/events$');
 
-Events.prototype['GET'] = Handlers.chain(
+Resources.events['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game: { events }, url } = request;
@@ -84,10 +86,10 @@ Events.prototype['GET'] = Handlers.chain(
   });
 });
 
-export const Players = Resource.create(
-  ['GET', 'POST'], '^/games/(?<id>\\d+)/players$');
+Resources.players = new Resource(
+  ['GET', 'POST'], '^/api/games/(?<id>\\d+)/players$');
 
-Players.prototype['POST'] = Handlers.chain(
+Resources.players['POST'] = Handlers.chain(
   PreFilters.requiresGame(Phases.joining),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
@@ -116,7 +118,7 @@ Players.prototype['POST'] = Handlers.chain(
   return response.end();
 });
 
-Players.prototype['GET'] = Handlers.chain(
+Resources.players['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
   let { game: { actor, players }, url } = request;
@@ -136,10 +138,10 @@ Players.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Hand = Resource.create(
-  ['GET'], '^/games/(?<id>\\d+)/cards$');
+Resources.hand = new Resource(
+  ['GET'], '^/api/games/(?<id>\\d+)/cards$');
 
-Hand.prototype['GET'] = Handlers.chain(
+Resources.hand['GET'] = Handlers.chain(
   PreFilters.requiresGame(),
   PreFilters.requiresPlayer()
 ).then((request, response) => {
@@ -164,10 +166,10 @@ Hand.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Contracts = Resource.create(
-  ['GET'], '^/games/(?<id>\\d+)/contracts');
+Resources.contracts = new Resource(
+  ['GET'], '^/api/games/(?<id>\\d+)/contracts$');
 
-Contracts.prototype['GET'] = Handlers.chain(
+Resources.contracts['GET'] = Handlers.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
@@ -197,10 +199,10 @@ Contracts.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export const Auction = Resource.create(
-  ['POST'], '^/games/(?<id>\\d+)/auction$');
+Resources.auction = new Resource(
+  ['POST'], '^/api/games/(?<id>\\d+)/auction$');
 
-Auction.prototype['POST'] = Handlers.chain(
+Resources.auction['POST'] = Handlers.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor(),
@@ -238,10 +240,10 @@ Auction.prototype['POST'] = Handlers.chain(
   return response.end();
 });
 
-export const Trick = Resource.create(
-  ['GET', 'POST'], '^/games/(?<id>\\d+)/trick$');
+Resources.trick = new Resource(
+  ['GET', 'POST'], '^/api/games/(?<id>\\d+)/trick$');
 
-Trick.prototype['POST'] = Handlers.chain(
+Resources.trick['POST'] = Handlers.chain(
   PreFilters.requiresGame(Phases.playing),
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor(),
@@ -270,7 +272,7 @@ Trick.prototype['POST'] = Handlers.chain(
   return response.end();
 });
 
-Trick.prototype['GET'] = Handlers.chain(
+Resources.trick['GET'] = Handlers.chain(
   PreFilters.requiresGame(Phases.playing)
 ).then((request, response) => {
   let { game: { trick } } = request;
@@ -292,14 +294,5 @@ Trick.prototype['GET'] = Handlers.chain(
   return response.end();
 });
 
-export default {
-  Games,
-  State,
-  Events,
-  Players,
-  Contracts,
-  Auction,
-  Hand,
-  Trick
-};
+export default Resources;
 

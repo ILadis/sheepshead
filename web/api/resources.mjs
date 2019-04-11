@@ -13,7 +13,6 @@ import { Game } from '../../game.mjs';
 import { Card, Suit, Rank } from '../../card.mjs';
 import { Player } from '../../player.mjs';
 import { Contract } from '../../contract.mjs';
-import { Order } from '../../order.mjs';
 import * as Phases from '../../phases.mjs';
 
 export const Games = Resource.create(
@@ -50,7 +49,7 @@ export const State = Resource.create(
 State.prototype['GET'] = Handlers.chain(
   PreFilters.requiresGame()
 ).then((request, response) => {
-  let { game, registry } = request;
+  let { game } = request;
 
   let entity = new Entities.State(game);
   let json = JSON.stringify(entity);
@@ -147,7 +146,8 @@ Hand.prototype['GET'] = Handlers.chain(
   let { game: { contract }, player } = request;
 
   if (!contract) {
-    contract = Contract['normal']['acorn'];
+    let variants = Contract.normal;
+    contract = variants.acorn;
   }
 
   let cards = Array.from(player.cards);
@@ -172,7 +172,7 @@ Contracts.prototype['GET'] = Handlers.chain(
   PreFilters.requiresPlayer(),
   PreFilters.requiresActor()
 ).then((request, response) => {
-  let { game: { input }, player } = request;
+  let { game: { input } } = request;
 
   let rules = input.args[1];
   let entities = new Array();
@@ -206,7 +206,7 @@ Auction.prototype['POST'] = Handlers.chain(
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game: { input }, player, entity } = request;
+  let { game: { input }, entity } = request;
 
   if (!entity.name && !entity.variant) {
     input.resolve();
@@ -247,7 +247,7 @@ Trick.prototype['POST'] = Handlers.chain(
   PreFilters.requiresActor(),
   PreFilters.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game: { input }, player, entity } = request;
+  let { game: { input }, entity } = request;
 
   let rank = Rank[entity.rank];
   let suit = Suit[entity.suit];

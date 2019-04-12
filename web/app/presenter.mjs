@@ -33,8 +33,8 @@ Presenter.prototype.showGame = function(self) {
   views.bottom.onCardClicked = (card) => this.client.playCard(card);
 };
 
-Presenter.prototype.showHands = async function() {
-  let players = await this.client.fetchPlayers();
+Presenter.prototype.showHands = async function(player) {
+  let players = player ? [player] : await this.client.fetchPlayers();
 
   for (let player of players) {
     let position = this.positionOf(player);
@@ -81,16 +81,16 @@ Presenter.prototype.onTurn = function({ player, phase }) {
   let dialog = this.views.dialog;
   dialog.dismiss();
 
-  this.showHands();
-  if (!this.isSelf(player)) {
-    return;
-  }
+  player.actor = true;
+  this.showHands(player);
 
   switch (phase) {
   case 'attendance':
+    this.showHands();
   case 'bidding':
-    this.showContracts();
-    break;
+    if (this.isSelf(player)) {
+      this.showContracts();
+    }
   }
 };
 
@@ -102,7 +102,7 @@ Presenter.prototype.onContested = function(player) {
 
 Presenter.prototype.onPlayed = function({ player, card }) {
   this.views.trick.addCard(card);
-  this.showHands();
+  this.showHands(player);
 };
 
 Presenter.prototype.onCompleted = function({ winner, points }) {

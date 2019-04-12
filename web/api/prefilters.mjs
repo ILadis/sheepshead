@@ -8,7 +8,7 @@ PreFilters.chain = function(...filters) {
     let next = () => {
       let { done, value } = iterator.next();
       if (!done) {
-        value.handle(request, response, next);
+        value(request, response, next);
       } else if (callback) {
         callback(request, response);
       }
@@ -25,9 +25,8 @@ PreFilters.chain = function(...filters) {
   return chain;
 };
 
-
 PreFilters.requiresGame = function(...phases) {
-  let handle = (request, response, next) => {
+  return (request, response, next) => {
     let id = Number(request.pathparams['id']);
     let game = request.registry.lookup(id);
     if (!game) {
@@ -44,12 +43,10 @@ PreFilters.requiresGame = function(...phases) {
 
     next();
   };
-
-  return { handle };
 };
 
 PreFilters.requiresPlayer = function() {
-  let handle = (request, response, next) => {
+  return (request, response, next) => {
     let token = request.bearer;
     if (!token) {
       response.setHeader('WWW-Authenticate', 'Bearer');
@@ -68,12 +65,10 @@ PreFilters.requiresPlayer = function() {
 
     next();
   };
-
-  return { handle };
 };
 
 PreFilters.requiresActor = function() {
-  let handle = async (request, response, next) => {
+  return (request, response, next) => {
     let game = request.game;
     let player = request.player;
 
@@ -84,12 +79,10 @@ PreFilters.requiresActor = function() {
 
     next();
   };
-
-  return { handle };
 };
 
 PreFilters.requiresEntity = function(parser) {
-  let handle = async (request, response, next) => {
+  return async (request, response, next) => {
     let body = await request.body;
     if (body.length <= 0) {
       response.writeHead(400);
@@ -111,7 +104,5 @@ PreFilters.requiresEntity = function(parser) {
 
     next();
   };
-
-  return { handle };
 };
 

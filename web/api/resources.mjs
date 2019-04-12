@@ -17,7 +17,7 @@ import * as Phases from '../../phases.mjs';
 const Resources = Object.create(null);
 
 Resources.games = new Resource(
-  ['POST'], '^/api/games$');
+  ['POST'], '/api/games');
 
 Resources.games['POST'] = (request, response) => {
   let { registry } = request;
@@ -45,7 +45,7 @@ Resources.games['POST'] = (request, response) => {
 };
 
 Resources.state = new Resource(
-  ['GET'], '^/api/games/(?<id>\\d+)$');
+  ['GET'], '/api/games/(?<id>\\d+)');
 
 Resources.state['GET'] = PreFilters.chain(
   PreFilters.requiresGame()
@@ -63,7 +63,7 @@ Resources.state['GET'] = PreFilters.chain(
 });
 
 Resources.events = new Resource(
-  ['GET'], '^/api/games/(?<id>\\d+)/events$');
+  ['GET'], '/api/games/(?<id>\\d+)/events');
 
 Resources.events['GET'] = PreFilters.chain(
   PreFilters.requiresGame()
@@ -86,7 +86,7 @@ Resources.events['GET'] = PreFilters.chain(
 });
 
 Resources.players = new Resource(
-  ['GET', 'POST'], '^/api/games/(?<id>\\d+)/players$');
+  ['GET', 'POST'], '/api/games/(?<id>\\d+)/players');
 
 Resources.players['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.joining),
@@ -138,7 +138,7 @@ Resources.players['GET'] = PreFilters.chain(
 });
 
 Resources.hand = new Resource(
-  ['GET'], '^/api/games/(?<id>\\d+)/cards$');
+  ['GET'], '/api/games/(?<id>\\d+)/cards');
 
 Resources.hand['GET'] = PreFilters.chain(
   PreFilters.requiresGame(),
@@ -166,7 +166,7 @@ Resources.hand['GET'] = PreFilters.chain(
 });
 
 Resources.contracts = new Resource(
-  ['GET'], '^/api/games/(?<id>\\d+)/contracts$');
+  ['GET'], '/api/games/(?<id>\\d+)/contracts');
 
 Resources.contracts['GET'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
@@ -199,7 +199,7 @@ Resources.contracts['GET'] = PreFilters.chain(
 });
 
 Resources.auction = new Resource(
-  ['POST'], '^/api/games/(?<id>\\d+)/auction$');
+  ['POST'], '/api/games/(?<id>\\d+)/auction');
 
 Resources.auction['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.attendance, Phases.bidding),
@@ -240,7 +240,7 @@ Resources.auction['POST'] = PreFilters.chain(
 });
 
 Resources.trick = new Resource(
-  ['GET', 'POST'], '^/api/games/(?<id>\\d+)/trick$');
+  ['GET', 'POST'], '/api/games/(?<id>\\d+)/trick');
 
 Resources.trick['POST'] = PreFilters.chain(
   PreFilters.requiresGame(Phases.playing),

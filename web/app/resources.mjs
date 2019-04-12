@@ -23,7 +23,7 @@ for (let path of [
   let name = Path.basename(path);
   let mime = MediaType.fromFileExt(path);
 
-  let resource = new Resource(['GET'], `^/${name}$`);
+  let resource = new Resource(['GET'], `/${name}`);
   resource['GET'] = Resource.serveFile(path, mime);
 
   Resources[name] = resource;

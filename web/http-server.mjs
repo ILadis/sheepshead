@@ -17,6 +17,13 @@ HttpServer.prototype.registerAll = function(module) {
   }
 };
 
+HttpServer.prototype.baseUri = function(base) {
+  let handlers = this.handlers;
+  for (let handler of handlers) {
+    handler.base = base;
+  }
+};
+
 HttpServer.prototype.listen = function(port) {
   let server = this.server;
   let promise = new Promise((resolve, reject) => {

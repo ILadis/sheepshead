@@ -59,3 +59,11 @@ Registry.prototype.handle = function(request, response, next) {
   next();
 };
 
+export function Fallback() {
+}
+
+Fallback.prototype.handle = function(request, response, next) {
+  response.writeHead(404);
+  response.end();
+};
+

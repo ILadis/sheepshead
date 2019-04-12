@@ -4,13 +4,18 @@ import URL from 'url';
 
 export function Resource(methods, path) {
   this.methods = new Set(methods);
-  this.path = new RegExp(path, 'i');
-};
+  this.path = new RegExp(`^${path}$`, 'i');
+}
 
 Resource.prototype.handle = function(request, response, next) {
   let url = URL.parse(request.url, true);
-  let matches = this.path.exec(url.pathname);
+  let base = this.base || '';
+  if (!url.pathname.startsWith(base)) {
+    return next();
+  }
 
+  let path = url.pathname.substr(base.length);
+  let matches = this.path.exec(path);
   if (!matches) {
     return next();
   }

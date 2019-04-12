@@ -7,11 +7,11 @@ import * as Handlers from './handlers.mjs';
 import Api from './api/resources.mjs';
 import App from './app/resources.mjs';
 
-let index = new Resource(['GET'], '^/$');
-index['GET'] = Resource.serveRedirect('/index.html');
+let port = process.env.PORT || 8090;
+let base = process.env.BASE || '';
 
-let fallback = new Resource(['GET'], '.*');
-fallback['GET'] = Resource.serveNotFound();
+let index = new Resource(['GET'], '/');
+index['GET'] = Resource.serveRedirect('/index.html');
 
 let server = new HttpServer();
 server.register(new Handlers.Payload());
@@ -20,7 +20,8 @@ server.register(new Handlers.Registry());
 server.registerAll(Api);
 server.registerAll(App);
 server.register(index);
-server.register(fallback);
+server.register(new Handlers.Fallback());
 
-server.listen(process.env.PORT || 8090);
+server.baseUri(base);
+server.listen(port);
 

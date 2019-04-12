@@ -18,7 +18,7 @@ Presenter.prototype.showGame = function(self) {
   };
 
   this.shell.setTitle('Sheepshead');
-  this.shell.setContents(Object.values(views));
+  this.shell.setContents(views);
   this.views = views;
   this.self = self;
 
@@ -52,7 +52,7 @@ Presenter.prototype.showHands = async function() {
 
 Presenter.prototype.showToast = function(text, duration) {
   this.views.toast.makeText(text, duration);
-}
+};
 
 Presenter.prototype.showContracts = async function() {
   let dialog = this.views.dialog;
@@ -68,10 +68,8 @@ Presenter.prototype.showContracts = async function() {
     options.addItem(label, contract);
   }
 
-  options.onItemSelected = async (contract) => {
-    try {
-      await this.client.bidContract(contract);
-    } catch { }
+  options.onItemSelected = (contract) => {
+    this.client.bidContract(contract);
   };
 };
 

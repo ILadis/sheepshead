@@ -11,8 +11,8 @@ HttpServer.prototype.register = function(handler) {
 };
 
 HttpServer.prototype.registerAll = function(module) {
-  for (let key in module) {
-    let handler = module[key];
+  for (let name in module) {
+    let handler = module[name];
     this.register(handler);
   }
 };

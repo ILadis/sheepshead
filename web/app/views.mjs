@@ -48,7 +48,8 @@ Shell.prototype.setContents = function(views) {
   }
 
   let section = document.createElement('section');
-  for (let view of views) {
+  for (let name in views) {
+    let view = views[name];
     view.appendTo(section);
   }
 

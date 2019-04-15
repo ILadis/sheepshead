@@ -165,20 +165,18 @@ Client.prototype.playCard = async function(card) {
   return true;
 };
 
-Client.prototype.listenEvents = function(offset = 1) {
+Client.prototype.listenEvents = function() {
   let id = this.id;
   let source = new EventSource(`api/games/${id}/events?offset=1`);
 
-  let stream = {
-    offset: 0,
-    close: source.close.bind(source)
-  };
+  let stream = Object.create(null);
+  let offset = 0;
 
   let handler = function(event) {
     let id = Number.parseInt(event.lastEventId);
     let data = JSON.parse(event.data);
-    if (id > stream.offset) {
-      stream.offset = id;
+    if (id > offset) {
+      offset = id;
       stream['on' + event.type](data);
     }
   };

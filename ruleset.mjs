@@ -58,10 +58,10 @@ Ruleset.forPlaying = function(game) {
     }
 
     let partner = contract.partner;
-    if (actor.cards.has(partner)) {
-      if (lead.suit == partner.suit) {
-        return card == partner;
-      }
+    if (actor.cards.has(partner)
+      && !trumps.has(lead)
+      && lead.suit == partner.suit) {
+      return card == partner;
     }
 
     if (dominants.has(lead)) {

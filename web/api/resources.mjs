@@ -3,7 +3,7 @@ import { Resource } from '../resource.mjs';
 import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
-import { PreFilters } from './prefilters.mjs';
+import * as PreFilters from './prefilters.mjs';
 import { EventStream } from './event-stream.mjs';
 import { DeferredInput } from './deferred-input.mjs';
 import * as Entities from './entities.mjs';
@@ -184,7 +184,7 @@ Resources.contracts['GET'] = PreFilters.chain(
     for (let variant in Contract[name]) {
       let contract = Contract[name][variant];
       if (rules.isValid(contract)) {
-        entities.push(new Entities.Contract(name, variant));
+        entities.push(new Entities.Contract(contract));
       }
     }
   }

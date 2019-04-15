@@ -12,14 +12,14 @@ State.prototype.toJSON = function() {
   return { id, phase, actor };
 };
 
-export function Contract(name, variant) {
-  this.name = name;
-  this.variant = variant;
+export function Contract(contract) {
+  this.contract = contract;
 }
 
 Contract.prototype.toJSON = function() {
-  let name = this.name;
-  let variant = this.variant;
+  let contract = this.contract;
+  let name = contract ? contract.name : undefined;
+  let variant = contract ? contract.variant : undefined;
   return { name, variant };
 };
 

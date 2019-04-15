@@ -1,7 +1,5 @@
 
-export const PreFilters = Object.create(null);
-
-PreFilters.chain = function(...filters) {
+export function chain(...filters) {
   let callback, chain = function(request, response) {
     let iterator = filters.values();
 
@@ -25,7 +23,7 @@ PreFilters.chain = function(...filters) {
   return chain;
 };
 
-PreFilters.requiresGame = function(...phases) {
+export function requiresGame(...phases) {
   return (request, response, next) => {
     let id = Number(request.pathparams['id']);
     let game = request.registry.lookup(id);
@@ -45,7 +43,7 @@ PreFilters.requiresGame = function(...phases) {
   };
 };
 
-PreFilters.requiresPlayer = function() {
+export function requiresPlayer() {
   return (request, response, next) => {
     let token = request.bearer;
     if (!token) {
@@ -67,7 +65,7 @@ PreFilters.requiresPlayer = function() {
   };
 };
 
-PreFilters.requiresActor = function() {
+export function requiresActor() {
   return (request, response, next) => {
     let game = request.game;
     let player = request.player;
@@ -81,7 +79,7 @@ PreFilters.requiresActor = function() {
   };
 };
 
-PreFilters.requiresEntity = function(parser) {
+export function requiresEntity(parser) {
   return async (request, response, next) => {
     let body = await request.body;
     if (body.length <= 0) {

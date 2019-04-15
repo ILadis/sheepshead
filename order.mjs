@@ -78,4 +78,3 @@ Order.prototype.orderOf = function(card) {
   return 0;
 };
 
-

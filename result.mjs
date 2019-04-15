@@ -4,6 +4,11 @@ export function Result() {
   this.points = 0;
 };
 
+Result.prototype.add = function(player) {
+  this.players.add(player);
+  this.points += player.points;
+};
+
 Result.compare = function(result, other) {
   let winner = result, loser = other;
   if (other.points >= result.points) {
@@ -12,10 +17,5 @@ Result.compare = function(result, other) {
   }
 
   return { winner, loser };
-};
-
-Result.prototype.add = function(player) {
-  this.players.add(player);
-  this.points += player.points;
 };
 

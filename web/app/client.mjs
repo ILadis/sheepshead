@@ -169,9 +169,10 @@ Client.prototype.listenEvents = function(offset = 1) {
   let id = this.id;
   let source = new EventSource(`api/games/${id}/events?offset=1`);
 
-  let stream = Object.create(null);
-  stream.offset = 0;
-  stream.close = source.close.bind(source);
+  let stream = {
+    offset: 0,
+    close: source.close.bind(source)
+  };
 
   let handler = function(event) {
     let id = Number.parseInt(event.lastEventId);

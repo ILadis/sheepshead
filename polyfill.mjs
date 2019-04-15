@@ -1,7 +1,5 @@
 
-export const Polyfill = Object.create(null);
-
-Polyfill.when = function(type, define) {
+function when(type, define) {
   if (type !== 'undefined') {
     define((target, name, descriptor) => {
       if (target && name in target == false) {
@@ -11,7 +9,7 @@ Polyfill.when = function(type, define) {
   }
 };
 
-Polyfill.when(typeof Symbol, (define) => {
+when(typeof Symbol, (define) => {
   define(Symbol.prototype, 'description', {
     configurable: true,
     enumerable: false,
@@ -21,7 +19,7 @@ Polyfill.when(typeof Symbol, (define) => {
   });
 });
 
-Polyfill.when(typeof HTMLElement, (define) => {
+when(typeof HTMLElement, (define) => {
   let event = 'transitionend'
   let handler = Symbol(event);
 

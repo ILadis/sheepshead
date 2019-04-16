@@ -17,11 +17,30 @@ import * as Phases from '../../phases.mjs';
 const Resources = Object.create(null);
 
 Resources.games = new Resource(
-  ['POST'], '/api/games');
+  ['GET', 'POST'], '/api/games');
 
-Resources.games['POST'] = (request, response) => {
-  let { registry } = request;
+Resources.games['GET'] = PreFilter.chain(
+  PreFilter.requiresGames()
+).then((request, response) => {
+  let { games } = request;
+
+  let entity = games.map(g => new Entities.State(g));
+  let json = JSON.stringify(entity);
+
+  response.setHeader('Content-Type', MediaType.json);
+  response.setHeader('Content-Length', Buffer.byteLength(json));
+  response.writeHead(200);
+  response.write(json);
+  return response.end();
+});
+
+Resources.games['POST'] = PreFilter.chain(
+  PreFilter.requiresGames()
+).then((request, response) => {
+  let { games, registry } = request;
+
   let game = new Game();
+  games.push(game);
 
   let events = new EventStream();
   events.attach(game);
@@ -29,9 +48,10 @@ Resources.games['POST'] = (request, response) => {
   let input = new DeferredInput();
   input.attach(game);
 
-  let id = registry.register(1, game);
+  let id = games.length;
   game.id = id;
 
+  registry.register(id, game);
   game.run();
 
   let entity = new Entities.State(game);
@@ -42,7 +62,7 @@ Resources.games['POST'] = (request, response) => {
   response.writeHead(201);
   response.write(json);
   return response.end();
-};
+});
 
 Resources.state = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)');
@@ -177,8 +197,6 @@ Resources.contracts['GET'] = PreFilter.chain(
 
   let rules = input.args[1];
   let entities = new Array();
-
-  entities.push(new Entities.Contract());
 
   for (let name in Contract) {
     for (let variant in Contract[name]) {

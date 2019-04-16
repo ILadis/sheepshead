@@ -1,18 +1,11 @@
 
-export function Client(id) {
-  this.id = id;
+export function Client() {
 }
 
-Client.forGame = async function(id) {
-  if (Number.isInteger(id)) {
-    var request = new Request(`api/games/${id}`, {
-      method: 'GET'
-    });
-  } else {
-    var request = new Request('api/games', {
-      method: 'POST'
-    });
-  }
+Client.prototype.createGame = async function() {
+  let request = new Request('api/games', {
+    method: 'POST'
+  });
 
   let response = await fetch(request);
   if (!response.ok) {
@@ -20,13 +13,27 @@ Client.forGame = async function(id) {
   }
 
   let json = await response.json();
-  id = json.id;
 
-  return new Client(id);
+  return json;
 };
 
-Client.prototype.joinGame = async function(name) {
-  let id = this.id;
+Client.prototype.listGames = async function() {
+  let request = new Request('api/games', {
+    method: 'GET'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  let json = await response.json();
+
+  return json;
+};
+
+Client.prototype.joinGame = async function(game, name) {
+  let id = game.id;
   var json = JSON.stringify({ name });
 
   let request = new Request(`api/games/${id}/players`, {
@@ -43,6 +50,7 @@ Client.prototype.joinGame = async function(name) {
   }
 
   var json = await response.json();
+  this.id = id;
   this.token = json.token;
 
   return json;
@@ -167,7 +175,8 @@ Client.prototype.playCard = async function(card) {
 
 Client.prototype.listenEvents = function() {
   let id = this.id;
-  let source = new EventSource(`api/games/${id}/events?offset=1`);
+  let query = '?offset=1';
+  let source = new EventSource(`api/games/${id}/events${query}`);
 
   let stream = Object.create(null);
   let offset = 0;

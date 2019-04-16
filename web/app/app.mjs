@@ -5,17 +5,12 @@ import { Shell } from './views.mjs';
 import { Presenter } from './presenter.mjs';
 
 addEventListener('load', async () => {
-  let params = new URLSearchParams(location.search);
-  let id = Number(params.get('id') || 'NaN');
-  let name = String(params.get('name') || 'Player');
-
-  let client = await Client.forGame(id);
-  let self = await client.joinGame(name);
+  let client = new Client();
 
   let shell = new Shell();
   shell.appendTo(document.body);
 
   let presenter = new Presenter(shell, client);
-  presenter.showGame(self);
+  presenter.showLobby();
 });
 

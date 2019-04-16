@@ -70,13 +70,9 @@ Hand.prototype.postConstruct = function(position = 'bottom') {
 Hand.prototype.setPlayer = function(player) {
   let span = this.view.querySelector('span');
   span.textContent = player.name;
-};
-
-Hand.prototype.setActive = function(active) {
-  let span = this.view.querySelector('span');
   span.classList.remove('active');
 
-  if (active) {
+  if (player.actor) {
     span.classList.add('active');
   }
 };
@@ -91,7 +87,7 @@ Hand.prototype.clearCards = function() {
 Hand.prototype.setCards = function(cards) {
   this.clearCards();
 
-  if (!Array.isArray(cards)) {
+  if (Number.isInteger(cards)) {
     cards = new Array(cards);
   }
 
@@ -100,7 +96,7 @@ Hand.prototype.setCards = function(cards) {
     button.className = 'card';
     button.onclick = () => this.onCardClicked(card);
 
-    if (card && card.suit && card.rank) {
+    if (card) {
       button.dataset.suit = card.suit;
       button.dataset.rank = card.rank;
     }
@@ -200,11 +196,11 @@ Dialog.prototype.withOptions = function() {
   let ul = document.createElement('ul');
   this.view.appendChild(ul);
 
-  let onItemSelected = () => {};
-  let addItem = function(label, data) {
+  let onItemSelected = (item) => { };
+  let addItem = function(label, item) {
     let li = document.createElement('li');
     li.textContent = label;
-    li.onclick = () => this.onItemSelected(data);
+    li.onclick = () => this.onItemSelected(item);
 
     ul.appendChild(li);
   };
@@ -218,5 +214,33 @@ Dialog.prototype.show = function() {
 
 Dialog.prototype.dismiss = function() {
   this.view.style.opacity = 0;
+};
+
+export const List = View.create(html`
+<div class="list">
+  <ul></ul>
+</div>`);
+
+List.prototype.clearItems = function() {
+  let lis = this.view.querySelectorAll('li');
+  for (let i = 0; i < lis.length; i++) {
+    lis[i].remove();
+  }
+
+  let ul = this.view.querySelector('ul');
+  ul.style.visibility = 'hidden';
+};
+
+List.prototype.addItem = function(label, item) {
+  let li = document.createElement('li');
+  li.textContent = label;
+  li.onclick = () => this.onItemClicked(item);
+
+  let ul = this.view.querySelector('ul');
+  ul.style.visibility = 'visible';
+  ul.appendChild(li);
+};
+
+List.prototype.onItemClicked = function(item) {
 };
 

@@ -27,6 +27,21 @@ PreFilter.chain = function(...filters) {
   return chain;
 };
 
+PreFilter.requiresGames = function() {
+  return new PreFilter((request, response, next) => {
+    let key = Symbol.for('games');
+    let games = request.registry.lookup(key);
+    if (!games) {
+      games = new Array();
+      request.registry.register(key, games);
+    }
+
+    request.games = games;
+
+    next();
+  });
+};
+
 PreFilter.requiresGame = function(...phases) {
   return new PreFilter((request, response, next) => {
     let id = Number(request.pathparams['id']);

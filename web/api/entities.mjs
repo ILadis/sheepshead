@@ -17,9 +17,8 @@ export function Contract(contract) {
 }
 
 Contract.prototype.toJSON = function() {
-  let contract = this.contract;
-  let name = contract ? contract.name : undefined;
-  let variant = contract ? contract.variant : undefined;
+  let name = this.contract.name;
+  let variant = this.contract.variant;
   return { name, variant };
 };
 

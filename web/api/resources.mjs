@@ -3,7 +3,7 @@ import { Resource } from '../resource.mjs';
 import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
-import * as PreFilters from './prefilters.mjs';
+import { PreFilter } from './prefilter.mjs';
 import { EventStream } from './event-stream.mjs';
 import { DeferredInput } from './deferred-input.mjs';
 import * as Entities from './entities.mjs';
@@ -47,8 +47,8 @@ Resources.games['POST'] = (request, response) => {
 Resources.state = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)');
 
-Resources.state['GET'] = PreFilters.chain(
-  PreFilters.requiresGame()
+Resources.state['GET'] = PreFilter.chain(
+  PreFilter.requiresGame()
 ).then((request, response) => {
   let { game } = request;
 
@@ -65,8 +65,8 @@ Resources.state['GET'] = PreFilters.chain(
 Resources.events = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)/events');
 
-Resources.events['GET'] = PreFilters.chain(
-  PreFilters.requiresGame()
+Resources.events['GET'] = PreFilter.chain(
+  PreFilter.requiresGame()
 ).then((request, response) => {
   let { game: { events }, url } = request;
 
@@ -88,9 +88,9 @@ Resources.events['GET'] = PreFilters.chain(
 Resources.players = new Resource(
   ['GET', 'POST'], '/api/games/(?<id>\\d+)/players');
 
-Resources.players['POST'] = PreFilters.chain(
-  PreFilters.requiresGame(Phases.joining),
-  PreFilters.requiresEntity(JSON)
+Resources.players['POST'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.joining),
+  PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
   var { game: { input }, entity, registry } = request;
 
@@ -117,8 +117,8 @@ Resources.players['POST'] = PreFilters.chain(
   return response.end();
 });
 
-Resources.players['GET'] = PreFilters.chain(
-  PreFilters.requiresGame()
+Resources.players['GET'] = PreFilter.chain(
+  PreFilter.requiresGame()
 ).then((request, response) => {
   let { game: { actor, players }, url } = request;
 
@@ -140,9 +140,9 @@ Resources.players['GET'] = PreFilters.chain(
 Resources.hand = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)/cards');
 
-Resources.hand['GET'] = PreFilters.chain(
-  PreFilters.requiresGame(),
-  PreFilters.requiresPlayer()
+Resources.hand['GET'] = PreFilter.chain(
+  PreFilter.requiresGame(),
+  PreFilter.requiresPlayer()
 ).then((request, response) => {
   let { game: { contract }, player } = request;
 
@@ -168,10 +168,10 @@ Resources.hand['GET'] = PreFilters.chain(
 Resources.contracts = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)/contracts');
 
-Resources.contracts['GET'] = PreFilters.chain(
-  PreFilters.requiresGame(Phases.attendance, Phases.bidding),
-  PreFilters.requiresPlayer(),
-  PreFilters.requiresActor()
+Resources.contracts['GET'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.attendance, Phases.bidding),
+  PreFilter.requiresPlayer(),
+  PreFilter.requiresActor()
 ).then((request, response) => {
   let { game: { input } } = request;
 
@@ -201,11 +201,11 @@ Resources.contracts['GET'] = PreFilters.chain(
 Resources.auction = new Resource(
   ['POST'], '/api/games/(?<id>\\d+)/auction');
 
-Resources.auction['POST'] = PreFilters.chain(
-  PreFilters.requiresGame(Phases.attendance, Phases.bidding),
-  PreFilters.requiresPlayer(),
-  PreFilters.requiresActor(),
-  PreFilters.requiresEntity(JSON)
+Resources.auction['POST'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.attendance, Phases.bidding),
+  PreFilter.requiresPlayer(),
+  PreFilter.requiresActor(),
+  PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
   let { game: { input }, entity } = request;
 
@@ -242,11 +242,11 @@ Resources.auction['POST'] = PreFilters.chain(
 Resources.trick = new Resource(
   ['GET', 'POST'], '/api/games/(?<id>\\d+)/trick');
 
-Resources.trick['POST'] = PreFilters.chain(
-  PreFilters.requiresGame(Phases.playing),
-  PreFilters.requiresPlayer(),
-  PreFilters.requiresActor(),
-  PreFilters.requiresEntity(JSON)
+Resources.trick['POST'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.playing),
+  PreFilter.requiresPlayer(),
+  PreFilter.requiresActor(),
+  PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
   let { game: { input }, entity } = request;
 
@@ -271,8 +271,8 @@ Resources.trick['POST'] = PreFilters.chain(
   return response.end();
 });
 
-Resources.trick['GET'] = PreFilters.chain(
-  PreFilters.requiresGame(Phases.playing)
+Resources.trick['GET'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.playing)
 ).then((request, response) => {
   let { game: { trick } } = request;
 

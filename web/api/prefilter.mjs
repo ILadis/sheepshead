@@ -1,12 +1,16 @@
 
-export function chain(...filters) {
+export function PreFilter(filter) {
+  this.filter = filter;
+}
+
+PreFilter.chain = function(...filters) {
   let callback, chain = function(request, response) {
     let iterator = filters.values();
 
     let next = () => {
       let { done, value } = iterator.next();
       if (!done) {
-        value(request, response, next);
+        value.filter(request, response, next);
       } else if (callback) {
         callback(request, response);
       }
@@ -23,8 +27,8 @@ export function chain(...filters) {
   return chain;
 };
 
-export function requiresGame(...phases) {
-  return (request, response, next) => {
+PreFilter.requiresGame = function(...phases) {
+  return new PreFilter((request, response, next) => {
     let id = Number(request.pathparams['id']);
     let game = request.registry.lookup(id);
     if (!game) {
@@ -40,11 +44,11 @@ export function requiresGame(...phases) {
     request.game = game;
 
     next();
-  };
+  });
 };
 
-export function requiresPlayer() {
-  return (request, response, next) => {
+PreFilter.requiresPlayer = function() {
+  return new PreFilter((request, response, next) => {
     let token = request.bearer;
     if (!token) {
       response.setHeader('WWW-Authenticate', 'Bearer');
@@ -62,11 +66,11 @@ export function requiresPlayer() {
     request.player = player;
 
     next();
-  };
+  });
 };
 
-export function requiresActor() {
-  return (request, response, next) => {
+PreFilter.requiresActor = function() {
+  return new PreFilter((request, response, next) => {
     let game = request.game;
     let player = request.player;
 
@@ -76,11 +80,11 @@ export function requiresActor() {
     }
 
     next();
-  };
+  });
 };
 
-export function requiresEntity(parser) {
-  return async (request, response, next) => {
+PreFilter.requiresEntity = function(parser) {
+  return new PreFilter(async (request, response, next) => {
     let body = await request.body;
     if (body.length <= 0) {
       response.writeHead(400);
@@ -101,6 +105,6 @@ export function requiresEntity(parser) {
     request.entity = entity;
 
     next();
-  };
+  });
 };
 

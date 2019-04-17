@@ -1,8 +1,6 @@
 # Sheepshead
 Sheepshead is a work-in-progress implementation of the german trick-taking game [Schafkopf](https://en.wikipedia.org/wiki/Schafkopf), that runs inside your browser and supports multiple real-time game sessions with four human players.
 
-![Sheepshead](https://user-images.githubusercontent.com/7196536/56324510-52cde480-616f-11e9-8439-a82492d13731.png)
-
 ## Getting started
 To get the game running, you need a recent version of [Node.js](https://nodejs.org).
 
@@ -31,4 +29,7 @@ Example:
 ```sh
 env BASE='/sheep' node --experimental-modules sheepshead-master/web/index.mjs
 ```
+
+## Images
+![Sheepshead](https://user-images.githubusercontent.com/7196536/56324510-52cde480-616f-11e9-8439-a82492d13731.png)
 

@@ -24,7 +24,7 @@ Resources.games['GET'] = PreFilter.chain(
 ).then((request, response) => {
   let { games } = request;
 
-  let entity = games.map(g => new Entities.State(g));
+  let entity = games.map(g => new Entities.Game(g));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -54,7 +54,7 @@ Resources.games['POST'] = PreFilter.chain(
   registry.register(id, game);
   game.run();
 
-  let entity = new Entities.State(game);
+  let entity = new Entities.Game(game);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -72,7 +72,7 @@ Resources.state['GET'] = PreFilter.chain(
 ).then((request, response) => {
   let { game } = request;
 
-  let entity = new Entities.State(game);
+  let entity = new Entities.Game(game);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);

@@ -1,15 +1,15 @@
 
-export function State(game) {
+export function Game(game) {
   this.game = game;
 };
 
-State.prototype.toJSON = function() {
+Game.prototype.toJSON = function() {
   let id = this.game.id;
   let phase = this.game.phase;
   phase = phase ? phase.name : undefined;
-  let actor = this.game.actor;
-  actor = actor ? new Player(actor) : undefined;
-  return { id, phase, actor };
+  let players = Array.from(this.game.players);
+  players = players.map(p => p.name);
+  return { id, phase, players };
 };
 
 export function Contract(contract) {

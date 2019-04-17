@@ -32,6 +32,11 @@ Presenter.prototype.refreshGames = async function() {
   let games = await this.client.listGames();
   for (let game of games) {
     let label = `Game #${game.id}`;
+    let players = game.players.join(', ');
+    if (players.length) {
+      label += ` (${players})`;
+    }
+
     list.addItem(label, game);
   }
 

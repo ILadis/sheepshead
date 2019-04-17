@@ -2,7 +2,7 @@
 import Crypto from 'crypto';
 
 export function Token() {
-  this.bytes = Crypto.randomBytes(2);
+  this.bytes = Crypto.randomBytes(16);
 }
 
 Token.generate = function() {

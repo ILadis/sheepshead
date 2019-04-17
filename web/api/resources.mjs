@@ -1,8 +1,8 @@
 
 import { Resource } from '../resource.mjs';
-import { Token } from '../token.mjs';
 import { MediaType } from '../media-type.mjs';
 
+import { Token } from './token.mjs';
 import { PreFilter } from './prefilter.mjs';
 import { EventStream } from './event-stream.mjs';
 import { DeferredInput } from './deferred-input.mjs';

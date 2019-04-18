@@ -194,6 +194,8 @@ Client.prototype.listenEvents = function() {
     'joined',
     'turn',
     'contested',
+    'bidded',
+    'settled',
     'played',
     'completed',
     'finished'

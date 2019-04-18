@@ -20,6 +20,14 @@ EventStream.prototype.attach = function(game) {
     let player = new Entities.Player(args[0]);
     this.publish('contested', player);
   };
+  game.onbidded = (...args) => {
+    let contract = new Entities.Contract(args[0]);
+    this.publish('bidded', contract);
+  };
+  game.onsettled = (...args) => {
+    let contract = new Entities.Contract(args[0]);
+    this.publish('settled', contract);
+  };
   game.onplayed = (...args) => {
     let play = new Entities.Play(args[0], args[1]);
     this.publish('played', play);

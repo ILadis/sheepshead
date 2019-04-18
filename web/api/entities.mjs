@@ -19,7 +19,9 @@ export function Contract(contract) {
 Contract.prototype.toJSON = function() {
   let name = this.contract.name;
   let variant = this.contract.variant;
-  return { name, variant };
+  let owner = this.contract.owner;
+  owner = owner ? new Player(owner) : undefined;
+  return { name, variant, owner };
 };
 
 export function Play(player, card) {

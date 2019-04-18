@@ -68,16 +68,15 @@ export async function attendance({ sequence, phase}) {
     return proceed;
   }
 
-  await this.onbidded(lead);
-
   return bidding;
 }
 
 export async function bidding({ auction, phase }) {
   let rules = Ruleset.forBidding(this);
 
-  do {
-    let lead = auction.lead();
+  var lead = auction.lead();
+  while (!auction.settled()) {
+    await this.onbidded(lead);
 
     for (let player of auction.bidders()) {
       if (player == lead.owner) {
@@ -95,17 +94,16 @@ export async function bidding({ auction, phase }) {
         contract.assign(player);
         auction.bid(contract);
 
-        await this.onbidded(contract);
+        var lead = contract;
+        await this.onbidded(lead);
       } else {
         auction.concede(player);
       }
     }
-  } while (!auction.settled());
+  }
 
-  let lead = auction.lead();
   this.contract = lead;
-
-  await this.onsettled(contract);
+  await this.onsettled(lead);
 
   return playing;
 }

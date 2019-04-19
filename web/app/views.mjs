@@ -244,3 +244,17 @@ List.prototype.addItem = function(label, item) {
 List.prototype.onItemClicked = function(item) {
 };
 
+export const FAButton = View.create(html`
+<div class="fab">
+  <button></button>
+</div>`);
+
+FAButton.prototype.postConstruct = function(label) {
+  let button = this.view.querySelector('button');
+  button.textContent = label;
+  button.onclick = () => this.onClicked();
+};
+
+FAButton.prototype.onClicked = function() {
+};
+

@@ -68,8 +68,6 @@ body {
 
 .card:not([data-rank]):not([data-suit]) {
   background-image: url(back.svg);
-
-
   background-size: 6pt;
   background-position: center;
 }
@@ -248,6 +246,27 @@ body {
 
 .list ul li:last-child {
   border: none;
+}
+
+.fab {
+  position: absolute;
+  right: 30pt;
+  bottom: 20pt;
+}
+
+.fab button {
+  width: 44pt;
+  height: 44pt;
+  font-size: 36pt;
+  font-weight: 300;
+  text-align: center;
+  line-height: 44pt;
+  color: #fff;
+  background: #3b833b;
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
 }
 
 @media (min-width: 580pt) {

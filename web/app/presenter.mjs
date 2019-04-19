@@ -20,13 +20,14 @@ Presenter.prototype.showToast = function(text, duration) {
 Presenter.prototype.showLobby = function() {
   this.showView('Lobby', {
     list: new View.List(),
+    fab: new View.FAButton('+'),
     toast: new View.Toast()
   });
   this.refreshGames();
 };
 
 Presenter.prototype.refreshGames = async function() {
-  let list = this.views.list;
+  let { list, fab } = this.views;
   list.clearItems();
 
   let games = await this.client.listGames();
@@ -35,7 +36,17 @@ Presenter.prototype.refreshGames = async function() {
     list.addItem(label, game);
   }
 
+  fab.onClicked = () => this.createGame();
   list.onItemClicked = (game) => this.joinGame(game);
+};
+
+Presenter.prototype.createGame = async function() {
+  try {
+    let game = await this.client.createGame();
+    this.joinGame(game);
+  } catch (e) {
+    this.showToast('Can not create game');
+  }
 };
 
 Presenter.prototype.joinGame = async function(game) {

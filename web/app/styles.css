@@ -66,15 +66,10 @@ body {
   display: inline-block;
 }
 
-.card:not([data-rank]):not([data-suit]) {
+.card[class=card] {
   background-image: url(back.svg);
   background-size: 6pt;
   background-position: center;
-}
-
-.card:not([data-rank]):not([data-suit]):after,
-.card:not([data-rank]):not([data-suit]):before {
-  visibility: hidden;
 }
 
 .card:before {
@@ -86,14 +81,14 @@ body {
   display: block;
 }
 
-.card[data-rank=seven]:before { content: '7' }
-.card[data-rank=eight]:before { content: '8' }
-.card[data-rank=nine]:before { content: '9' }
-.card[data-rank=sergeant]:before { content: 'U' }
-.card[data-rank=officer]:before { content: 'O' }
-.card[data-rank=king]:before { content: 'K' }
-.card[data-rank=ten]:before { content: '10' }
-.card[data-rank=ace]:before { content: 'A' }
+.card.seven:before { content: '7' }
+.card.eight:before { content: '8' }
+.card.nine:before { content: '9' }
+.card.sergeant:before { content: 'U' }
+.card.officer:before { content: 'O' }
+.card.king:before { content: 'K' }
+.card.ten:before { content: '10' }
+.card.ace:before { content: 'A' }
 
 .card:after {
   content: '';
@@ -104,10 +99,10 @@ body {
   display: block;
 }
 
-.card[data-suit=bell]:after { background-image: url('bell.svg'); }
-.card[data-suit=heart]:after { background-image: url('heart.svg'); }
-.card[data-suit=leaf]:after { background-image: url('leaf.svg'); }
-.card[data-suit=acorn]:after { background-image: url('acorn.svg'); }
+.card.bell:after { background-image: url('bell.svg'); }
+.card.heart:after { background-image: url('heart.svg'); }
+.card.leaf:after { background-image: url('leaf.svg'); }
+.card.acorn:after { background-image: url('acorn.svg'); }
 
 .trick {
   position: absolute;
@@ -167,14 +162,10 @@ body {
   width: 100%;
   top: 30%;
   text-align: center;
-  outline-style: none;
-  border-style: none;
-  opacity: 0;
-  transition: opacity 0.3s;
+  pointer-events: none;
 }
 
-.toast:before {
-  content: attr(data-text);
+.toast span {
   padding: 8pt 24pt;
   max-width: 80%;
   color: #3c3c3c;
@@ -184,6 +175,8 @@ body {
   border-radius: 2pt;
   background-color: #fff;
   box-shadow: 0 2pt 6pt 1pt #bfbfbf;
+  opacity: 0;
+  transition: opacity 0.3s;
   display: inline-block;
 }
 
@@ -204,10 +197,8 @@ body {
   transition: opacity 0.3s;
 }
 
-.dialog:before {
-  content: attr(data-title);
+.dialog h1 {
   font-size: 13pt;
-  display: block;
 }
 
 .dialog ul {

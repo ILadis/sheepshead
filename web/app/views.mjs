@@ -97,8 +97,8 @@ Hand.prototype.setCards = function(cards) {
     button.onclick = () => this.onCardClicked(card);
 
     if (card) {
-      button.dataset.suit = card.suit;
-      button.dataset.rank = card.rank;
+      button.classList.add(card.suit);
+      button.classList.add(card.rank);
     }
 
     this.view.appendChild(button);
@@ -127,14 +127,16 @@ Trick.prototype.addCard = function(card) {
 
   let hr = document.createElement('hr');
   hr.className = 'card';
-  hr.dataset.suit = card.suit;
-  hr.dataset.rank = card.rank;
+  hr.classList.add(card.suit);
+  hr.classList.add(card.rank);
 
   this.view.appendChild(hr);
 };
 
 export const Toast = View.create(html`
-<div class="toast"></div>`);
+<div class="toast">
+  <span></span>
+</div>`);
 
 Toast.prototype.postConstruct = function() {
   this.queue = new Array();
@@ -157,44 +159,45 @@ Toast.prototype.show = function() {
     return;
   }
 
-  this.view.ontransitionend = () => {
+  let span = this.view.querySelector('span');
+  span.style.opacity = 1;
+  span.textContent = next.text;
+
+  span.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
   };
-
-  this.view.dataset.text = next.text;
-  this.view.style.opacity = 1;
-  this.view.style.visibility = 'visible';
 };
 
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  this.view.ontransitionend = () => {
-    this.view.style.visibility = 'hidden';
+  let span = this.view.querySelector('span');
+  span.style.opacity = 0;
+
+  span.ontransitionend = () => {
     this.queue.shift();
     this.show();
   };
-
-  this.view.style.opacity = 0;
 };
 
 export const Dialog = View.create(html`
 <div class="dialog">
+  <h1></h1>
   <ul></ul>
 </div>`);
 
 Dialog.prototype.setTitle = function(title) {
-  this.view.dataset.title = title;
+  let h1 = this.view.querySelector('h1')
+  h1.textContent = title;
 };
 
 Dialog.prototype.withOptions = function() {
-  while (this.view.firstChild) {
-    this.view.firstChild.remove();
-  }
+  let ul = this.view.querySelector('ul');
 
-  let ul = document.createElement('ul');
-  this.view.appendChild(ul);
+  while (ul.firstChild) {
+    ul.firstChild.remove();
+  }
 
   let onItemSelected = (item) => { };
   let addItem = function(label, item) {

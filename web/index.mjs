@@ -11,7 +11,7 @@ let port = process.env.PORT || 8090;
 let base = process.env.BASE || '';
 
 let index = new Resource(['GET'], '/');
-index['GET'] = Resource.serveRedirect('/index.html');
+index['GET'] = Resource.serveRedirect('index.html');
 
 let server = new HttpServer();
 server.register(new Handlers.Payload());

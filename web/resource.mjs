@@ -50,7 +50,7 @@ Resource.serveFile = function(file, mime) {
 Resource.serveRedirect = function(uri) {
   return async (request, response) => {
     response.setHeader('Location', uri);
-    response.writeHead(301);
+    response.writeHead(302);
     response.end();
   };
 };

@@ -36,6 +36,9 @@ Presenter.prototype.refreshGames = async function() {
     list.addItem(label, game);
   }
 
+  list.setHint('There are currently no games available to join. '
+    + 'Click the button below to create one.')
+
   fab.onClicked = () => this.createGame();
   list.onItemClicked = (game) => this.joinGame(game);
 };

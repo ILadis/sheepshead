@@ -219,6 +219,12 @@ body {
   padding: 12pt 8pt;
 }
 
+.list span {
+  padding: 0 16pt;
+  text-align: center;
+  display: block;
+}
+
 .list ul {
   list-style: none;
 }

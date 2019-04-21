@@ -221,8 +221,14 @@ Dialog.prototype.dismiss = function() {
 
 export const List = View.create(html`
 <div class="list">
+  <span></span>
   <ul></ul>
 </div>`);
+
+List.prototype.setHint = function(hint) {
+  let span = this.view.querySelector('span');
+  span.textContent = hint;
+};
 
 List.prototype.clearItems = function() {
   let lis = this.view.querySelectorAll('li');
@@ -232,6 +238,9 @@ List.prototype.clearItems = function() {
 
   let ul = this.view.querySelector('ul');
   ul.style.visibility = 'hidden';
+
+  let span = this.view.querySelector('span');
+  span.style.display = 'block';
 };
 
 List.prototype.addItem = function(label, item) {
@@ -242,6 +251,9 @@ List.prototype.addItem = function(label, item) {
   let ul = this.view.querySelector('ul');
   ul.style.visibility = 'visible';
   ul.appendChild(li);
+
+  let span = this.view.querySelector('span');
+  span.style.display = 'none';
 };
 
 List.prototype.onItemClicked = function(item) {

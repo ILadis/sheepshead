@@ -192,6 +192,7 @@ Client.prototype.listenEvents = function() {
 
   for (let event of [
     'joined',
+    'dealt',
     'turn',
     'contested',
     'bidded',

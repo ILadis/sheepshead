@@ -12,6 +12,9 @@ EventStream.prototype.attach = function(game) {
     let player = new Entities.Player(args[0]);
     this.publish('joined', player);
   };
+  game.ondealt = (...args) => {
+    this.publish('dealt');
+  };
   game.onturn = (...args) => {
     let player = new Entities.Turn(args[0], args[1]);
     this.publish('turn', player);
@@ -44,7 +47,7 @@ EventStream.prototype.attach = function(game) {
   };
 };
 
-EventStream.prototype.publish = function(type, entity) {
+EventStream.prototype.publish = function(type, entity = { }) {
   let id = this.events.length + 1;
   let data = JSON.stringify(entity);
 

@@ -1,48 +1,24 @@
 
-function View(template) {
-  let node = document.importNode(template.content, true);
-  this.view = node.firstElementChild;
+export const Shell = function() {
+  this.node = importNode(Shell.template);
 }
 
-View.create = function(template) {
-  let view = function(...args) {
-    View.call(this, template);
-    this.postConstruct(...args);
-  };
-  view.template = template;
-  view.prototype = Object.create(View.prototype);
-  return view;
-};
-
-View.prototype.postConstruct = function() {
-};
-
-View.prototype.appendTo = function(other) {
-  other.appendChild(this.view);
-};
-
-function html(strings) {
-  let template = document.createElement('template');
-  template.innerHTML = strings.join('');
-  return template;
-}
-
-export const Shell = View.create(html`
+Shell.template = html`
 <div class="shell">
   <header>
     <h1></h1>
   </header>
   <main></main>
-</div>`);
+</div>`;
 
 Shell.prototype.setTitle = function(title) {
-  let h1 = this.view.querySelector('header > h1');
+  let h1 = this.node.querySelector('header > h1');
   h1.textContent = title;
   document.title = title;
 };
 
 Shell.prototype.setContents = function(views) {
-  let sections = this.view.querySelectorAll('main > section');
+  let sections = this.node.querySelectorAll('main > section');
   for (let i = 0; i < sections.length; i++) {
     sections[i].remove();
   }
@@ -50,35 +26,51 @@ Shell.prototype.setContents = function(views) {
   let section = document.createElement('section');
   for (let name in views) {
     let view = views[name];
-    view.appendTo(section);
+    section.appendChild(view.node);
   }
 
-  let main = this.view.querySelector('main');
+  let main = this.node.querySelector('main');
   main.appendChild(section);
 };
 
-export const Hand = View.create(html`
+export const Hand = function() {
+  this.node = importNode(Hand.template);
+}
+
+Hand.template = html`
 <div class="hand">
   <span></span>
-</div>`);
+</div>`;
 
-Hand.prototype.postConstruct = function(position = 'bottom') {
-  let div = this.view;
-  div.classList.add(position);
+Hand.prototype.setPosition = function(position) {
+  switch (position) {
+  case 'top':
+  case 'bottom':
+  case 'left':
+  case 'right':
+    this.node.classList.add(position);
+  }
 };
 
 Hand.prototype.setPlayer = function(player) {
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.textContent = player.name;
   span.classList.remove('active');
-
   if (player.actor) {
     span.classList.add('active');
   }
 };
 
+Hand.prototype.setActor = function(actor) {
+  let span = this.node.querySelector('span');
+  span.classList.remove('active');
+  if (actor) {
+    span.classList.add('active');
+  }
+}
+
 Hand.prototype.clearCards = function() {
-  let buttons = this.view.querySelectorAll('button');
+  let buttons = this.node.querySelectorAll('button');
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].remove();
   }
@@ -101,18 +93,22 @@ Hand.prototype.setCards = function(cards) {
       button.classList.add(card.rank);
     }
 
-    this.view.appendChild(button);
+    this.node.appendChild(button);
   }
 };
 
 Hand.prototype.onCardClicked = function(card) {
 };
 
-export const Trick = View.create(html`
-<div class="trick"></div>`);
+export const Trick = function() {
+  this.node = importNode(Trick.template);
+}
+
+Trick.template = html`
+<div class="trick"></div>`;
 
 Trick.prototype.clearCards = function(atCount = 4) {
-  let hrs = this.view.querySelectorAll('hr');
+  let hrs = this.node.querySelectorAll('hr');
   if (hrs.length != atCount) {
     return;
   }
@@ -130,17 +126,18 @@ Trick.prototype.addCard = function(card) {
   hr.classList.add(card.suit);
   hr.classList.add(card.rank);
 
-  this.view.appendChild(hr);
+  this.node.appendChild(hr);
 };
 
-export const Toast = View.create(html`
+export const Toast = function() {
+  this.node = importNode(Toast.template);
+  this.queue = new Array();
+}
+
+Toast.template = html`
 <div class="toast">
   <span></span>
-</div>`);
-
-Toast.prototype.postConstruct = function() {
-  this.queue = new Array();
-};
+</div>`;
 
 Toast.prototype.makeText = function(text, duration = 2000) {
   this.queue.push({ text, duration });
@@ -159,7 +156,7 @@ Toast.prototype.show = function() {
     return;
   }
 
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.style.opacity = 1;
   span.textContent = next.text;
 
@@ -172,7 +169,7 @@ Toast.prototype.show = function() {
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.style.opacity = 0;
 
   span.ontransitionend = () => {
@@ -181,19 +178,23 @@ Toast.prototype.dismiss = function() {
   };
 };
 
-export const Dialog = View.create(html`
+export const Dialog = function() {
+  this.node = importNode(Dialog.template);
+}
+
+Dialog.template = html`
 <div class="dialog">
   <h1></h1>
   <ul></ul>
-</div>`);
+</div>`;
 
 Dialog.prototype.setTitle = function(title) {
-  let h1 = this.view.querySelector('h1')
+  let h1 = this.node.querySelector('h1')
   h1.textContent = title;
 };
 
 Dialog.prototype.withOptions = function() {
-  let ul = this.view.querySelector('ul');
+  let ul = this.node.querySelector('ul');
 
   while (ul.firstChild) {
     ul.firstChild.remove();
@@ -212,34 +213,38 @@ Dialog.prototype.withOptions = function() {
 };
 
 Dialog.prototype.show = function() {
-  this.view.style.opacity = 1;
+  this.node.style.opacity = 1;
 };
 
 Dialog.prototype.dismiss = function() {
-  this.view.style.opacity = 0;
+  this.node.style.opacity = 0;
 };
 
-export const List = View.create(html`
+export const List = function() {
+  this.node = importNode(List.template);
+}
+
+List.template = html`
 <div class="list">
   <span></span>
   <ul></ul>
-</div>`);
+</div>`;
 
 List.prototype.setHint = function(hint) {
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.textContent = hint;
 };
 
 List.prototype.clearItems = function() {
-  let lis = this.view.querySelectorAll('li');
+  let lis = this.node.querySelectorAll('li');
   for (let i = 0; i < lis.length; i++) {
     lis[i].remove();
   }
 
-  let ul = this.view.querySelector('ul');
+  let ul = this.node.querySelector('ul');
   ul.style.visibility = 'hidden';
 
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.style.display = 'block';
 };
 
@@ -248,28 +253,43 @@ List.prototype.addItem = function(label, item) {
   li.textContent = label;
   li.onclick = () => this.onItemClicked(item);
 
-  let ul = this.view.querySelector('ul');
+  let ul = this.node.querySelector('ul');
   ul.style.visibility = 'visible';
   ul.appendChild(li);
 
-  let span = this.view.querySelector('span');
+  let span = this.node.querySelector('span');
   span.style.display = 'none';
 };
 
 List.prototype.onItemClicked = function(item) {
 };
 
-export const FAButton = View.create(html`
+export const Button = function() {
+  this.node = importNode(Button.template);
+}
+
+Button.template = html`
 <div class="fab">
   <button></button>
-</div>`);
+</div>`;
 
-FAButton.prototype.postConstruct = function(label) {
-  let button = this.view.querySelector('button');
+Button.prototype.setLabel = function(label) {
+  let button = this.node.querySelector('button');
   button.textContent = label;
   button.onclick = () => this.onClicked();
+}
+
+Button.prototype.onClicked = function() {
 };
 
-FAButton.prototype.onClicked = function() {
-};
+function html(source) {
+  let template = document.createElement('template');
+  template.innerHTML = source[0];
+  return template.content;
+}
+
+function importNode(template) {
+  let node = document.importNode(template, true);
+  return node.firstElementChild;
+}
 

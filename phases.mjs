@@ -38,6 +38,8 @@ export async function dealing({ players, head }) {
     }
   } while (!deck.empty());
 
+  await this.ondealt(players);
+
   return attendance;
 }
 

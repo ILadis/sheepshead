@@ -8,7 +8,7 @@ addEventListener('load', async () => {
   let client = new Client();
 
   let shell = new Shell();
-  shell.appendTo(document.body);
+  document.body.appendChild(shell.node);
 
   let presenter = new Presenter(shell, client);
   presenter.showLobby();

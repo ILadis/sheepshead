@@ -171,8 +171,8 @@ Resources.hand['GET'] = PreFilter.chain(
     contract = variants.acorn;
   }
 
-  let cards = Array.from(player.cards);
   let order = contract.order;
+  let cards = Array.from(player.cards);
   cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
 
   let entities = cards.map(c => new Entities.Card(c));
@@ -195,18 +195,9 @@ Resources.contracts['GET'] = PreFilter.chain(
 ).then((request, response) => {
   let { game: { input } } = request;
 
-  let rules = input.args[1];
-  let entities = new Array();
+  let options = Array.from(input.args[2]);
 
-  for (let name in Contract) {
-    for (let variant in Contract[name]) {
-      let contract = Contract[name][variant];
-      if (rules.isValid(contract)) {
-        entities.push(new Entities.Contract(contract));
-      }
-    }
-  }
-
+  let entities = options.map(c => new Entities.Contract(c));
   let json = JSON.stringify(entities);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -246,7 +237,7 @@ Resources.auction['POST'] = PreFilter.chain(
   }
 
   let rules = input.args[1];
-  if (!rules.isValid(contract)) {
+  if (!rules.valid(contract)) {
     response.writeHead(400);
     return response.end();
   }
@@ -277,8 +268,8 @@ Resources.trick['POST'] = PreFilter.chain(
   }
 
   let card = Card[suit][rank];
-  let rules = input.args[2];
-  if (!rules.isValid(card)) {
+  let rules = input.args[1];
+  if (!rules.valid(card)) {
     response.writeHead(400);
     return response.end();
   }

@@ -2,6 +2,7 @@
 import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
+import { Contract } from './contract.mjs';
 import { Auction } from './auction.mjs';
 import { Result } from './result.mjs';
 import { Ruleset } from './ruleset.mjs';
@@ -53,9 +54,11 @@ export async function attendance({ sequence, phase}) {
     this.actor = player;
     await this.onturn(player, phase);
 
+    let options = rules.options(Contract);
+
     do {
-      var contract = await this.onbid(player, rules);
-    } while (contract && !rules.isValid(contract));
+      var contract = await this.onbid(player, rules, options);
+    } while (!rules.valid(contract));
 
     if (contract) {
       contract.assign(player);
@@ -88,9 +91,15 @@ export async function bidding({ auction, phase }) {
       this.actor = player;
       await this.onturn(player, phase);
 
+      let options = rules.options(Contract);
+      if (!options) {
+        auction.concede(player);
+        continue;
+      }
+
       do {
-        var contract = await this.onbid(player, rules);
-      } while (contract && !rules.isValid(contract));
+        var contract = await this.onbid(player, rules, options);
+      } while (!rules.valid(contract));
 
       if (contract) {
         contract.assign(player);
@@ -120,9 +129,11 @@ export async function playing({ contract, sequence, phase }) {
     this.actor = player;
     await this.onturn(player, phase);
 
+    let options = rules.options(player.cards);
+
     do {
-      var card = await this.onplay(player, trick, rules);
-    } while (!rules.isValid(card));
+      var card = await this.onplay(player, rules, options);
+    } while (!rules.valid(card));
 
     player.draw(card);
 

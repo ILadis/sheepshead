@@ -99,3 +99,11 @@ Contract.solo = {
   }
 };
 
+Contract[Symbol.iterator] = function*() {
+  for (let name in Contract) {
+    for (let variant in Contract[name]) {
+      yield Contract[name][variant];
+    }
+  }
+};
+

@@ -19,13 +19,17 @@ Auction.prototype.bidders = function() {
 Auction.prototype.lead = function() {
   let lead, highest = 0;
   for (let [player, contract] of this.bids) {
-    if (contract && contract.value > highest) {
+    if (contract.value > highest) {
       lead = contract;
       highest = contract.value;
     }
   }
 
   return lead;
+};
+
+Auction.prototype.blind = function() {
+  return this.bids.size;
 };
 
 Auction.prototype.settled = function() {

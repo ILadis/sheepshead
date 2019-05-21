@@ -95,8 +95,9 @@ Presenter.prototype.onJoined = function(player) {
   this.showToast(`${player.name} joined the game`);
 };
 
-Presenter.prototype.onDealt = function() {
-  this.refreshPlayers();
+Presenter.prototype.onDealt = async function() {
+  let players = await this.client.fetchPlayers();
+  this.refreshPlayers(...players);
 };
 
 Presenter.prototype.onTurn = function({ player, phase }) {
@@ -115,31 +116,30 @@ Presenter.prototype.onTurn = function({ player, phase }) {
   }
 };
 
-Presenter.prototype.refreshPlayers = async function(player) {
-  let players = new Array(player);
-  if (!player) {
-    players = await this.client.fetchPlayers();
-  }
-
+Presenter.prototype.refreshPlayers = function(...players) {
   let { left, top, right, bottom } = this.views;
   for (let hand of [left, top, right, bottom]) {
     hand.setActor(false);
   }
+
   bottom.onCardClicked = (card) => this.playCard(card);
 
   let hands = this.views;
   for (let player of players) {
     let position = this.positionOf(player);
     let hand = hands[position];
-    let cards = player.cards;
-
-    if (this.isSelf(player)) {
-      cards = await this.client.fetchCards();
-    }
 
     hand.setPosition(position);
     hand.setPlayer(player);
-    hand.setCards(cards);
+
+    let cards = player.cards;
+    if (this.isSelf(player)) {
+      this.client.fetchCards().then((cards) => {
+        hand.setCards(cards);
+      });
+    } else {
+      hand.setCards(cards);
+    }
   }
 };
 

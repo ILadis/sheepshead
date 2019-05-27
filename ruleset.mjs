@@ -88,8 +88,9 @@ Ruleset.forPlaying = function(game) {
 
     return hasCard({ actor, card },
       () => enforceTrump({ actor, contract, lead, card },
-        () => enforceDominant({ actor, contract, lead, card },
-          () => true)));
+        () => enforcePartner({ actor, contract, lead, card }, 
+          () => enforceDominant({ actor, contract, lead, card },
+            () => true))));
   });
 
   function hasCard({ actor, card }, next) {
@@ -112,15 +113,23 @@ Ruleset.forPlaying = function(game) {
     return next();
   }
 
-  function enforceDominant({ actor, contract, lead, card }, next) {
-    let dominants = contract.order.dominants;
+  function enforcePartner({ actor, contract, lead, card }, next) {
+    let trumps = contract.order.trumps;
     let partner = contract.partner;
 
-    if (dominants.has(lead)) {
+    if (!trumps.has(lead)) {
       if (actor.cards.has(partner) && lead.suit == partner.suit) {
         return card == partner;
       }
+    }
 
+    return next();
+  }
+
+  function enforceDominant({ actor, contract, lead, card }, next) {
+    let dominants = contract.order.dominants;
+
+    if (dominants.has(lead)) {
       for (let dominant of dominants) {
         if (actor.cards.has(dominant)) {
           return dominants.has(card);

@@ -16,6 +16,7 @@ for (let path of [
   filepath`./back.svg`,
   filepath`./app.mjs`,
   filepath`./presenter.mjs`,
+  filepath`./strings.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,
   filepath`../../polyfill.mjs`,

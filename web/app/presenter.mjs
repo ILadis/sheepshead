@@ -1,9 +1,10 @@
 
 import * as View from './views.mjs';
 
-export function Presenter(shell, client) {
+export function Presenter(shell, client, strings) {
   this.shell = shell;
   this.client = client;
+  this.strings = strings;
 }
 
 Presenter.prototype.showView = function(title, views) {
@@ -32,12 +33,12 @@ Presenter.prototype.refreshGames = async function() {
 
   let games = await this.client.listGames();
   for (let game of games) {
-    let label = this.gameLabel(game);
+    let label = this.labelOf(game);
     list.addItem(label, game);
   }
 
-  list.setHint('There are currently no games available to join. '
-    + 'Click the button below to create one.')
+  let hint = this.strings.get('no-games-hint');
+  list.setHint(hint);
 
   fab.setLabel('+');
   fab.onClicked = () => this.createGame();
@@ -49,7 +50,8 @@ Presenter.prototype.createGame = async function() {
     let game = await this.client.createGame();
     this.joinGame(game);
   } catch (e) {
-    this.showToast('Can not create game');
+    let message = this.strings.get('create-game-error');
+    this.showToast(message);
   }
 };
 
@@ -61,7 +63,8 @@ Presenter.prototype.joinGame = async function(game) {
     this.self = await this.client.joinGame(game, name);
     this.showGame();
   } catch (e) {
-    this.showToast('Can not join game');
+    let message = this.strings.get('join-game-error');
+    this.showToast(message);
   }
 };
 
@@ -92,7 +95,8 @@ Presenter.prototype.listenEvents = function() {
 };
 
 Presenter.prototype.onJoined = function(player) {
-  this.showToast(`${player.name} joined the game`);
+  let message = this.strings.get('joined-game-toast', player.name)
+  this.showToast(message);
 };
 
 Presenter.prototype.onDealt = async function() {
@@ -111,7 +115,7 @@ Presenter.prototype.onTurn = function({ player, phase }) {
   case 'attendance':
   case 'bidding':
     if (this.isSelf(player)) {
-      this.listContracts();
+      this.listContracts(phase);
     }
   }
 };
@@ -147,20 +151,24 @@ Presenter.prototype.playCard = function(card) {
   this.client.playCard(card);
 };
 
-Presenter.prototype.listContracts = async function() {
+Presenter.prototype.listContracts = async function(phase) {
   let dialog = this.views.dialog;
   let contracts = await this.client.fetchContracts();
 
   let options = dialog.withOptions();
-  options.addItem('concede', { });
+
+  let concede = this.strings.get('concede-label');
+  options.addItem(concede, { });
   for (let contract of contracts) {
-    let label = this.contractLabel(contract);
+    let { name, variant } = contract;
+    let label = this.strings.get('contract-label', name, variant);
     options.addItem(label, contract);
   }
 
   options.onItemSelected = (contract) => this.bidContract(contract);
 
-  dialog.setTitle('Choose what to play');
+  let title = this.strings.get('contract-title', phase);
+  dialog.setTitle(title);
   dialog.show();
 };
 
@@ -177,7 +185,8 @@ Presenter.prototype.onContested = function(player) {
 Presenter.prototype.onBidded = function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
-    let label = this.contractLabel(contract);
+    let { name, variant } = contract;
+    let label = this.strings.get('contract-label', name, variant);
     this.showToast(`${player.name} wants to play ${label}`);
   }
 };
@@ -185,7 +194,8 @@ Presenter.prototype.onBidded = function(contract) {
 Presenter.prototype.onSettled = function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
-    let label = this.contractLabel(contract);
+    let { name, variant } = contract;
+    let label = this.strings.get('contract-label', name, variant);
     this.showToast(`${player.name} is playing ${label}`);
   }
 };
@@ -196,7 +206,8 @@ Presenter.prototype.onPlayed = function({ player, card }) {
 };
 
 Presenter.prototype.onCompleted = function({ winner, points }) {
-  this.showToast(`${winner.name} wins +${points}`);
+  let text = this.strings.get('trick-completed-toast', winner.name, points);
+  this.showToast(text);
 };
 
 Presenter.prototype.onFinished = function({ winner }) {
@@ -205,16 +216,7 @@ Presenter.prototype.onFinished = function({ winner }) {
   this.showToast(`${players} won with ${points} points`, 5000);
 };
 
-Presenter.prototype.contractLabel = function(contract) {
-  let { name, variant } = contract;
-  let label = `${name}`;
-  if (variant != 'default') {
-    label += ` (${variant})`;
-  }
-  return label;
-};
-
-Presenter.prototype.gameLabel = function(game) {
+Presenter.prototype.labelOf = function(game) {
   let { id, players } = game;
   let label = `Game #${id}`;
   if (players.length) {

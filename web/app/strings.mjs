@@ -17,6 +17,10 @@ Strings.forLanguage = function(tag) {
 };
 
 Strings.english = new Strings('en', {
+  'lobby-title': () => 'Lobby',
+  'game-title': () => 'Sheepshead',
+  'player-name-fallback': () => 'Player',
+
   'no-games-hint': () => ''
     + 'There are currently no games available to join. '
     + 'Click the button below to create one.',
@@ -37,10 +41,18 @@ Strings.english = new Strings('en', {
     + `${player} wants to play a `
     + self.get('contract-label', contract, variant),
 
+  'settled-toast': (player, contract, variant, self) => ''
+    + `${player} is playing a `
+    + self.get('contract-label', contract, variant),
+
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} wins +1 point`,
     other: `${player} wins +${points} points`
   }),
+
+  'finished-toast': (players, points) => ''
+    + players.format('join', ' and ') + ` won with ${points} `
+    + 'points',
 
   'contract-title': (phase) => phase.case({
     attendance: 'Choose what to play!',
@@ -59,10 +71,17 @@ Strings.english = new Strings('en', {
     acorn: '(Acorn)'
   }),
 
-  'concede-label': () => 'Concede'
+  'concede-label': () => 'Concede',
+
+  'game-label': (id, players) => ''
+    + `Game #${id} (` + players.format('join', ', ') + ')'
 });
 
 Strings.german = new Strings('de', {
+  'lobby-title': () => 'Spieleliste',
+  'game-title': () => 'Schafkopf',
+  'player-name-fallback': () => 'Spieler',
+
   'no-games-hint': () => ''
     + 'Im Moment sind keine Spiele zum Beitreten verfügbar. '
     + 'Erstelle ein neues Spiel!',
@@ -89,10 +108,22 @@ Strings.german = new Strings('de', {
     }) + ' ' + self.get('contract-label', contract, variant)
     + ' spielen',
 
+  'settled-toast': (player, contract, variant, self) => ''
+    + `${player} spielt ` +contract.case({
+      normal: 'ein',
+      wenz: 'einen',
+      geier: 'einen',
+      solo: 'ein'
+    }) + ' ' + self.get('contract-label', contract, variant),
+
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} gewinnt +1 Punkt`,
     other: `${player} gewinnt +${points} Punkte`
   }),
+
+  'finished-toast': (players, points) => ''
+    + players.format('join', ' und ') + ` haben mit ${points} `
+    + 'Punkten gewonnen',
 
   'contract-title': (phase) => phase.case({
     attendance: 'Was möchtest du spielen?',
@@ -111,7 +142,10 @@ Strings.german = new Strings('de', {
     acorn: '(Eichel)'
   }),
 
-  'concede-label': () => 'Aussteigen'
+  'concede-label': () => 'Aussteigen',
+
+  'game-label': (id, players) => ''
+    + `Spiel #${id} (` + players.format('join', ', ') + ')'
 });
 
 Strings.prototype.get = function(name, ...args) {
@@ -126,27 +160,47 @@ Strings.prototype.matches = function(tag) {
 };
 
 Strings.prototype.wrap = function(arg) {
-  let value = new Value(arg,
-    () => Number(arg) == 1 ? 'one' : 'other',
-    () => String(arg).toLowerCase());
-
-  return value;
+  return new Value(arg, Selectors, Formatter);
 };
 
-function Value(value, ...selectors) {
+const Selectors = {
+  plural: (value) => Number(value) == 1 ? 'one' : 'other',
+  enum: (value) => String(value).toLowerCase()
+};
+
+const Formatter = {
+  join: (value, word) => value.length <= 1
+    ? value[0] || ''
+    : value.slice(0, -1).join(', ') + word + value.slice(-1)
+};
+
+function Value(value, selectors, formatter) {
   this.value = value;
   this.selectors = selectors;
+  this.formatter = formatter;
 }
 
 Value.prototype.case = function(options, fallback = '') {
-  for (let selector of this.selectors) {
-    let key = selector();
+  let value = this.value;
+  let selectors = this.selectors;
+
+  for (let kind in selectors) {
+    let selector = selectors[kind];
+
+    let key = selector(value);
     if (key && key in options) {
       return options[key];
     }
   }
 
   return fallback;
+};
+
+Value.prototype.format = function(kind, options) {
+  let value = this.value;
+  let formatter = this.formatter[kind];
+
+  return formatter(value, options);
 };
 
 Value.prototype.toString =

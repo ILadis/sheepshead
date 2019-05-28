@@ -7,7 +7,7 @@ export function Presenter(shell, client, strings) {
   this.strings = strings;
 }
 
-Presenter.prototype.stringFor = function(name, ..args) {
+Presenter.prototype.stringFor = function(name, ...args) {
   return this.strings.get(name, ...args);
 };
 

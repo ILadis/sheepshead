@@ -7,6 +7,10 @@ export function Presenter(shell, client, strings) {
   this.strings = strings;
 }
 
+Presenter.prototype.stringFor = function(name, ..args) {
+  return this.strings.get(name, ...args);
+};
+
 Presenter.prototype.showView = function(title, views) {
   this.shell.setTitle(title);
   this.shell.setContents(views);
@@ -37,7 +41,7 @@ Presenter.prototype.refreshGames = async function() {
     list.addItem(label, game);
   }
 
-  let hint = this.strings.get('no-games-hint');
+  let hint = this.stringFor('no-games-hint');
   list.setHint(hint);
 
   fab.setLabel('+');
@@ -50,8 +54,7 @@ Presenter.prototype.createGame = async function() {
     let game = await this.client.createGame();
     this.joinGame(game);
   } catch (e) {
-    let message = this.strings.get('create-game-error');
-    this.showToast(message);
+    this.showToast(this.stringFor('create-game-error'));
   }
 };
 
@@ -63,8 +66,7 @@ Presenter.prototype.joinGame = async function(game) {
     this.self = await this.client.joinGame(game, name);
     this.showGame();
   } catch (e) {
-    let message = this.strings.get('join-game-error');
-    this.showToast(message);
+    this.showToast(this.stringFor('join-game-error'));
   }
 };
 
@@ -95,8 +97,7 @@ Presenter.prototype.listenEvents = function() {
 };
 
 Presenter.prototype.onJoined = function(player) {
-  let message = this.strings.get('joined-game-toast', player.name)
-  this.showToast(message);
+  this.showToast(this.stringFor('joined-game-toast', player.name));
 };
 
 Presenter.prototype.onDealt = async function() {
@@ -157,17 +158,17 @@ Presenter.prototype.listContracts = async function(phase) {
 
   let options = dialog.withOptions();
 
-  let concede = this.strings.get('concede-label');
+  let concede = this.stringFor('concede-label');
   options.addItem(concede, { });
   for (let contract of contracts) {
     let { name, variant } = contract;
-    let label = this.strings.get('contract-label', name, variant);
+    let label = this.stringFor('contract-label', name, variant);
     options.addItem(label, contract);
   }
 
   options.onItemSelected = (contract) => this.bidContract(contract);
 
-  let title = this.strings.get('contract-title', phase);
+  let title = this.stringFor('contract-title', phase);
   dialog.setTitle(title);
   dialog.show();
 };
@@ -178,16 +179,15 @@ Presenter.prototype.bidContract = function(contract) {
 
 Presenter.prototype.onContested = function(player) {
   if (!this.isSelf(player)) {
-    this.showToast(`${player.name} wants to play`);
+    this.showToast(this.stringFor('contested-toast', player.name));
   }
 };
 
 Presenter.prototype.onBidded = function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
-    let { name, variant } = contract;
-    let label = this.strings.get('contract-label', name, variant);
-    this.showToast(`${player.name} wants to play ${label}`);
+    this.showToast(this.strings.get('bidded-toast',
+      player.name, contract.name, contract.variant));
   }
 };
 

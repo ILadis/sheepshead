@@ -27,11 +27,19 @@ Strings.english = new Strings('en', {
   'join-game-error': () => ''
     + 'Unable to join game, please refresh or try again',
 
-  'joined-game-toast': (name) => `${name} joined the game`,
+  'joined-game-toast': (player) => ''
+    + `${player} joined the game`,
 
-  'trick-completed-toast': (name, points) => points.case({
-    one: `${name} wins +1 point`,
-    other: `${name} wins +${points} points`
+  'contested-toast': (player) => ''
+    + `${player} wants to play`,
+
+  'bidded-toast': (player, contract, variant, self) => ''
+    + `${player} wants to play a `
+    + self.get('contract-label', contract, variant),
+
+  'trick-completed-toast': (player, points) => points.case({
+    one: `${player} wins +1 point`,
+    other: `${player} wins +${points} points`
   }),
 
   'contract-title': (phase) => phase.case({
@@ -39,7 +47,7 @@ Strings.english = new Strings('en', {
     bidding: 'Do you want to overbid?'
   }),
 
-  'contract-label': (name, variant) => name.case({
+  'contract-label': (contract, variant) => contract.case({
     normal: 'Normal',
     wenz: 'Wenz',
     geier: 'Geier',
@@ -66,11 +74,24 @@ Strings.german = new Strings('de', {
   'join-game-error': () => ''
     + 'Fehler beim Beitreten des Spiel, versuche es später erneut',
 
-  'joined-game-toast': (name) => `${name} ist dem Spiel beigetreten`,
+  'joined-game-toast': (player) => ''
+    + `${player} ist dem Spiel beigetreten`,
 
-  'trick-completed-toast': (name, points) => points.case({
-    one: `${name} gewinnt +1 Punkt`,
-    other: `${name} gewinnt +${points} Punkte`
+  'contested-toast': (player) => ''
+    + `${player} möchte spielen`,
+
+  'bidded-toast': (player, contract, variant, self) => ''
+    + `${player} möchte ` + contract.case({
+      normal: 'ein',
+      wenz: 'einen',
+      geier: 'einen',
+      solo: 'ein'
+    }) + ' ' + self.get('contract-label', contract, variant)
+    + ' spielen',
+
+  'trick-completed-toast': (player, points) => points.case({
+    one: `${player} gewinnt +1 Punkt`,
+    other: `${player} gewinnt +${points} Punkte`
   }),
 
   'contract-title': (phase) => phase.case({
@@ -78,7 +99,7 @@ Strings.german = new Strings('de', {
     bidding: 'Möchtest du überbieten?'
   }),
 
-  'contract-label': (name, variant) => name.case({
+  'contract-label': (contract, variant) => contract.case({
     normal: 'Rufspiel',
     wenz: 'Wenz',
     geier: 'Geier',
@@ -97,7 +118,7 @@ Strings.prototype.get = function(name, ...args) {
   let string = this.strings[name];
   let values = args.map(arg => this.wrap(arg));
 
-  return string(...values);
+  return string(...values, this);
 };
 
 Strings.prototype.matches = function(tag) {
@@ -105,9 +126,8 @@ Strings.prototype.matches = function(tag) {
 };
 
 Strings.prototype.wrap = function(arg) {
-  let plurals = new Intl.PluralRules(this.locale);
   let value = new Value(arg,
-    () => plurals.select(arg),
+    () => Number(arg) == 1 ? 'one' : 'other',
     () => String(arg).toLowerCase());
 
   return value;
@@ -129,6 +149,7 @@ Value.prototype.case = function(options, fallback = '') {
   return fallback;
 };
 
+Value.prototype.toString =
 Value.prototype[Symbol.toPrimitive] = function() {
   return String(this.value);
 };

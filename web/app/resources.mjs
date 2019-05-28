@@ -17,6 +17,8 @@ for (let path of [
   filepath`./app.mjs`,
   filepath`./presenter.mjs`,
   filepath`./strings.mjs`,
+  filepath`./intl-de.mjs`,
+  filepath`./intl-en.mjs`,
   filepath`./views.mjs`,
   filepath`./client.mjs`,
   filepath`../../polyfill.mjs`,

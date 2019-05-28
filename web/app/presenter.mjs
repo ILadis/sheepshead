@@ -23,7 +23,8 @@ Presenter.prototype.showToast = function(text, duration) {
 };
 
 Presenter.prototype.showLobby = function() {
-  this.showView('Lobby', {
+  let title = this.stringFor('lobby-title');
+  this.showView(title, {
     list: new View.List(),
     fab: new View.Button(),
     toast: new View.Toast()
@@ -37,7 +38,8 @@ Presenter.prototype.refreshGames = async function() {
 
   let games = await this.client.listGames();
   for (let game of games) {
-    let label = this.labelOf(game);
+    let { id, players } = game;
+    let label = this.stringFor('game-label', id, players);
     list.addItem(label, game);
   }
 
@@ -54,24 +56,28 @@ Presenter.prototype.createGame = async function() {
     let game = await this.client.createGame();
     this.joinGame(game);
   } catch (e) {
-    this.showToast(this.stringFor('create-game-error'));
+    let message = this.stringFor('create-game-error');
+    this.showToast(message);
   }
 };
 
 Presenter.prototype.joinGame = async function(game) {
   let params = new URLSearchParams(location.search);
-  let name = String(params.get('name') || 'Player');
+  let fallback = this.stringFor('player-name-fallback');
+  let name = String(params.get('name') || fallback);
 
   try {
     this.self = await this.client.joinGame(game, name);
     this.showGame();
   } catch (e) {
-    this.showToast(this.stringFor('join-game-error'));
+    let message = this.stringFor('join-game-error');
+    this.showToast(message);
   }
 };
 
 Presenter.prototype.showGame = function() {
-  this.showView('Sheepshead', {
+  let title = this.stringFor('game-title');
+  this.showView(title, {
     bottom: new View.Hand(),
     left: new View.Hand(),
     right: new View.Hand(),
@@ -97,7 +103,8 @@ Presenter.prototype.listenEvents = function() {
 };
 
 Presenter.prototype.onJoined = function(player) {
-  this.showToast(this.stringFor('joined-game-toast', player.name));
+  let message = this.stringFor('joined-game-toast', player.name);
+  this.showToast(message);
 };
 
 Presenter.prototype.onDealt = async function() {
@@ -186,7 +193,7 @@ Presenter.prototype.onContested = function(player) {
 Presenter.prototype.onBidded = function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
-    this.showToast(this.strings.get('bidded-toast',
+    this.showToast(this.stringFor('bidded-toast',
       player.name, contract.name, contract.variant));
   }
 };
@@ -194,9 +201,8 @@ Presenter.prototype.onBidded = function(contract) {
 Presenter.prototype.onSettled = function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
-    let { name, variant } = contract;
-    let label = this.strings.get('contract-label', name, variant);
-    this.showToast(`${player.name} is playing ${label}`);
+    this.showToast(this.stringFor('settled-toast',
+      player.name, contract.name, contract.variant));
   }
 };
 
@@ -206,23 +212,15 @@ Presenter.prototype.onPlayed = function({ player, card }) {
 };
 
 Presenter.prototype.onCompleted = function({ winner, points }) {
-  let text = this.strings.get('trick-completed-toast', winner.name, points);
-  this.showToast(text);
+  let message = this.stringFor('trick-completed-toast', winner.name, points);
+  this.showToast(message);
 };
 
 Presenter.prototype.onFinished = function({ winner }) {
   let { players, points } = winner;
-  players = players.map(p => p.name).join(' and ');
-  this.showToast(`${players} won with ${points} points`, 5000);
-};
-
-Presenter.prototype.labelOf = function(game) {
-  let { id, players } = game;
-  let label = `Game #${id}`;
-  if (players.length) {
-    label += ` (${players.join(', ')})`;
-  }
-  return label;
+  let names = players.map(p => p.name);
+  let message = this.stringFor('finished-toast', names, points);
+  this.showToast(message, 5000);
 };
 
 Presenter.prototype.isSelf = function(other) {

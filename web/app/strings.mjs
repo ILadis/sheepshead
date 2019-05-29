@@ -1,27 +1,27 @@
 
+import * as l18n from './l18n.mjs';
+
 export function Strings(locale, strings) {
   this.locale = locale;
   this.strings = strings;
 }
 
-Strings.forLanguage = async function(lang) {
-  let tag = lang.substr(0, 2);
-
-  try {
-    var intl = await import(`./intl-${tag}.mjs`);
-  } catch (e) {
-    var intl = await import('./intl-en.mjs');
+Strings.forLanguage = function(lang) {
+  let locale = lang.substr(0, 2);
+  if (!l18n[locale]) {
+    locale = 'en';
   }
 
-  let { locale, strings } = intl;
+  let strings = l18n[locale];
   return new Strings(locale, strings);
 };
 
 Strings.prototype.get = function(name, ...args) {
   let string = this.strings[name];
   let values = args.map(arg => this.wrap(arg));
+  let self = this.get.bind(this);
 
-  return string(...values, this);
+  return string(...values, self);
 };
 
 Strings.prototype.wrap = function(arg) {

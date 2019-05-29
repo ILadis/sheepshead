@@ -29,7 +29,12 @@ Strings.prototype.wrap = function(arg) {
 };
 
 const Selectors = {
-  plural: (value) => Number(value) == 1 ? 'one' : 'other',
+  plural: (value) => Number.isInteger(value)
+    ? value == 1 ? 'one' : 'other'
+    : null,
+  array: (value) => Array.isArray(value)
+    ? value.length == 1 ? 'one' : 'other'
+    : null,
   enum: (value) => String(value).toLowerCase()
 };
 

@@ -2,6 +2,7 @@
 export const de = {
   'lobby-title': () => 'Spieleliste',
   'game-title': () => 'Schafkopf',
+
   'player-name-fallback': () => 'Spieler',
 
   'no-games-hint': () => ''
@@ -43,8 +44,10 @@ export const de = {
   }),
 
   'finished-toast': (players, points) => ''
-    + players.format('join', ' und ') + ` haben mit ${points} `
-    + 'Punkten gewonnen',
+    + players.format('join', ' und ') + ' ' + players.case({
+      one: `hat`,
+      other: `haben`
+    }) + ` mit ${points} Punkten gewonnen`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Was möchtest du spielen?',
@@ -66,12 +69,13 @@ export const de = {
   'concede-label': () => 'Aussteigen',
 
   'game-label': (id, players) => ''
-    + `Spiel #${id} (` + players.format('join', ', ') + ')'
+    + `Spiel #${id} (${players.format('join', ', ')})`
 };
 
 export const en = {
   'lobby-title': () => 'Lobby',
   'game-title': () => 'Sheepshead',
+
   'player-name-fallback': () => 'Player',
 
   'no-games-hint': () => ''
@@ -127,6 +131,6 @@ export const en = {
   'concede-label': () => 'Concede',
 
   'game-label': (id, players) => ''
-    + `Game #${id} (` + players.format('join', ', ') + ')'
+    + `Game #${id} (${players.format('join', ', ')})`
 };
 

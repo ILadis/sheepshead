@@ -3,6 +3,10 @@ export function Auction() {
   this.bids = new Map();
 }
 
+Auction.prototype.isBidder = function(player) {
+  return this.bids.has(player);
+};
+
 Auction.prototype.bid = function(contract) {
   let player = contract.owner;
   this.bids.set(player, contract);

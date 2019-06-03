@@ -6,6 +6,10 @@ export function Order() {
   this.dominants = new Set();
 }
 
+Order.prototype.isDominant = function(card) {
+  return this.dominants.has(card);
+}
+
 Order.prototype.dominate = function(suit) {
   this.dominants.clear();
   for (let rank of Rank) {
@@ -14,6 +18,10 @@ Order.prototype.dominate = function(suit) {
       this.dominants.add(card);
     }
   }
+};
+
+Order.prototype.isTrump = function(card) {
+  return this.trumps.has(card);
 };
 
 Order.prototype.promote = function(suits = [], ranks = []) {

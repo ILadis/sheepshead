@@ -6,6 +6,10 @@ export function Player(name, index) {
   this.cards = new Set();
 }
 
+Player.prototype.hasCard = function(card) {
+  return this.cards.has(card);
+};
+
 Player.prototype.draw = function(card) {
   return this.cards.delete(card);
 };

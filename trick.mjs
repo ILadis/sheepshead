@@ -11,7 +11,7 @@ Trick.prototype.add = function(player, card) {
 
 Trick.prototype.points = function() {
   let points = 0;
-  for (let card of this.plays.values()) {
+  for (let card of this.cards) {
     points += card.points();
   }
   return points;

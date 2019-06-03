@@ -19,7 +19,7 @@ Ruleset.prototype.options = function(iterator) {
     return false;
   }
 
-  return options;
+  return options.values();
 }
 
 Ruleset.forBidding = function(game) {
@@ -42,7 +42,8 @@ Ruleset.forBidding = function(game) {
   function enforceValue({ actor, auction, contract }, next) {
     let lead = auction.lead();
     let minimum = auction.blind();
-    if (auction.bids.has(actor)) {
+
+    if (auction.isBidder(actor)) {
       minimum = lead.value;
     }
 
@@ -62,17 +63,18 @@ Ruleset.forBidding = function(game) {
 
   function enforcePartner({ actor, contract }, next) {
     let partner = contract.partner;
+    let order = contract.order;
+
     if (!partner) {
       return next();
     }
 
-    if (actor.cards.has(partner)) {
+    if (actor.hasCard(partner)) {
       return false;
     }
 
-    let trumps = contract.order.trumps;
     for (let card of actor.cards) {
-      if (card.suit == partner.suit && !trumps.has(card)) {
+      if (card.suit == partner.suit && !order.isTrump(card)) {
         return true;
       }
     }
@@ -86,26 +88,26 @@ Ruleset.forPlaying = function(game) {
     let { actor, contract, trick } = game;
     let lead = trick.lead() || card;
 
-    return hasCard({ actor, card },
+    return enforceOwns({ actor, card },
       () => enforceTrump({ actor, contract, lead, card },
         () => enforcePartner({ actor, contract, lead, card }, 
           () => enforceDominant({ actor, contract, lead, card },
             () => true))));
   });
 
-  function hasCard({ actor, card }, next) {
-    if (!actor.cards.has(card)) {
+  function enforceOwns({ actor, card }, next) {
+    if (!actor.hasCard(card)) {
       return false;
     }
     return next();
   }
 
   function enforceTrump({ actor, contract, lead, card }, next) {
-    let trumps = contract.order.trumps;
-    if (trumps.has(lead)) {
-      for (let trump of trumps) {
-        if (actor.cards.has(trump)) {
-          return trumps.has(card);
+    let order = contract.order;
+    if (order.isTrump(lead)) {
+      for (let trump of order.trumps) {
+        if (actor.hasCard(trump)) {
+          return order.isTrump(card);
         }
       }
     }
@@ -114,11 +116,11 @@ Ruleset.forPlaying = function(game) {
   }
 
   function enforcePartner({ actor, contract, lead, card }, next) {
-    let trumps = contract.order.trumps;
     let partner = contract.partner;
+    let order = contract.order;
 
-    if (!trumps.has(lead)) {
-      if (actor.cards.has(partner) && lead.suit == partner.suit) {
+    if (!order.isTrump(lead)) {
+      if (actor.hasCard(partner) && lead.suit == partner.suit) {
         return card == partner;
       }
     }
@@ -127,13 +129,11 @@ Ruleset.forPlaying = function(game) {
   }
 
   function enforceDominant({ actor, contract, lead, card }, next) {
-    let dominants = contract.order.dominants;
+    let order = contract.order;
 
-    if (dominants.has(lead)) {
-      for (let dominant of dominants) {
-        if (actor.cards.has(dominant)) {
-          return dominants.has(card);
-        }
+    for (let dominant of order.dominants) {
+      if (actor.hasCard(dominant)) {
+        return order.isDominant(card);
       }
     }
 

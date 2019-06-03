@@ -9,19 +9,9 @@ describe('Order', () => {
     Assert.ok(order.trumps[Symbol.iterator]);
   });
 
-  it('should have has function for trumps property', () => {
-    let order = new Order();
-    Assert.equal(typeof order.trumps.has, 'function');
-  });
-
   it('should have iterable dominants property', () => {
     let order = new Order();
     Assert.ok(order.dominants[Symbol.iterator]);
-  });
-
-  it('should have has function for dominants property', () => {
-    let order = new Order();
-    Assert.equal(typeof order.dominants.has, 'function');
   });
 
   describe('#dominate()', () => {

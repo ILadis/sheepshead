@@ -120,7 +120,7 @@ Ruleset.forPlaying = function(game) {
     let order = contract.order;
 
     if (!order.isTrump(lead)) {
-      if (actor.hasCard(partner) && lead.suit == partner.suit) {
+      if (lead.suit == partner.suit && actor.hasCard(partner)) {
         return card == partner;
       }
     }

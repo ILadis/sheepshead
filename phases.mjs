@@ -125,6 +125,8 @@ export async function playing({ contract, sequence, phase }) {
   let trick = new Trick();
   this.trick = trick;
 
+  contract.order.dominate();
+
   for (let player of sequence) {
     this.actor = player;
     await this.onturn(player, phase);
@@ -170,7 +172,7 @@ export async function countup({ players, trick, contract }) {
   this.sequence = Player.sequence(players, winner);
   await this.oncompleted(trick, winner);
 
-  return winner.cards.size > 0 ? playing : aftermath;
+  return winner.cards.empty() ? aftermath : playing;
 }
 
 export async function aftermath({ players, contract }) {

@@ -3,7 +3,7 @@ export function Auction() {
   this.bids = new Map();
 }
 
-Auction.prototype.isBidder = function(player) {
+Auction.prototype.includes = function(player) {
   return this.bids.has(player);
 };
 

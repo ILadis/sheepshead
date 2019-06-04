@@ -68,7 +68,8 @@ Player.prototype.toJSON = function() {
   let actor = this.actor;
   let name = this.player.name;
   let index = this.player.index;
-  let cards = this.player.cards.size;
+  let cards = Array.from(this.player.cards)
+  cards = cards.length;
   return { token, actor, index, name, cards };
 };
 

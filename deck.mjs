@@ -25,10 +25,6 @@ Deck.prototype.shuffle = function(rand = Math.random) {
   }
 };
 
-Deck.prototype.sort = function(comparator) {
-  this.cards.sort(comparator);
-};
-
 Deck.prototype.add = function(...cards) {
   for (let card of cards) {
     this.cards.push(card);

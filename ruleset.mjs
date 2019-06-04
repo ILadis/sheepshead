@@ -43,7 +43,7 @@ Ruleset.forBidding = function(game) {
     let lead = auction.lead();
     let minimum = auction.blind();
 
-    if (auction.isBidder(actor)) {
+    if (auction.includes(actor)) {
       minimum = lead.value;
     }
 

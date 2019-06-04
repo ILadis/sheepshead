@@ -9,10 +9,12 @@ export function Order() {
 
 Order.prototype.dominate = function(suit) {
   this.dominants.clear();
-  for (let rank of Rank) {
-    let card = Card[suit][rank];
-    if (!this.trumps.contains(card)) {
-      this.dominants.add(card);
+  if (suit) {
+    for (let rank of Rank) {
+      let card = Card[suit][rank];
+      if (!this.trumps.contains(card)) {
+        this.dominants.add(card);
+      }
     }
   }
 };

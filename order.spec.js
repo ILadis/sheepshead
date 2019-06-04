@@ -30,6 +30,14 @@ describe('Order', () => {
         Card[Suit.leaf][Rank.ace]
       ]);
     });
+
+    it('should clear dominants if no suit is given', () => {
+      let order = new Order();
+      order.promote([], [Rank.sergeant, Rank.officer]);
+      order.dominate(Suit.leaf);
+      order.dominate();
+      Assert.ok(order.dominants.empty());
+    });
   });
 
   describe('#promote()', () => {

@@ -56,25 +56,6 @@ describe('Deck', () => {
     });
   });
 
-  describe('#sort()', () => {
-    it('should sort cards according to comparator', () => {
-      let comparator = (c1, c2) => c2.points() - c1.points();
-      let deck = new Deck();
-      deck.add(Card[Suit.leaf][Rank.ace]);
-      deck.add(Card[Suit.leaf][Rank.sergeant]);
-      deck.add(Card[Suit.leaf][Rank.seven]);
-      deck.add(Card[Suit.leaf][Rank.king]);
-      deck.sort(comparator);
-      let cards = Array.from(deck);
-      Assert.deepEqual(cards, [
-        Card[Suit.leaf][Rank.ace],
-        Card[Suit.leaf][Rank.king],
-        Card[Suit.leaf][Rank.sergeant],
-        Card[Suit.leaf][Rank.seven]
-      ]);
-    });
-  });
-
   describe('#add()', () => {
     it('should add cards in given order', () => {
       let deck = new Deck();

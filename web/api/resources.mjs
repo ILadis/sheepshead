@@ -172,7 +172,7 @@ Resources.hand['GET'] = PreFilter.chain(
   }
 
   let order = contract.order;
-  let cards = player.cards;
+  let cards = Array.from(player.cards);
   cards.sort((c1, c2) => order.orderOf(c2) - order.orderOf(c1));
 
   let entities = cards.map(c => new Entities.Card(c));

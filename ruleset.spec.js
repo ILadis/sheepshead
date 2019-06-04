@@ -45,12 +45,12 @@ describe('Ruleset', () => {
   describe('#forPlaying()', () => {
     let player = new Player('Player 1');
     let actor = new Player('Player 2');
-    actor.give([
+    actor.cards.add(
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace],
       Card[Suit.acorn][Rank.sergeant]
-    ]);
+    );
 
     it('should enforce ownership of card', () => {
       let trick = new Trick();

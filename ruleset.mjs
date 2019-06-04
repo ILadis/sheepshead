@@ -63,7 +63,6 @@ Ruleset.forBidding = function(game) {
 
   function enforcePartner({ actor, contract }, next) {
     let partner = contract.partner;
-    let order = contract.order;
 
     if (!partner) {
       return next();
@@ -73,6 +72,7 @@ Ruleset.forBidding = function(game) {
       return false;
     }
 
+    let order = contract.order;
     for (let card of actor.cards) {
       if (card.suit == partner.suit && !order.trumps.contains(card)) {
         return true;
@@ -117,8 +117,11 @@ Ruleset.forPlaying = function(game) {
 
   function enforcePartner({ actor, contract, lead, card }, next) {
     let partner = contract.partner;
-    let order = contract.order;
+    if (!partner) {
+      return next();
+    }
 
+    let order = contract.order;
     if (!order.trumps.contains(lead)) {
       if (lead.suit == partner.suit && actor.cards.contains(partner)) {
         return card == partner;
@@ -128,9 +131,8 @@ Ruleset.forPlaying = function(game) {
     return next();
   }
 
-  function enforceDominant({ actor, contract, lead, card }, next) {
+  function enforceDominant({ actor, contract, card }, next) {
     let order = contract.order;
-
     for (let dominant of order.dominants) {
       if (actor.cards.contains(dominant)) {
         return order.dominants.contains(card);

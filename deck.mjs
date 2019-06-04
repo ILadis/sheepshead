@@ -25,11 +25,44 @@ Deck.prototype.shuffle = function() {
   }
 };
 
+Deck.prototype.sort = function(comparator) {
+  this.cards.sort(comparator);
+};
+
+Deck.prototype.add = function(...cards) {
+  for (let card of cards) {
+    this.cards.push(card);
+  }
+};
+
 Deck.prototype.draw = function(count = 4) {
   return this.cards.splice(0, count);
 };
 
+Deck.prototype.remove = function(...cards) {
+  for (let card of cards) {
+    let index = this.cards.indexOf(card);
+    if (index != -1) {
+      this.cards.splice(index, 1);
+    }
+  }
+};
+
+Deck.prototype.contains = function(card) {
+  return this.cards.includes(card);
+};
+
 Deck.prototype.empty = function() {
   return this.cards.length <= 0;
+};
+
+Deck.prototype.clear = function() {
+  while (this.cards.length) {
+    this.cards.pop();
+  }
+};
+
+Deck.prototype[Symbol.iterator] = function() {
+  return this.cards.values();
 };
 

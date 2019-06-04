@@ -69,12 +69,12 @@ Ruleset.forBidding = function(game) {
       return next();
     }
 
-    if (actor.hasCard(partner)) {
+    if (actor.cards.contains(partner)) {
       return false;
     }
 
     for (let card of actor.cards) {
-      if (card.suit == partner.suit && !order.isTrump(card)) {
+      if (card.suit == partner.suit && !order.trumps.contains(card)) {
         return true;
       }
     }
@@ -90,13 +90,13 @@ Ruleset.forPlaying = function(game) {
 
     return enforceOwns({ actor, card },
       () => enforceTrump({ actor, contract, lead, card },
-        () => enforcePartner({ actor, contract, lead, card }, 
+        () => enforcePartner({ actor, contract, lead, card },
           () => enforceDominant({ actor, contract, lead, card },
             () => true))));
   });
 
   function enforceOwns({ actor, card }, next) {
-    if (!actor.hasCard(card)) {
+    if (!actor.cards.contains(card)) {
       return false;
     }
     return next();
@@ -104,10 +104,10 @@ Ruleset.forPlaying = function(game) {
 
   function enforceTrump({ actor, contract, lead, card }, next) {
     let order = contract.order;
-    if (order.isTrump(lead)) {
+    if (order.trumps.contains(lead)) {
       for (let trump of order.trumps) {
-        if (actor.hasCard(trump)) {
-          return order.isTrump(card);
+        if (actor.cards.contains(trump)) {
+          return order.trumps.contains(card);
         }
       }
     }
@@ -119,8 +119,8 @@ Ruleset.forPlaying = function(game) {
     let partner = contract.partner;
     let order = contract.order;
 
-    if (!order.isTrump(lead)) {
-      if (lead.suit == partner.suit && actor.hasCard(partner)) {
+    if (!order.trumps.contains(lead)) {
+      if (lead.suit == partner.suit && actor.cards.contains(partner)) {
         return card == partner;
       }
     }
@@ -132,8 +132,8 @@ Ruleset.forPlaying = function(game) {
     let order = contract.order;
 
     for (let dominant of order.dominants) {
-      if (actor.hasCard(dominant)) {
-        return order.isDominant(card);
+      if (actor.cards.contains(dominant)) {
+        return order.dominants.contains(card);
       }
     }
 

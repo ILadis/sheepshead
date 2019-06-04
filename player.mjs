@@ -1,24 +1,12 @@
 
+import { Deck } from './deck.mjs';
+
 export function Player(name, index) {
   this.name = name;
   this.index = index;
   this.points = 0;
-  this.cards = new Set();
+  this.cards = new Deck();
 }
-
-Player.prototype.hasCard = function(card) {
-  return this.cards.has(card);
-};
-
-Player.prototype.draw = function(card) {
-  return this.cards.delete(card);
-};
-
-Player.prototype.give = function(cards) {
-  for (let card of cards) {
-    this.cards.add(card);
-  }
-};
 
 Player.sequence = function(group, from) {
   let start = group.indexOf(from);

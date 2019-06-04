@@ -1,27 +1,20 @@
 
+import { Deck } from './deck.mjs';
 import { Card, Rank, Suit } from './card.mjs';
 
 export function Order() {
-  this.trumps = new Set();
-  this.dominants = new Set();
-}
-
-Order.prototype.isDominant = function(card) {
-  return this.dominants.has(card);
+  this.trumps = new Deck();
+  this.dominants = new Deck();
 }
 
 Order.prototype.dominate = function(suit) {
   this.dominants.clear();
   for (let rank of Rank) {
     let card = Card[suit][rank];
-    if (!this.trumps.has(card)) {
+    if (!this.trumps.contains(card)) {
       this.dominants.add(card);
     }
   }
-};
-
-Order.prototype.isTrump = function(card) {
-  return this.trumps.has(card);
 };
 
 Order.prototype.promote = function(suits = [], ranks = []) {
@@ -69,7 +62,7 @@ Order.prototype.orderOf = function(card) {
   for (let suit of Suit) {
     for (let rank of Rank) {
       let c = Card[suit][rank];
-      if (card == c && !this.trumps.has(c)) {
+      if (card == c && !this.trumps.contains(c)) {
         return value;
       }
       value++

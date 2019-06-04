@@ -35,7 +35,7 @@ export async function dealing({ players, head }) {
   do {
     for (let player of sequence) {
       let cards = deck.draw();
-      player.give(cards);
+      player.cards.add(...cards);
     }
   } while (!deck.empty());
 
@@ -135,7 +135,7 @@ export async function playing({ contract, sequence, phase }) {
       var card = await this.onplay(player, rules, options);
     } while (!rules.valid(card));
 
-    player.draw(card);
+    player.cards.remove(card);
 
     if (trick.empty()) {
       contract.order.dominate(card.suit);

@@ -14,10 +14,10 @@ Deck.prototype.fill = function() {
   }
 };
 
-Deck.prototype.shuffle = function() {
+Deck.prototype.shuffle = function(rand = Math.random) {
   let index = this.cards.length;
   while (index != 0) {
-    let shuffle = Math.floor(Math.random() * index--);
+    let shuffle = Math.floor(rand() * index--);
     let card = this.cards[index];
 
     this.cards[index] = this.cards[shuffle];

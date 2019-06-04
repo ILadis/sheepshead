@@ -1,17 +1,18 @@
 
 import Assert from 'assert';
+import { Deck } from './deck.mjs';
 import { Order } from './order.mjs';
 import { Card, Suit, Rank } from './card.mjs';
 
 describe('Order', () => {
-  it('should have iterable trumps property', () => {
+  it('should have trumps property', () => {
     let order = new Order();
-    Assert.ok(order.trumps[Symbol.iterator]);
+    Assert.ok(order.trumps instanceof Deck);
   });
 
-  it('should have iterable dominants property', () => {
+  it('should have dominants property', () => {
     let order = new Order();
-    Assert.ok(order.dominants[Symbol.iterator]);
+    Assert.ok(order.dominants instanceof Deck);
   });
 
   describe('#dominate()', () => {

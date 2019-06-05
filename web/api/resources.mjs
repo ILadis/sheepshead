@@ -290,7 +290,7 @@ Resources.trick['GET'] = PreFilter.chain(
     return response.end();
   }
 
-  let cards = Array.from(trick.cards);
+  let cards = Array.from(trick.cards());
 
   let entities = cards.map(c => new Entities.Card(c));
   let json = JSON.stringify(entities);

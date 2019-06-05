@@ -79,7 +79,7 @@ export async function attendance({ sequence, phase}) {
 export async function bidding({ auction, phase }) {
   let rules = Ruleset.forBidding(this);
 
-  var lead = auction.lead();
+  let lead = auction.lead();
   while (!auction.settled()) {
     await this.onbidded(lead);
 
@@ -104,9 +104,7 @@ export async function bidding({ auction, phase }) {
       if (contract) {
         contract.assign(player);
         auction.bid(contract);
-
-        var lead = contract;
-        await this.onbidded(lead);
+        lead = contract;
       } else {
         auction.concede(player);
       }
@@ -125,7 +123,8 @@ export async function playing({ contract, sequence, phase }) {
   let trick = new Trick();
   this.trick = trick;
 
-  contract.order.dominate();
+  let order = contract.order;
+  order.dominate();
 
   for (let player of sequence) {
     this.actor = player;
@@ -140,7 +139,7 @@ export async function playing({ contract, sequence, phase }) {
     player.cards.remove(card);
 
     if (trick.empty()) {
-      contract.order.dominate(card.suit);
+      order.dominate(card.suit);
     }
 
     trick.add(player, card);
@@ -155,18 +154,9 @@ export async function playing({ contract, sequence, phase }) {
   return countup;
 }
 
-export async function countup({ players, trick, contract }) {
-  let winner, highest = 0;
-
-  for (let [player, card] of trick.plays) {
-    let value = contract.order.valueOf(card);
-
-    if (value > highest) {
-      winner = player;
-      highest = value;
-    }
-  }
-
+export async function countup({ players, contract, trick }) {
+  let order = contract.order;
+  let winner = trick.winner(order);
   winner.points += trick.points();
 
   this.sequence = Player.sequence(players, winner);

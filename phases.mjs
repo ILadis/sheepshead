@@ -1,4 +1,5 @@
 
+import { Card, Suit, Rank } from './card.mjs';
 import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
@@ -29,7 +30,13 @@ export async function dealing({ players, head }) {
   this.sequence = sequence;
 
   let deck = new Deck();
-  deck.fill();
+  for (let suit of Suit) {
+    for (let rank of Rank) {
+      let card = Card[suit][rank];
+      deck.add(card);
+    }
+  }
+
   deck.shuffle();
 
   do {
@@ -44,7 +51,7 @@ export async function dealing({ players, head }) {
   return attendance;
 }
 
-export async function attendance({ sequence, phase}) {
+export async function attendance({ sequence, phase }) {
   let rules = Ruleset.forBidding(this);
 
   let auction = new Auction();
@@ -124,7 +131,7 @@ export async function playing({ contract, sequence, phase }) {
   this.trick = trick;
 
   let order = contract.order;
-  order.dominate();
+  order.dominants.clear();
 
   for (let player of sequence) {
     this.actor = player;
@@ -139,7 +146,7 @@ export async function playing({ contract, sequence, phase }) {
     player.cards.remove(card);
 
     if (trick.empty()) {
-      order.dominate(card.suit);
+      order.dominate(card);
     }
 
     trick.add(player, card);

@@ -1,18 +1,7 @@
 
-import { Card, Suit, Rank } from './card.mjs';
-
 export function Deck() {
   this.cards = new Array();
 }
-
-Deck.prototype.fill = function() {
-  for (let suit of Suit) {
-    for (let rank of Rank) {
-      let card = Card[suit][rank];
-      this.cards.push(card);
-    }
-  }
-};
 
 Deck.prototype.shuffle = function(rand = Math.random) {
   let index = this.cards.length;
@@ -23,6 +12,10 @@ Deck.prototype.shuffle = function(rand = Math.random) {
     this.cards[index] = this.cards[shuffle];
     this.cards[shuffle] = card;
   }
+};
+
+Deck.prototype.sort = function(comparator) {
+  this.cards.sort(comparator);
 };
 
 Deck.prototype.add = function(...cards) {

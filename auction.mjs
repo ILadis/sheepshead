@@ -22,7 +22,7 @@ Auction.prototype.bidders = function() {
 
 Auction.prototype.lead = function() {
   let lead, highest = 0;
-  for (let [player, contract] of this.bids) {
+  for (let contract of this.bids.values()) {
     if (contract.value > highest) {
       lead = contract;
       highest = contract.value;

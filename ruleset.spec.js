@@ -43,17 +43,14 @@ describe('Ruleset', () => {
   });
 
   describe('#forPlaying()', () => {
-    let player = new Player('Player 1');
-    let actor = new Player('Player 2');
-    actor.cards.add(
-      Card[Suit.heart][Rank.king],
-      Card[Suit.leaf][Rank.seven],
-      Card[Suit.leaf][Rank.ace],
-      Card[Suit.acorn][Rank.sergeant]
-    );
-
     it('should enforce ownership of card', () => {
       let trick = new Trick();
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.leaf][Rank.seven]
+      );
+
       let rules = Ruleset.forPlaying({ actor, trick });
       for (let card of [
         Card[Suit.bell][Rank.eight],
@@ -64,10 +61,21 @@ describe('Ruleset', () => {
       }
     });
 
-    it('should enforce trump cards', () => {
+    it('should enforce trump card', () => {
+      let lead = Card[Suit.leaf][Rank.eight];
+
       let contract = Contract.solo.leaf;
+      contract.order.dominate(lead);
       let trick = new Trick();
-      trick.add(player, Card[Suit.leaf][Rank.eight]);
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace],
+        Card[Suit.acorn][Rank.sergeant]
+      );
 
       let rules = Ruleset.forPlaying({ actor, trick, contract });
       let options = Array.from(rules.options(actor.cards));
@@ -79,10 +87,21 @@ describe('Ruleset', () => {
       ]);
     });
 
-    it('should enforce partner card', () => {
+    it('should enforce partner card when called', () => {
+      let lead = Card[Suit.leaf][Rank.eight];
+
       let contract = Contract.normal.leaf;
+      contract.order.dominate(lead);
       let trick = new Trick();
-      trick.add(player, Card[Suit.leaf][Rank.eight]);
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace],
+        Card[Suit.acorn][Rank.sergeant]
+      );
 
       let rules = Ruleset.forPlaying({ actor, trick, contract });
       let options = Array.from(rules.options(actor.cards));
@@ -92,9 +111,60 @@ describe('Ruleset', () => {
       ]);
     });
 
+    it('should disallow partner card when not called', () => {
+      let lead = Card[Suit.leaf][Rank.sergeant];
+
+      let contract = Contract.normal.leaf;
+      contract.order.dominate(lead);
+      let trick = new Trick();
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace]
+      );
+
+      let rules = Ruleset.forPlaying({ actor, trick, contract });
+      let options = Array.from(rules.options(actor.cards));
+
+      Assert.deepEqual(options, [
+        Card[Suit.leaf][Rank.seven]
+      ]);
+    });
+
+    it('should disallow partner card when not called', () => {
+      let lead = Card[Suit.bell][Rank.ace];
+
+      let contract = Contract.normal.leaf;
+      contract.order.dominate(lead);
+      let trick = new Trick();
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace]
+      );
+
+      let rules = Ruleset.forPlaying({ actor, trick, contract });
+      let options = Array.from(rules.options(actor.cards));
+
+      Assert.deepEqual(options, [
+        Card[Suit.leaf][Rank.seven]
+      ]);
+    });
+
     it('should enforce partner card when in lead', () => {
       let contract = Contract.normal.leaf;
       let trick = new Trick();
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace]
+      );
+
       let rules = Ruleset.forPlaying({ actor, trick, contract });
 
       let card = Card[Suit.leaf][Rank.seven];
@@ -105,9 +175,18 @@ describe('Ruleset', () => {
     });
 
     it('should enforce dominant cards', () => {
+      let lead = Card[Suit.acorn][Rank.seven];
+
       let contract = Contract.geier.default;
-      contract.order.dominate(Suit.acorn);
+      contract.order.dominate(lead);
       let trick = new Trick();
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.leaf][Rank.ace],
+        Card[Suit.acorn][Rank.sergeant]
+      );
 
       let rules = Ruleset.forPlaying({ actor, trick, contract });
       let options = Array.from(rules.options(actor.cards));
@@ -118,10 +197,20 @@ describe('Ruleset', () => {
     });
 
     it('should not enforce any card if actor does not have lead suit', () => {
+      let lead = Card[Suit.bell][Rank.ace];
+
       let contract = Contract.normal.leaf;
-      contract.order.dominate(Suit.bell);
+      contract.order.dominate(lead);
       let trick = new Trick();
-      trick.add(player, Card[Suit.bell][Rank.ace]);
+      trick.add(new Player('Player'), lead);
+
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace],
+        Card[Suit.acorn][Rank.sergeant]
+      );
 
       let rules = Ruleset.forPlaying({ actor, trick, contract });
       let options = Array.from(rules.options(actor.cards));
@@ -129,10 +218,9 @@ describe('Ruleset', () => {
       Assert.deepEqual(options, [
         Card[Suit.heart][Rank.king],
         Card[Suit.leaf][Rank.seven],
-        Card[Suit.leaf][Rank.ace],
         Card[Suit.acorn][Rank.sergeant]
       ]);
-    })
+    });
   });
 });
 

@@ -24,19 +24,6 @@ describe('Deck', () => {
     });
   });
 
-  describe('#fill()', () => {
-    it('should add 32 cards', () => {
-      let count = 0;
-      let deck = new Deck();
-      deck.fill();
-      do {
-        count++;
-        deck.draw(1);
-      } while (!deck.empty());
-      Assert.equal(count, 32);
-    });
-  });
-
   describe('#shuffle()', () => {
     it('should shuffle cards according to random', () => {
       let random = () => 0.5;
@@ -46,6 +33,25 @@ describe('Deck', () => {
       deck.add(Card[Suit.leaf][Rank.seven]);
       deck.add(Card[Suit.leaf][Rank.king]);
       deck.shuffle(random);
+      let cards = Array.from(deck);
+      Assert.deepEqual(cards, [
+        Card[Suit.leaf][Rank.ace],
+        Card[Suit.leaf][Rank.king],
+        Card[Suit.leaf][Rank.sergeant],
+        Card[Suit.leaf][Rank.seven]
+      ]);
+    });
+  });
+
+  describe('#sort()', () => {
+    it('should sort cards according to comparator', () => {
+      let comparator = (c1, c2) => c2.points() - c1.points();
+      let deck = new Deck();
+      deck.add(Card[Suit.leaf][Rank.seven]);
+      deck.add(Card[Suit.leaf][Rank.sergeant]);
+      deck.add(Card[Suit.leaf][Rank.ace]);
+      deck.add(Card[Suit.leaf][Rank.king]);
+      deck.sort(comparator);
       let cards = Array.from(deck);
       Assert.deepEqual(cards, [
         Card[Suit.leaf][Rank.ace],
@@ -128,21 +134,24 @@ describe('Deck', () => {
 
     it('should return true when deck is cleared', () => {
       let deck = new Deck();
-      deck.fill();
+      deck.add(Card[Suit.leaf][Rank.ace]);
+      deck.add(Card[Suit.leaf][Rank.sergeant]);
       deck.clear();
       Assert.ok(deck.empty());
     });
 
     it('should return true when all cards are drawn', () => {
       let deck = new Deck();
-      deck.fill();
-      deck.draw(32);
+      deck.add(Card[Suit.leaf][Rank.ace]);
+      deck.add(Card[Suit.leaf][Rank.sergeant]);
+      deck.draw(2);
       Assert.ok(deck.empty());
     });
 
-    it('should return false on filled deck', () => {
+    it('should return false when cards are added', () => {
       let deck = new Deck();
-      deck.fill();
+      deck.add(Card[Suit.leaf][Rank.ace]);
+      deck.add(Card[Suit.leaf][Rank.sergeant]);
       Assert.ok(!deck.empty());
     });
   });

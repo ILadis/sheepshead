@@ -16,10 +16,10 @@ describe('Order', () => {
   });
 
   describe('#dominate()', () => {
-    it('should make non trumps of given suit dominants', () => {
+    it('should make non trumps of given suit of card dominants', () => {
       let order = new Order();
       order.promote([], [Rank.sergeant, Rank.officer]);
-      order.dominate(Suit.leaf);
+      order.dominate(Card[Suit.leaf][Rank.seven]);
       let dominants = Array.from(order.dominants);
       Assert.deepEqual(dominants, [
         Card[Suit.leaf][Rank.seven],
@@ -31,11 +31,10 @@ describe('Order', () => {
       ]);
     });
 
-    it('should clear dominants if no suit is given', () => {
+    it('should not make dominants if given card is trump', () => {
       let order = new Order();
       order.promote([], [Rank.sergeant, Rank.officer]);
-      order.dominate(Suit.leaf);
-      order.dominate();
+      order.dominate(Card[Suit.leaf][Rank.officer]);
       Assert.ok(order.dominants.empty());
     });
   });
@@ -97,7 +96,7 @@ describe('Order', () => {
     describe('with heart/sergeant trump, leaf dominant', () => {
       let order = new Order();
       order.promote([Suit.heart], [Rank.sergeant]);
-      order.dominate(Suit.leaf);
+      order.dominate(Card[Suit.leaf][Rank.seven]);
 
       it('should return 0 for acorn ace', () => {
         let card = Card[Suit.acorn][Rank.ace];

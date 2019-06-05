@@ -116,15 +116,17 @@ Ruleset.forPlaying = function(game) {
   }
 
   function enforcePartner({ actor, contract, lead, card }, next) {
-    let partner = contract.partner;
-    if (!partner) {
-      return next();
-    }
-
     let order = contract.order;
-    if (!order.trumps.contains(lead)) {
-      if (lead.suit == partner.suit && actor.cards.contains(partner)) {
+    let partner = contract.partner;
+
+    if (partner) {
+      let called = lead.suit == partner.suit && !order.trumps.contains(lead);
+      if (called && actor.cards.contains(partner)) {
         return card == partner;
+      }
+
+      if (card == partner) {
+        return called;
       }
     }
 

@@ -7,13 +7,14 @@ export function Order() {
   this.dominants = new Deck();
 }
 
-Order.prototype.dominate = function(suit) {
+Order.prototype.dominate = function(card) {
   this.dominants.clear();
-  if (suit) {
+  if (!this.trumps.contains(card)) {
+    let suit = card.suit;
     for (let rank of Rank) {
-      let card = Card[suit][rank];
-      if (!this.trumps.contains(card)) {
-        this.dominants.add(card);
+      let dominant = Card[suit][rank];
+      if (!this.trumps.contains(dominant)) {
+        this.dominants.add(dominant);
       }
     }
   }
@@ -24,16 +25,16 @@ Order.prototype.promote = function(suits = [], ranks = []) {
   for (let suit of suits) {
     for (let rank of Rank) {
       if (!ranks.includes(rank)) {
-        let card = Card[suit][rank];
-        this.trumps.add(card);
+        let trump = Card[suit][rank];
+        this.trumps.add(trump);
       }
     }
   }
 
   for (let rank of ranks) {
     for (let suit of Suit) {
-      let card = Card[suit][rank];
-      this.trumps.add(card);
+      let trump = Card[suit][rank];
+      this.trumps.add(trump);
     }
   }
 };

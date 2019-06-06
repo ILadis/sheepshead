@@ -174,7 +174,7 @@ describe('Ruleset', () => {
       Assert.equal(rules.valid(partner), true);
     });
 
-    it('should enforce dominant cards', () => {
+    it('should enforce dominant card', () => {
       let lead = Card[Suit.acorn][Rank.seven];
 
       let contract = Contract.geier.default;
@@ -196,7 +196,7 @@ describe('Ruleset', () => {
       ]);
     });
 
-    it('should not enforce any card if actor does not have lead suit', () => {
+    it('should not force card if actor does not have lead', () => {
       let lead = Card[Suit.bell][Rank.ace];
 
       let contract = Contract.normal.leaf;

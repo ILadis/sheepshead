@@ -16,7 +16,7 @@ describe('Order', () => {
   });
 
   describe('#dominate()', () => {
-    it('should make non trumps of given suit of card dominants', () => {
+    it('should make non trumps of given card dominants', () => {
       let order = new Order();
       order.promote([], [Rank.sergeant, Rank.officer]);
       order.dominate(Card[Suit.leaf][Rank.seven]);

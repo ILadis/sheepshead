@@ -4,6 +4,7 @@ import { Ruleset } from './ruleset.mjs';
 import { Player } from './player.mjs';
 import { Trick } from './trick.mjs';
 import { Contract } from './contract.mjs';
+import { Auction } from './auction.mjs';
 import { Card, Suit, Rank } from './card.mjs';
 
 describe('Ruleset', () => {
@@ -39,6 +40,108 @@ describe('Ruleset', () => {
       let numbers = [1, 2, 3];
       let it = rules.options(numbers);
       Assert.equal(it, false);
+    });
+  });
+
+  describe('#forBidding()', () => {
+    it('should honor concede', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      Assert.ok(rules.valid(null));
+    });
+
+    it('should force blind value', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+
+      let contract = Contract.geier.default;
+      contract.assign(new Player());
+      auction.bid(contract);
+
+      let blind = auction.blind();
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      let options = Array.from(rules.options(Contract));
+      let values = options.map(c => c.value);
+      for (let value of values) {
+        Assert.ok(value > blind);
+      }
+    });
+
+    it('should force equal value when predecessor', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+
+      let contract1 = Contract.normal.leaf;
+      contract1.assign(actor);
+      auction.bid(contract1);
+
+      let contract2 = Contract.geier.default;
+      contract2.assign(new Player());
+      auction.bid(contract2);
+
+      let lead = auction.lead();
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      let options = Array.from(rules.options(Contract));
+      let values = options.map(c => c.value);
+      for (let value of values) {
+        Assert.ok(value >= lead.value);
+      }
+    });
+
+    it('should force higher value when successor', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+
+      let contract1 = Contract.geier.default;
+      contract1.assign(new Player());
+      auction.bid(contract1);
+
+      let contract2 = Contract.normal.leaf;
+      contract2.assign(actor);
+      auction.bid(contract2);
+
+      let lead = auction.lead();
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      let options = Array.from(rules.options(Contract));
+      let values = options.map(c => c.value);
+      for (let value of values) {
+        Assert.ok(value > lead.value);
+      }
+    });
+
+    it('should disallow ownership of partner card', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.leaf][Rank.seven],
+        Card[Suit.leaf][Rank.ace]
+      );
+
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      Assert.ok(!rules.valid(Contract.normal.leaf));
+    });
+
+    it('should force ownership of non trump partner suit', () => {
+      let auction = new Auction();
+      let actor = new Player('Actor');
+      actor.cards.add(
+        Card[Suit.heart][Rank.king],
+        Card[Suit.bell][Rank.seven],
+        Card[Suit.leaf][Rank.officer]
+      );
+
+      let rules = Ruleset.forBidding({ auction, actor });
+
+      Assert.ok(!rules.valid(Contract.normal.leaf));
+      Assert.ok(rules.valid(Contract.normal.bell));
     });
   });
 

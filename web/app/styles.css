@@ -285,6 +285,24 @@ body {
   box-shadow: 0 4pt 6pt 1pt #bfbfbf;
 }
 
+.fab::after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: -10%; left: -10%;
+  width: 120%;
+  height: 120%;
+  border-radius: 50%;
+  background: rgba(59, 131, 59, 0.2);
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 1;
+}
+
+.fab:hover::after {
+  opacity: 1;
+}
+
 @media (min-width: 580pt) {
   .shell section {
     top: 50%;

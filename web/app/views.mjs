@@ -158,6 +158,8 @@ Toast.prototype.show = function() {
   }
 
   let span = this.node.querySelector('span');
+  getComputedStyle(span).opacity;
+
   span.style.opacity = 1;
   span.textContent = next.text;
 

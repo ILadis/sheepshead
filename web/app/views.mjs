@@ -264,6 +264,30 @@ List.prototype.addItem = function(label, item) {
 List.prototype.onItemClicked = function(item) {
 };
 
+export const Textfield = function() {
+  this.node = importNode(Textfield.template);
+}
+
+Textfield.template = html`
+<div class="textfield">
+  <span></span>
+  <input type="text">
+</div>`;
+
+Textfield.prototype.setLabel = function(label) {
+  let span = this.node.querySelector('span');
+  span.textContent = label;
+};
+
+Textfield.prototype.setValue = function(value) {
+  let input = this.node.querySelector('input');
+  input.value = value;
+  input.onchange = () => this.onValueChange(input.value);
+};
+
+Textfield.prototype.onValueChanged = function(value) {
+};
+
 export const Button = function() {
   this.node = importNode(Button.template);
 }

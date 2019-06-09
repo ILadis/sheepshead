@@ -215,6 +215,25 @@ body {
   transition: background-color 0.6s;
 }
 
+.textfield {
+  padding: 12pt 24pt 10pt;
+  background: #e9ebeb;
+  border-width: 1pt;
+  border-color: #dadbdb;
+  border-bottom-style: solid;
+}
+
+.textfield span {
+  margin-right: 3pt;
+}
+
+.textfield input {
+  padding: 5pt 10pt;
+  width: 140pt;
+  border: none;
+  border-radius: 16pt;
+}
+
 .list {
   padding: 12pt 8pt;
 }

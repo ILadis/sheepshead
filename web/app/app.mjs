@@ -6,6 +6,9 @@ import { Presenter } from './presenter.mjs';
 import { Strings } from './strings.mjs';
 
 addEventListener('load', () => {
+  let params = new URLSearchParams(location.search);
+  let name = String(params.get('name') || '');
+
   let client = new Client();
 
   let shell = new Shell();
@@ -15,5 +18,6 @@ addEventListener('load', () => {
 
   let presenter = new Presenter(shell, client, strings);
   presenter.showLobby();
+  presenter.changePlayerName(name);
 });
 

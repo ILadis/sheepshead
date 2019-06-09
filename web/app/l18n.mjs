@@ -3,6 +3,7 @@ export const de = {
   'lobby-title': () => 'Spieleliste',
   'game-title': () => 'Schafkopf',
 
+  'player-name-input': () => 'Du spielst als',
   'player-name-fallback': () => 'Spieler',
 
   'no-games-hint': () => ''
@@ -76,6 +77,7 @@ export const en = {
   'lobby-title': () => 'Lobby',
   'game-title': () => 'Sheepshead',
 
+  'player-name-input': () => "You're playing as",
   'player-name-fallback': () => 'Player',
 
   'no-games-hint': () => ''

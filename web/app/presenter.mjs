@@ -25,15 +25,17 @@ Presenter.prototype.showToast = function(text, duration) {
 Presenter.prototype.showLobby = function() {
   let title = this.stringFor('lobby-title');
   this.showView(title, {
+    name: new View.Textfield(),
     list: new View.List(),
     fab: new View.Button(),
     toast: new View.Toast()
   });
   this.refreshGames();
+  this.changePlayerName();
 };
 
 Presenter.prototype.refreshGames = async function() {
-  let { list, fab } = this.views;
+  let { name, list, fab } = this.views;
   list.clearItems();
 
   let games = await this.client.listGames();
@@ -51,6 +53,25 @@ Presenter.prototype.refreshGames = async function() {
   list.onItemClicked = (game) => this.joinGame(game);
 };
 
+Presenter.prototype.changePlayerName = function(name) {
+  let fallback = this.stringFor('player-name-fallback');
+  let label = this.stringFor('player-name-input');
+
+  if (!name || !name.length) {
+    name = fallback;
+  }
+
+  let view = this.views.name;
+  if (view) {
+    view.setLabel(label);
+    view.setValue(name);
+
+    view.onValueChange = (name) => this.playerName = name;
+  }
+
+  this.playerName = name;
+};
+
 Presenter.prototype.createGame = async function() {
   try {
     let game = await this.client.createGame();
@@ -62,9 +83,7 @@ Presenter.prototype.createGame = async function() {
 };
 
 Presenter.prototype.joinGame = async function(game) {
-  let params = new URLSearchParams(location.search);
-  let fallback = this.stringFor('player-name-fallback');
-  let name = String(params.get('name') || fallback);
+  let name = this.playerName;
 
   try {
     this.self = await this.client.joinGame(game, name);

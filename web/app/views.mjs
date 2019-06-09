@@ -107,24 +107,25 @@ export const Trick = function() {
 Trick.template = html`
 <div class="trick"></div>`;
 
-Trick.prototype.clearCards = function(atCount = 4) {
+Trick.prototype.clearCards = function() {
   let hrs = this.node.querySelectorAll('hr');
-  if (hrs.length != atCount) {
-    return;
-  }
-
-  for (let i = 0; i < hrs.length; i++) {
-    hrs[i].remove();
+  if (hrs.length >= 4) {
+    for (let i = 0; i < hrs.length; i++) {
+      hrs[i].remove();
+    }
   }
 };
 
-Trick.prototype.addCard = function(card) {
+Trick.prototype.addCard = function(card, position) {
   this.clearCards();
 
   let hr = document.createElement('hr');
   hr.className = 'card';
   hr.classList.add(card.suit);
   hr.classList.add(card.rank);
+
+  hr.classList.add(position);
+  hr.style.animationName = `slidein-${position}`;
 
   this.node.appendChild(hr);
 };

@@ -97,11 +97,11 @@ Presenter.prototype.joinGame = async function(game) {
 Presenter.prototype.showGame = function() {
   let title = this.stringFor('game-title');
   this.showView(title, {
+    trick: new View.Trick(),
     bottom: new View.Hand(),
     left: new View.Hand(),
     right: new View.Hand(),
     top: new View.Hand(),
-    trick: new View.Trick(),
     dialog: new View.Dialog(),
     toast: new View.Toast()
   });
@@ -226,7 +226,8 @@ Presenter.prototype.onSettled = function(contract) {
 };
 
 Presenter.prototype.onPlayed = function({ player, card }) {
-  this.views.trick.addCard(card);
+  let position = this.positionOf(player);
+  this.views.trick.addCard(card, position);
   this.refreshPlayers(player);
 };
 

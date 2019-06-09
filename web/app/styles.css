@@ -107,8 +107,39 @@ body {
 .trick {
   position: absolute;
   width: 100%;
+  height: 100%;
+}
+
+.trick .card {
+  position: absolute;
   top: 45%;
-  text-align: center;
+  left: 50%;
+  animation: 0.5s forwards;
+}
+
+.trick .card.top { transform: translateX(-50%) rotateZ(180deg) translateY(60%); }
+.trick .card.bottom { transform: translateX(-50%) rotateZ(0deg) translateY(60%); }
+.trick .card.left { transform: translateX(-50%) rotateZ(90deg) translateY(60%); }
+.trick .card.right { transform: translateX(-50%)  rotateZ(270deg) translateY(60%); }
+
+@keyframes slidein-top {
+  from { margin-top: -50%; }
+  to { margin-top: 0; }
+}
+
+@keyframes slidein-bottom {
+  from { margin-top: 50%; }
+  to { margin-top: 0; }
+}
+
+@keyframes slidein-left {
+  from { margin-left: -50%; }
+  to { margin-left: 0; }
+}
+
+@keyframes slidein-right {
+  from { margin-left: 50%; }
+  to { margin-left: 0; }
 }
 
 .hand {
@@ -271,6 +302,7 @@ body {
 }
 
 .fab button {
+  position: relative;
   width: 44pt;
   height: 44pt;
   font-size: 36pt;
@@ -283,9 +315,10 @@ body {
   border-radius: 50%;
   outline: none;
   box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  z-index: 2;
 }
 
-.fab::after {
+.fab:after {
   content: ' ';
   display: block;
   position: absolute;
@@ -299,7 +332,7 @@ body {
   z-index: 1;
 }
 
-.fab:hover::after {
+.fab:hover:after {
   opacity: 1;
 }
 

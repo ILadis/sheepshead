@@ -263,6 +263,8 @@ body {
   width: 140pt;
   border: none;
   border-radius: 16pt;
+  outline: none;
+  background: #fff;
 }
 
 .list {

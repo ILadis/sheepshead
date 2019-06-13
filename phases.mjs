@@ -61,10 +61,8 @@ export async function attendance({ sequence, phase }) {
     this.actor = player;
     await this.onturn(player, phase);
 
-    let options = rules.options(Contract);
-
     do {
-      var contract = await this.onbid(player, rules, options);
+      var contract = await this.onbid(player, rules);
     } while (!rules.valid(contract));
 
     if (contract) {
@@ -105,7 +103,7 @@ export async function bidding({ auction, phase }) {
       }
 
       do {
-        var contract = await this.onbid(player, rules, options);
+        var contract = await this.onbid(player, rules);
       } while (!rules.valid(contract));
 
       if (contract) {
@@ -137,10 +135,8 @@ export async function playing({ contract, sequence, phase }) {
     this.actor = player;
     await this.onturn(player, phase);
 
-    let options = rules.options(player.cards);
-
     do {
-      var card = await this.onplay(player, rules, options);
+      var card = await this.onplay(player, rules);
     } while (!rules.valid(card));
 
     player.cards.remove(card);

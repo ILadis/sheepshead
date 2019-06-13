@@ -7,7 +7,6 @@ DeferredInput.prototype.attach = function(game) {
   game.input = this;
 
   game.onjoin =
-  game.onattend =
   game.onbid =
   game.onplay = (...args) => {
     return new Promise((resolve, reject) => {
@@ -16,7 +15,7 @@ DeferredInput.prototype.attach = function(game) {
     });
   };
 
-  game.onproceed = async (player) => {
+  game.onproceed = () => {
     return true;
   };
 };

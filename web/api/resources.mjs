@@ -12,6 +12,7 @@ import { Game } from '../../game.mjs';
 import { Card, Suit, Rank } from '../../card.mjs';
 import { Player } from '../../player.mjs';
 import { Contract } from '../../contract.mjs';
+import { Ruleset } from '../../ruleset.mjs';
 import * as Phases from '../../phases.mjs';
 
 const Resources = Object.create(null);
@@ -193,9 +194,10 @@ Resources.contracts['GET'] = PreFilter.chain(
   PreFilter.requiresPlayer(),
   PreFilter.requiresActor()
 ).then((request, response) => {
-  let { game: { input } } = request;
+  let { game } = request;
 
-  let options = Array.from(input.args[2]);
+  let rules = Ruleset.forBidding(game);
+  let options = Array.from(rules.options(Contract));
 
   let entities = options.map(c => new Entities.Contract(c));
   let json = JSON.stringify(entities);
@@ -216,7 +218,7 @@ Resources.auction['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game: { input }, entity } = request;
+  let { game , entity } = request;
 
   if (!entity.name && !entity.variant) {
     input.resolve();
@@ -236,7 +238,7 @@ Resources.auction['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let rules = input.args[1];
+  let rules = Ruleset.forBidding(game);
   if (!rules.valid(contract)) {
     response.writeHead(400);
     return response.end();
@@ -268,7 +270,7 @@ Resources.trick['POST'] = PreFilter.chain(
   }
 
   let card = Card[suit][rank];
-  let rules = input.args[1];
+  let rules = Ruleset.forPlaying(game);
   if (!rules.valid(card)) {
     response.writeHead(400);
     return response.end();

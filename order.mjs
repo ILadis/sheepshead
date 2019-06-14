@@ -65,10 +65,12 @@ Order.prototype.orderOf = function(card) {
   for (let suit of Suit) {
     for (let rank of Rank) {
       let c = Card[suit][rank];
-      if (card == c && !this.trumps.contains(c)) {
-        return value;
+      if (!this.trumps.contains(c)) {
+        if (card == c) {
+          return value;
+        }
+        value++
       }
-      value++
     }
   }
 

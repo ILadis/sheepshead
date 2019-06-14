@@ -16,7 +16,7 @@ import { Ruleset } from '../../ruleset.mjs';
 import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
-import { Brainless } from '../../bot/brain.mjs';
+import { Brainless } from '../../bot/brainless.mjs';
 
 const Resources = Object.create(null);
 

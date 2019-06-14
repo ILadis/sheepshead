@@ -41,6 +41,10 @@ Deck.prototype.contains = function(card) {
   return this.cards.includes(card);
 };
 
+Deck.prototype.size = function() {
+  return this.cards.length;
+};
+
 Deck.prototype.empty = function() {
   return this.cards.length <= 0;
 };

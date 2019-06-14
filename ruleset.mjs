@@ -100,6 +100,9 @@ Ruleset.forPlaying = function(game) {
     if (!actor.cards.contains(card)) {
       return false;
     }
+    if (actor.cards.size() == 1) {
+      return true;
+    }
     return next();
   }
 

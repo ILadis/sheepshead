@@ -19,7 +19,8 @@ Ruleset.prototype.options = function(iterator) {
     return false;
   }
 
-  return options.values();
+  let next = () => options.values();
+  return { [Symbol.iterator]: next };
 }
 
 Ruleset.forBidding = function(game) {

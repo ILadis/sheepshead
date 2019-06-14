@@ -31,9 +31,9 @@ describe('Player', () => {
     it('should return iterator factory', () => {
       let factory = Player.sequence([player1, player2], player1);
       let it1 = factory[Symbol.iterator]();
-      Assert.equal(it1.next().value, player1);
+      Assert.ok(it1.next);
       let it2 = factory[Symbol.iterator]();
-      Assert.equal(it2.next().value, player1);
+      Assert.ok(it2.next);
     });
 
     it('should iterate through players from given start', () => {

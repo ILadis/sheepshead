@@ -24,11 +24,23 @@ describe('Ruleset', () => {
   });
 
   describe('#options()', () => {
+    it('should return iterator factory', () => {
+      let validator = () => true;
+      let rules = new Ruleset(validator);
+      let numbers = [1, 2, 3];
+      let factory = rules.options(numbers);
+      let it1 = factory[Symbol.iterator]();
+      Assert.ok(it1.next);
+      let it2 = factory[Symbol.iterator]();
+      Assert.ok(it2.next);
+    });
+
     it('should return iterator of unique options', () => {
       let validator = (num) => num % 2 == 0;
       let rules = new Ruleset(validator);
       let numbers = [1, 2, 3, 4, 5, 4, 3, 2, 1];
-      let it = rules.options(numbers);
+      let factory = rules.options(numbers);
+      let it = factory[Symbol.iterator]();
       Assert.equal(it.next().value, 2);
       Assert.equal(it.next().value, 4);
       Assert.ok(it.next().done);
@@ -38,8 +50,8 @@ describe('Ruleset', () => {
       let validator = (num) => num < 0;
       let rules = new Ruleset(validator);
       let numbers = [1, 2, 3];
-      let it = rules.options(numbers);
-      Assert.equal(it, false);
+      let factory = rules.options(numbers);
+      Assert.equal(factory, false);
     });
   });
 

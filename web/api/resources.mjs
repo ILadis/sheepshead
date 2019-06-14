@@ -15,6 +15,9 @@ import { Contract } from '../../contract.mjs';
 import { Ruleset } from '../../ruleset.mjs';
 import * as Phases from '../../phases.mjs';
 
+import { Bot } from '../../bot/bot.mjs';
+import { Brainless } from '../../bot/brain.mjs';
+
 const Resources = Object.create(null);
 
 Resources.games = new Resource(
@@ -125,6 +128,12 @@ Resources.players['POST'] = PreFilter.chain(
   let index = input.args[0];
   let player = new Player(name, index);
 
+  if (player.name == 'Bot') {
+    let brain = new Brainless();
+    player = new Bot(index, brain);
+    player.attach(request.game);
+  }
+
   registry.register(token, player);
   input.resolve(player);
 
@@ -218,7 +227,7 @@ Resources.auction['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game , entity } = request;
+  let { game: { input }, entity } = request;
 
   if (!entity.name && !entity.variant) {
     input.resolve();
@@ -238,7 +247,7 @@ Resources.auction['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let rules = Ruleset.forBidding(game);
+  let rules = input.args[1];
   if (!rules.valid(contract)) {
     response.writeHead(400);
     return response.end();
@@ -270,7 +279,7 @@ Resources.trick['POST'] = PreFilter.chain(
   }
 
   let card = Card[suit][rank];
-  let rules = Ruleset.forPlaying(game);
+  let rules = input.args[1];
   if (!rules.valid(card)) {
     response.writeHead(400);
     return response.end();

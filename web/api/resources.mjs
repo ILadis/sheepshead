@@ -117,7 +117,7 @@ Resources.players['POST'] = PreFilter.chain(
   PreFilter.requiresGame(Phases.joining),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  var { game, entity, registry } = request;
+  var { game, registry, entity } = request;
 
   let name = String(entity.name);
   if (!name.length) {
@@ -230,7 +230,9 @@ Resources.auction['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  var { game, entity } = request;
+  var { game, registry, entity } = request;
+
+  let input = registry.lookup(game).input;
 
   if (!entity.name && !entity.variant) {
     input.resolve();
@@ -250,7 +252,6 @@ Resources.auction['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let input = registry.lookup(game).input;
   let rules = input.args[1];
   if (!rules.valid(contract)) {
     response.writeHead(400);
@@ -272,7 +273,7 @@ Resources.trick['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  var { game, entity } = request;
+  var { game, registry, entity } = request;
 
   let rank = Rank[entity.rank];
   let suit = Suit[entity.suit];

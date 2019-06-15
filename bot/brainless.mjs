@@ -10,13 +10,15 @@ Brainless.prototype.chooseFrom = function(options) {
   return options[index];
 };
 
-Brainless.prototype.onbid = function() {
-  let options = Array.from(Contract).filter(c => c.value == 1);
+Brainless.prototype.onbid = function(game, player, rules) {
+  let contracts = Array.from(Contract).filter(c => c.value == 1);
+  let options = Array.from(rules.options(contracts));
   return this.chooseFrom(options);
 };
 
-Brainless.prototype.onplay = function(game, player) {
-  let options = Array.from(player.cards);
+Brainless.prototype.onplay = function(game, player, rules) {
+  let cards = Array.from(player.cards);
+  let options = Array.from(rules.options(cards));
   return this.chooseFrom(options);
 };
 

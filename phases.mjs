@@ -16,7 +16,7 @@ export async function joining() {
     let player = await this.onjoin(index);
     players.push(player);
 
-    await this.onjoined(player);
+    this.onjoined(player);
   }
 
   let next = Player.next(players);
@@ -46,7 +46,7 @@ export async function dealing({ players, head }) {
     }
   } while (!deck.empty());
 
-  await this.ondealt(players);
+  this.ondealt(players);
 
   return attendance;
 }
@@ -59,7 +59,7 @@ export async function attendance({ sequence, phase }) {
 
   for (let player of sequence) {
     this.actor = player;
-    await this.onturn(player, phase);
+    this.onturn(player, phase);
 
     do {
       var contract = await this.onbid(player, rules);
@@ -69,7 +69,7 @@ export async function attendance({ sequence, phase }) {
       contract.assign(player);
       auction.bid(contract);
 
-      await this.oncontested(player);
+      this.oncontested(player);
     }
   }
 
@@ -86,7 +86,7 @@ export async function bidding({ auction, phase }) {
 
   let lead = auction.lead();
   while (!auction.settled()) {
-    await this.onbidded(lead);
+    this.onbidded(lead);
 
     for (let player of auction.bidders()) {
       if (player == lead.owner) {
@@ -94,7 +94,7 @@ export async function bidding({ auction, phase }) {
       }
 
       this.actor = player;
-      await this.onturn(player, phase);
+      this.onturn(player, phase);
 
       let options = rules.options(Contract);
       if (!options) {
@@ -117,7 +117,7 @@ export async function bidding({ auction, phase }) {
   }
 
   this.contract = lead;
-  await this.onsettled(lead);
+  this.onsettled(lead);
 
   return playing;
 }
@@ -133,7 +133,7 @@ export async function playing({ contract, sequence, phase }) {
 
   for (let player of sequence) {
     this.actor = player;
-    await this.onturn(player, phase);
+    this.onturn(player, phase);
 
     do {
       var card = await this.onplay(player, rules);
@@ -146,11 +146,11 @@ export async function playing({ contract, sequence, phase }) {
     }
 
     trick.add(player, card);
-    await this.onplayed(player, card, trick);
+    this.onplayed(player, card, trick);
 
     if (contract.partner == card) {
       contract.partner = player;
-      await this.onmatched(contract);
+      this.onmatched(contract);
     }
   }
 
@@ -163,7 +163,7 @@ export async function countup({ players, contract, trick }) {
   winner.points += trick.points();
 
   this.sequence = Player.sequence(players, winner);
-  await this.oncompleted(trick, winner);
+  this.oncompleted(trick, winner);
 
   return winner.cards.empty() ? aftermath : playing;
 }
@@ -184,7 +184,7 @@ export async function aftermath({ players, contract }) {
   }
 
   let { winner, loser } = Result.compare(declarer, defender);
-  await this.onfinished(winner, loser);
+  this.onfinished(winner, loser);
 
   return proceed;
 }
@@ -198,11 +198,12 @@ export async function proceed({ players, head, phase }) {
     player.points = 0;
 
     this.actor = player;
-    await this.onturn(player, phase);
+    this.onturn(player, phase);
 
     let proceed = await this.onproceed(player);
     if (!proceed) {
-      return;
+      this.onexited(player);
+      return exit;
     }
   }
 
@@ -210,5 +211,8 @@ export async function proceed({ players, head, phase }) {
   this.head = next;
 
   return dealing;
+}
+
+export async function exit() {
 }
 

@@ -25,6 +25,7 @@ Game.prototype.onsettled =
 Game.prototype.onplayed =
 Game.prototype.onmatched =
 Game.prototype.oncompleted =
-Game.prototype.onfinished = async function(...args) {
+Game.prototype.onfinished =
+Game.prototype.onexited = async function(...args) {
 };
 

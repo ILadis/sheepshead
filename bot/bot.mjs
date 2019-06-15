@@ -1,17 +1,27 @@
 
+import { Game } from '../game.mjs';
 import { Player } from '../player.mjs';
 
 export function Bot(index, brain) {
   Player.call(this, `Bot ${index}`, index);
-  this.occurrences = new Set();
-  this.thinktime = 500;
+
   this.brain = brain;
+  this.thinktime = 500;
 }
 
 Bot.prototype = Object.create(Player.prototype);
 
-Bot.prototype.connect = function(event, act = false) {
-  var event = 'on' + event;
+Bot.prototype.attach = function(game) {
+  this.game = game;
+
+  for (let event in Game.prototype) {
+    if (event.startsWith('on')) {
+      this.connect(event);
+    }
+  }
+};
+
+Bot.prototype.connect = function(event) {
   let { game, brain } = this;
 
   if (event in brain) {
@@ -19,33 +29,22 @@ Bot.prototype.connect = function(event, act = false) {
     let brainify = brain[event].bind(brain);
 
     game[event] = (...args) => {
-      if (act && game.actor === this) {
-        return this.defer(() => brainify(game));
+      let other = callback(...args);
+      let brain = brainify(game, ...args);
+
+      if (this == game.actor) {
+        return this.defer(brain);
       }
-      brainify(game);
-      return callback(...args);
+
+      return other;
     };
   }
 };
 
-Bot.prototype.defer = function(callback) {
+Bot.prototype.defer = function(result) {
   let time = this.thinktime;
   return new Promise((resolve) => {
-    setTimeout(() => resolve(callback()), time);
+    setTimeout(() => resolve(result), time);
   });
-};
-
-Bot.prototype.attach = function(game) {
-  this.game = game;
-
-  let notifier = ['played'];
-  for (let event of notifier) {
-    this.connect(event);
-  }
-
-  let actions = ['bid', 'play'];
-  for (let event of actions) {
-    this.connect(event, true);
-  }
 };
 

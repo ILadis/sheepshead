@@ -1,10 +1,11 @@
 
-export function Game(game) {
+export function Game(id, game) {
+  this.id = id;
   this.game = game;
 };
 
 Game.prototype.toJSON = function() {
-  let id = this.game.id;
+  let id = this.id;
   let phase = this.game.phase;
   phase = phase ? phase.name : undefined;
   let players = Array.from(this.game.players);

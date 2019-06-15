@@ -23,42 +23,40 @@ const Resources = Object.create(null);
 Resources.games = new Resource(
   ['GET', 'POST'], '/api/games');
 
-Resources.games['GET'] = PreFilter.chain(
-  PreFilter.requiresGames()
-).then((request, response) => {
-  let { games } = request;
+Resources.games['GET'] = (request, response) => {
+  var { registry } = request;
 
-  let entity = games.map(g => new Entities.Game(g));
-  let json = JSON.stringify(entity);
+  let games = registry.entries(e => e instanceof Game);
+  let entities = new Array();
+  for (let game of games) {
+    let id = registry.lookup(game).id;
+    entities.push(new Entities.Game(id, game));
+  }
+  let json = JSON.stringify(entities);
 
   response.setHeader('Content-Type', MediaType.json);
   response.setHeader('Content-Length', Buffer.byteLength(json));
   response.writeHead(200);
   response.write(json);
   return response.end();
-});
+};
 
-Resources.games['POST'] = PreFilter.chain(
-  PreFilter.requiresGames()
-).then((request, response) => {
-  let { games, registry } = request;
+Resources.games['POST'] = (request, response) => {
+  var { registry } = request;
 
   let game = new Game();
-  games.push(game);
-
   let events = new EventStream();
   events.attach(game);
 
   let input = new DeferredInput();
   input.attach(game);
 
-  let id = games.length;
-  game.id = id;
+  let id = registry.register(game);
+  registry.register({ id, input, events }, game);
 
-  registry.register(id, game);
   game.run();
 
-  let entity = new Entities.Game(game);
+  let entity = new Entities.Game(id, game);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -66,7 +64,7 @@ Resources.games['POST'] = PreFilter.chain(
   response.writeHead(201);
   response.write(json);
   return response.end();
-});
+};
 
 Resources.state = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)');
@@ -74,9 +72,11 @@ Resources.state = new Resource(
 Resources.state['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  let { game } = request;
+  var { game, registry } = request;
 
-  let entity = new Entities.Game(game);
+  let id = registry.lookup(game).id;
+
+  let entity = new Entities.Game(id, game);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -92,13 +92,14 @@ Resources.events = new Resource(
 Resources.events['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  let { game: { events }, url } = request;
-
-  let offset = Number(url.query['offset']);
+  var { game, registry, url } = request;
 
   response.setHeader('Cache-Control', 'no-cache');
   response.setHeader('Content-Type', MediaType.event);
   response.writeHead(200);
+
+  let offset = Number(url.query['offset']);
+  let events = registry.lookup(game).events;
 
   let callback = (event) => response.write(event);
   events.subscribe(callback, offset);
@@ -116,7 +117,7 @@ Resources.players['POST'] = PreFilter.chain(
   PreFilter.requiresGame(Phases.joining),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  var { game: { input }, entity, registry } = request;
+  var { game, entity, registry } = request;
 
   let name = String(entity.name);
   if (!name.length) {
@@ -125,6 +126,7 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   let token = Token.generate();
+  let input = registry.lookup(game).input;
   let index = input.args[0];
   let player = new Player(name, index);
 
@@ -134,7 +136,7 @@ Resources.players['POST'] = PreFilter.chain(
     player.attach(request.game);
   }
 
-  registry.register(token, player);
+  registry.register(player, token);
   input.resolve(player);
 
   var entity = new Entities.Player(player, false, token);
@@ -150,7 +152,7 @@ Resources.players['POST'] = PreFilter.chain(
 Resources.players['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  let { game: { actor, players }, url } = request;
+  var { game: { actor, players }, url } = request;
 
   let index = Number(url.query['index']);
   if (!Number.isNaN(index)) {
@@ -174,7 +176,7 @@ Resources.hand['GET'] = PreFilter.chain(
   PreFilter.requiresGame(),
   PreFilter.requiresPlayer()
 ).then((request, response) => {
-  let { game: { contract }, player } = request;
+  var { game: { contract }, player } = request;
 
   if (!contract) {
     let variants = Contract.normal;
@@ -203,9 +205,10 @@ Resources.contracts['GET'] = PreFilter.chain(
   PreFilter.requiresPlayer(),
   PreFilter.requiresActor()
 ).then((request, response) => {
-  let { game } = request;
+  var { game, registry } = request;
 
-  let rules = Ruleset.forBidding(game);
+  let input = registry.lookup(game).input;
+  let rules = input.args[1];
   let options = Array.from(rules.options(Contract));
 
   let entities = options.map(c => new Entities.Contract(c));
@@ -227,7 +230,7 @@ Resources.auction['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game: { input }, entity } = request;
+  var { game, entity } = request;
 
   if (!entity.name && !entity.variant) {
     input.resolve();
@@ -235,18 +238,19 @@ Resources.auction['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  var contract = Contract[entity.name];
+  let variants = Contract[entity.name];
+  if (!variants) {
+    response.writeHead(422);
+    return response.end();
+  }
+
+  let contract = variants[entity.variant];
   if (!contract) {
     response.writeHead(422);
     return response.end();
   }
 
-  var contract = contract[entity.variant];
-  if (!contract) {
-    response.writeHead(422);
-    return response.end();
-  }
-
+  let input = registry.lookup(game).input;
   let rules = input.args[1];
   if (!rules.valid(contract)) {
     response.writeHead(400);
@@ -268,7 +272,7 @@ Resources.trick['POST'] = PreFilter.chain(
   PreFilter.requiresActor(),
   PreFilter.requiresEntity(JSON)
 ).then((request, response) => {
-  let { game: { input }, entity } = request;
+  var { game, entity } = request;
 
   let rank = Rank[entity.rank];
   let suit = Suit[entity.suit];
@@ -279,6 +283,8 @@ Resources.trick['POST'] = PreFilter.chain(
   }
 
   let card = Card[suit][rank];
+
+  let input = registry.lookup(game).input;
   let rules = input.args[1];
   if (!rules.valid(card)) {
     response.writeHead(400);
@@ -294,7 +300,7 @@ Resources.trick['POST'] = PreFilter.chain(
 Resources.trick['GET'] = PreFilter.chain(
   PreFilter.requiresGame(Phases.playing)
 ).then((request, response) => {
-  let { game: { trick } } = request;
+  var { game: { trick } } = request;
 
   if (!trick) {
     response.writeHead(204);

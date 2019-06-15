@@ -7,7 +7,6 @@ export function EventStream() {
 }
 
 EventStream.prototype.attach = function(game) {
-  game.events = this;
   game.onjoined = (...args) => {
     let player = new Entities.Player(args[0]);
     this.publish('joined', player);

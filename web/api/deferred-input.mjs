@@ -4,8 +4,6 @@ export function DeferredInput() {
 }
 
 DeferredInput.prototype.attach = function(game) {
-  game.input = this;
-
   game.onjoin =
   game.onbid =
   game.onplay = (...args) => {

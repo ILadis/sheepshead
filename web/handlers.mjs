@@ -42,16 +42,31 @@ Authentication.prototype.handle = function(request, response, next) {
 };
 
 export function Registry() {
+  this.ids = 0;
   this.registry = new Map();
 }
 
-Registry.prototype.register = function(key, value) {
+Registry.prototype.register = function(value, key) {
+  key = key || ++this.ids;
   this.registry.set(key, value);
   return key;
 };
 
-Registry.prototype.lookup = function(key) {
+Registry.prototype.lookup = function(key, value) {
+  if (!this.registry.has(key)) {
+    this.registry.set(key, value);
+    return value;
+  }
   return this.registry.get(key);
+};
+
+Registry.prototype.entries = function*(filter = () => true) {
+  let values = this.registry.values();
+  for (let value of values) {
+    if (filter(value)) {
+      yield value;
+    }
+  }
 };
 
 Registry.prototype.handle = function(request, response, next) {

@@ -9,17 +9,29 @@ import { Card, Suit, Rank } from './card.mjs';
 
 describe('Ruleset', () => {
   describe('#valid()', () => {
-    it('should call validator with arguments', () => {
-      let validator = (...args) => validator.args = args;
+    it('should call validator with arguments and next function', () => {
+      let args = new Array();
+      let validator = function() { args = arguments; };
       let rules = new Ruleset(validator);
       rules.valid(13, 37);
-      Assert.deepEqual(validator.args, [13, 37]);
+      Assert.equal(args[0], 13);
+      Assert.equal(args[1], 37);
+      Assert.equal(typeof args[2], 'function');
     });
 
     it('should return result of validator', () => {
       let validator = () => true;
       let rules = new Ruleset(validator);
       Assert.equal(rules.valid(), true);
+    });
+
+    it('should call next validator in chain', () => {
+      let validator1 = (num, next) => num > 7 ? next() : false;
+      let validator2 = (num, next) => num < 9 ? next() : false;
+      let rules = new Ruleset(validator1, validator2);
+      Assert.equal(rules.valid(6), false);
+      Assert.equal(rules.valid(8), true);
+      Assert.equal(rules.valid(10), false);
     });
   });
 

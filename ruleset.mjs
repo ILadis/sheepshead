@@ -1,10 +1,19 @@
 
-export function Ruleset(validator) {
-  this.validator = validator;
+export function Ruleset(...validators) {
+  this.validators = validators;
 };
 
 Ruleset.prototype.valid = function(...args) {
-  return this.validator.apply(this, args);
+  let iterator = this.validators.values();
+  let next = () => {
+    let { done, value } = iterator.next();
+    if (!done) {
+      return value.call(this, ...args, next);
+    }
+
+    return true;
+  };
+  return next();
 };
 
 Ruleset.prototype.options = function(iterator) {
@@ -24,23 +33,17 @@ Ruleset.prototype.options = function(iterator) {
 }
 
 Ruleset.forBidding = function(game) {
-  return new Ruleset((contract) => {
-    let { auction, actor } = game;
+  return new Ruleset(honorConcede, enforceValue, enforcePartner);
 
-    return honorConcede({ contract },
-      () => enforceValue({ actor, auction, contract },
-        () => enforcePartner({ actor, contract },
-          () => true)));
-  });
-
-  function honorConcede({ contract }, next) {
+  function honorConcede(contract, next) {
     if (!contract) {
       return true;
     }
     return next();
   }
 
-  function enforceValue({ actor, auction, contract }, next) {
+  function enforceValue(contract, next) {
+    let { auction, actor } = game;
     let lead = auction.lead();
     let minimum = auction.blind();
 
@@ -62,8 +65,9 @@ Ruleset.forBidding = function(game) {
     return next();
   }
 
-  function enforcePartner({ actor, contract }, next) {
-    let partner = contract.partner;
+  function enforcePartner(contract, next) {
+    let { actor } = game;
+    let { partner, order: { trumps } } = contract;
 
     if (!partner) {
       return next();
@@ -73,9 +77,8 @@ Ruleset.forBidding = function(game) {
       return false;
     }
 
-    let order = contract.order;
     for (let card of actor.cards) {
-      if (card.suit == partner.suit && !order.trumps.contains(card)) {
+      if (card.suit == partner.suit && !trumps.contains(card)) {
         return true;
       }
     }
@@ -85,18 +88,11 @@ Ruleset.forBidding = function(game) {
 };
 
 Ruleset.forPlaying = function(game) {
-  return new Ruleset((card) => {
-    let { actor, contract, trick } = game;
-    let lead = trick.lead() || card;
+  return new Ruleset(enforceOwns, enforceTrump, enforcePartner, enforceDominant);
 
-    return enforceOwns({ actor, card },
-      () => enforceTrump({ actor, contract, lead, card },
-        () => enforcePartner({ actor, contract, lead, card },
-          () => enforceDominant({ actor, contract, lead, card },
-            () => true))));
-  });
+  function enforceOwns(card, next) {
+    let { actor } = game;
 
-  function enforceOwns({ actor, card }, next) {
     if (!actor.cards.contains(card)) {
       return false;
     }
@@ -106,8 +102,10 @@ Ruleset.forPlaying = function(game) {
     return next();
   }
 
-  function enforceTrump({ actor, contract, lead, card }, next) {
-    let order = contract.order;
+  function enforceTrump(card, next) {
+    let { actor, contract: { order }, trick } = game;
+    let lead = trick.lead() || card;
+
     if (order.trumps.contains(lead)) {
       for (let trump of order.trumps) {
         if (actor.cards.contains(trump)) {
@@ -119,12 +117,22 @@ Ruleset.forPlaying = function(game) {
     return next();
   }
 
-  function enforcePartner({ actor, contract, lead, card }, next) {
-    let order = contract.order;
-    let partner = contract.partner;
+  function isPartnerCalled(card) {
+    let { contract: { partner, order }, trick } = game;
+    let lead = trick.lead() || card;
+
+    if (!partner) {
+      return false;
+    }
+
+    return lead.suit == partner.suit && !order.trumps.contains(lead);
+  }
+
+  function enforcePartner(card, next) {
+    let { actor, contract: { partner } } = game;
+    let called = isPartnerCalled(card);
 
     if (partner) {
-      let called = lead.suit == partner.suit && !order.trumps.contains(lead);
       if (called && actor.cards.contains(partner)) {
         return card == partner;
       }
@@ -137,8 +145,9 @@ Ruleset.forPlaying = function(game) {
     return next();
   }
 
-  function enforceDominant({ actor, contract, card }, next) {
-    let order = contract.order;
+  function enforceDominant(card, next) {
+    let { actor, contract: { order } } = game;
+
     for (let dominant of order.dominants) {
       if (actor.cards.contains(dominant)) {
         return order.dominants.contains(card);

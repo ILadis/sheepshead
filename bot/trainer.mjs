@@ -9,7 +9,6 @@ export async function train(brain, samples, iterations) {
   let step = 1/4;
 
   do {
-    console.log(`create ${samples} samples with seed`);
     let rand = mulberry(12345);
     let count = samples;
 
@@ -34,7 +33,6 @@ export async function train(brain, samples, iterations) {
     };
 
     await game.run();
-    console.log(`repeating stuff, another ${iterations} left`);
   } while (--iterations > 0);
 
   brain.trained = true;
@@ -48,6 +46,6 @@ function mulberry(seed) {
     value = Math.imul(value ^ value >>> 15, value | 1);
     value ^= value + Math.imul(value ^ value >>> 7, value | 61);
     return ((value ^ value >>> 14) >>> 0) / 4294967296;
-  }
+  };
 }
 

@@ -12,11 +12,11 @@ import { Game } from '../../game.mjs';
 import { Card, Suit, Rank } from '../../card.mjs';
 import { Player } from '../../player.mjs';
 import { Contract } from '../../contract.mjs';
-import { Ruleset } from '../../ruleset.mjs';
 import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
-import { Brainless } from '../../bot/brainless.mjs';
+import { Brain } from '../../bot/brain.mjs';
+import * as Trainer from '../../bot/trainer.mjs';
 
 const Resources = Object.create(null);
 
@@ -126,18 +126,23 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   let token = Token.generate();
-  let input = registry.lookup(game).input;
-  let index = input.args[0];
+  let context = registry.lookup(game);
+  let index = context.input.args[0];
   let player = new Player(name, index);
 
   if (player.name == 'Bot') {
-    let brain = new Brainless();
+    let brain = new Brain();
+
     player = new Bot(index, brain);
-    player.attach(request.game);
+    player.attach(game);
+
+    Trainer.train(brain, 1000, 200).then(() => {
+      player.name += ' (trained)';
+    });
   }
 
   registry.register(player, token);
-  input.resolve(player);
+  context.input.resolve(player);
 
   var entity = new Entities.Player(player, false, token);
   let json = JSON.stringify(entity);

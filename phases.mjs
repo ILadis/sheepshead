@@ -32,12 +32,11 @@ export async function dealing({ players, head }) {
   let deck = new Deck();
   for (let suit of Suit) {
     for (let rank of Rank) {
-      let card = Card[suit][rank];
-      deck.add(card);
+      deck.add(Card[suit][rank]);
     }
   }
 
-  deck.shuffle();
+  deck.shuffle(this.rand);
 
   do {
     for (let player of sequence) {

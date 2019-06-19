@@ -8,7 +8,7 @@ export function Brain() {
   this.environment = new Tensor();
   this.occurrences = new Set();
   this.actions = new Map();
-  this.network = new Neataptic.architect.Perceptron(77, 25, 15, 32);
+  this.network = new Neataptic.architect.Perceptron(46, 32, 32);
 };
 
 Brain.prototype.ondealt = function(game, players) {
@@ -21,7 +21,10 @@ Brain.prototype.ondealt = function(game, players) {
 
 Brain.prototype.onturn = function(game, player) {
   let tensor = new Tensor();
-  let { trick, contract } = game;
+  let { trick, contract, players } = game;
+
+  let declarer = new Set();
+  let defender = new Set();
 
   // add player hand cards
   var states = tensor.append(8);
@@ -40,18 +43,6 @@ Brain.prototype.onturn = function(game, player) {
   }
   states.commit();
 
-  // add current card order
-  var states = tensor.append(32);
-  if (contract) {
-    for (let card of contract.order.dominants) {
-      states.next(Values.stateOf(card));
-    }
-    for (let card of contract.order.trumps) {
-      states.next(Values.stateOf(card));
-    }
-  }
-  states.commit();
-
   // add known cards
   var states = tensor.append(32);
   for (let card of this.occurrences) {
@@ -63,12 +54,43 @@ Brain.prototype.onturn = function(game, player) {
   // add declarer/defender state
   var states = tensor.append(1);
   if (contract) {
-    if (contract.owner == player) {
+    for (let player of players) {
+      switch (player) {
+      case contract.owner:
+      case contract.partner:
+        declarer.add(player);
+        break;
+      default:
+        defender.add(player);
+      }
+    }
+
+    if (player.cards.contains(contract.partner)) {
+      declarer.add(player);
+    }
+
+    if (declarer.has(player)) {
       states.next(1);
-    } else if (contract.partner == player) {
+    }
+    else if (defender.has(player)) {
+      states.next(0.5);
+    }
+  }
+  states.commit();
+
+  // add current trick winner
+  var states = tensor.append(1);
+  if (trick) {
+    let winner = trick.winner(contract.order);
+
+    if (declarer.has(player) && declarer.has(winner)) {
       states.next(1);
-    } else if (player.cards.contains(contract.partner)) {
+    }
+    else if (defender.has(player) && defender.has(winner)) {
       states.next(1);
+    }
+    else {
+      states.next(0.5);
     }
   }
   states.commit();
@@ -117,7 +139,7 @@ Brain.prototype.onplayed = function(game, player, card) {
 
   this.actions.get(player).add({ input, output });
 };
-var i = 0;
+
 Brain.prototype.onfinished = function(game, winner, loser) {
   for (let player of winner.players) {
     if (winner.points > 90) {

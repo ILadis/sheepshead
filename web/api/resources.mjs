@@ -15,7 +15,8 @@ import { Contract } from '../../contract.mjs';
 import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
-import { Brainless } from '../../bot/brainless.mjs';
+import { Brain } from '../../bot/neataptic/brain.mjs';
+import * as Trainer from '../../bot/neataptic/trainer.mjs';
 
 const Resources = Object.create(null);
 
@@ -148,13 +149,17 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   if (player.name == 'Bot') {
-    let brain = new Brainless();
-    let bot = player = new Bot(index, brain);
-    bot.attach(game);
+    let brain = new Brain();
+    player = new Bot(index, brain);
+
+    Trainer.train(brain, 100).then(() => {
+      player.name += ' (trained)';
+      player.attach(game);
+    });
   }
 
   registry.register(player, token);
-  input.resolve(player);
+  context.input.resolve(player);
 
   var entity = new Entities.Player(player, false, 0, token);
   let json = JSON.stringify(entity);

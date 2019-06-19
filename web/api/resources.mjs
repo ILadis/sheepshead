@@ -15,8 +15,7 @@ import { Contract } from '../../contract.mjs';
 import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
-import { Brain } from '../../bot/brain.mjs';
-import * as Trainer from '../../bot/trainer.mjs';
+import { Brainless } from '../../bot/brainless.mjs';
 
 const Resources = Object.create(null);
 
@@ -126,23 +125,18 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   let token = Token.generate();
-  let context = registry.lookup(game);
-  let index = context.input.args[0];
+  let input = registry.lookup(game).input;
+  let index = input.args[0];
   let player = new Player(name, index);
 
   if (player.name == 'Bot') {
-    let brain = new Brain();
-
-    player = new Bot(index, brain);
-    player.attach(game);
-
-    Trainer.train(brain, 1000, 200).then(() => {
-      player.name += ' (trained)';
-    });
+    let brain = new Brainless();
+    let bot = player = new Bot(index, brain);
+    bot.attach(game);
   }
 
   registry.register(player, token);
-  context.input.resolve(player);
+  input.resolve(player);
 
   var entity = new Entities.Player(player, false, token);
   let json = JSON.stringify(entity);

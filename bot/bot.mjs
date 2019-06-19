@@ -5,6 +5,7 @@ import { Player } from '../player.mjs';
 export function Bot(index, brain) {
   Player.call(this, `Bot ${index}`, index);
 
+  this.callbacks = new Map();
   this.brain = brain;
   this.thinktime = 500;
 }
@@ -12,6 +13,7 @@ export function Bot(index, brain) {
 Bot.prototype = Object.create(Player.prototype);
 
 Bot.prototype.attach = function(game) {
+  this.detach();
   this.game = game;
 
   for (let event in Game.prototype) {
@@ -21,12 +23,26 @@ Bot.prototype.attach = function(game) {
   }
 };
 
+Bot.prototype.detach = function() {
+  let { game, callbacks } = this;
+
+  if (game) {
+    for (let [event, callback] in callbacks) {
+      game[event] = callback;
+    }
+  }
+
+  callbacks.clear();
+};
+
 Bot.prototype.connect = function(event) {
-  let { game, brain } = this;
+  let { game, brain, callbacks } = this;
 
   if (event in brain) {
     let callback = game[event].bind(game);
     let brainify = brain[event].bind(brain);
+
+    callbacks.set(event, callback);
 
     game[event] = (...args) => {
       let other = callback(...args);

@@ -4,7 +4,6 @@ import { Deck } from './deck.mjs';
 export function Player(name, index) {
   this.name = name;
   this.index = index;
-  this.points = 0;
   this.cards = new Deck();
 }
 

@@ -22,11 +22,6 @@ describe('Player', () => {
     Assert.equal(player.index, index);
   });
 
-  it('should initially have 0 points', () => {
-    let player = new Player();
-    Assert.equal(player.points, 0);
-  });
-
   describe('#sequence()', () => {
     it('should return iterator factory', () => {
       let factory = Player.sequence([player1, player2], player1);

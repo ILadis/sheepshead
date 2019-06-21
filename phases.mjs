@@ -5,7 +5,7 @@ import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 import { Contract } from './contract.mjs';
 import { Auction } from './auction.mjs';
-import { Result } from './result.mjs';
+import { Scoreboard } from './scoreboard.mjs';
 import { Ruleset } from './ruleset.mjs';
 
 export async function joining() {
@@ -19,13 +19,16 @@ export async function joining() {
     this.onjoined(player);
   }
 
+  let scores = new Scoreboard(players);
+  this.scores = scores;
+
   let next = Player.next(players);
   this.head = next;
 
   return dealing;
 }
 
-export async function dealing({ players, head }) {
+export async function dealing({ players, head, rand }) {
   let sequence = Player.sequence(players, head);
   this.sequence = sequence;
 
@@ -36,7 +39,7 @@ export async function dealing({ players, head }) {
     }
   }
 
-  deck.shuffle(this.rand);
+  deck.shuffle(rand);
 
   do {
     for (let player of sequence) {
@@ -50,7 +53,7 @@ export async function dealing({ players, head }) {
   return attendance;
 }
 
-export async function attendance({ sequence, phase }) {
+export async function attendance({ sequence }) {
   let rules = Ruleset.forBidding(this);
 
   let auction = new Auction();
@@ -58,7 +61,7 @@ export async function attendance({ sequence, phase }) {
 
   for (let player of sequence) {
     this.actor = player;
-    this.onturn(player, phase);
+    this.onturn(player, attendance);
 
     do {
       var contract = await this.onbid(player, rules);
@@ -73,14 +76,10 @@ export async function attendance({ sequence, phase }) {
   }
 
   let lead = auction.lead();
-  if (!lead) {
-    return proceed;
-  }
-
-  return bidding;
+  return lead ? bidding : proceed;
 }
 
-export async function bidding({ auction, phase }) {
+export async function bidding({ auction }) {
   let rules = Ruleset.forBidding(this);
 
   let lead = auction.lead();
@@ -93,7 +92,7 @@ export async function bidding({ auction, phase }) {
       }
 
       this.actor = player;
-      this.onturn(player, phase);
+      this.onturn(player, bidding);
 
       let options = rules.options(Contract);
       if (!options) {
@@ -121,7 +120,7 @@ export async function bidding({ auction, phase }) {
   return playing;
 }
 
-export async function playing({ contract, sequence, phase }) {
+export async function playing({ scores, contract, sequence, players }) {
   let rules = Ruleset.forPlaying(this);
 
   let trick = new Trick();
@@ -132,7 +131,7 @@ export async function playing({ contract, sequence, phase }) {
 
   for (let player of sequence) {
     this.actor = player;
-    this.onturn(player, phase);
+    this.onturn(player, playing);
 
     do {
       var card = await this.onplay(player, rules);
@@ -153,54 +152,35 @@ export async function playing({ contract, sequence, phase }) {
     }
   }
 
-  return countup;
-}
-
-export async function countup({ players, contract, trick }) {
-  let order = contract.order;
   let winner = trick.winner(order);
-  winner.points += trick.points();
+  scores.claim(winner, trick);
 
   this.sequence = Player.sequence(players, winner);
   this.oncompleted(trick, winner);
 
-  return winner.cards.empty() ? aftermath : playing;
+  return winner.cards.empty() ? proceed : playing;
 }
 
-export async function aftermath({ players, contract }) {
-  let declarer = new Result();
-  let defender = new Result();
+export async function proceed({ scores, contract, players, head }) {
+  let result = scores.result(contract);
+  if (result) {
+    scores.score(result);
 
-  for (let player of players) {
-    switch (player) {
-    case contract.owner:
-    case contract.partner:
-      declarer.add(player);
-      break;
-    default:
-      defender.add(player);
-    }
+    let { winner, loser } = result;
+    this.onfinished(winner, loser);
   }
 
-  let { winner, loser } = Result.compare(declarer, defender);
-  this.onfinished(winner, loser);
-
-  return proceed;
-}
-
-export async function proceed({ players, head, phase }) {
   this.contract = null;
   this.trick = null;
 
   for (let player of players) {
     player.cards.clear();
-    player.points = 0;
 
     this.actor = player;
-    this.onturn(player, phase);
+    this.onturn(player, proceed);
 
-    let proceed = await this.onproceed(player);
-    if (!proceed) {
+    let resume = await this.onproceed(player);
+    if (!resume) {
       this.onexited(player);
       return exit;
     }

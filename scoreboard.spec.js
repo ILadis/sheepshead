@@ -57,9 +57,9 @@ describe('Result', () => {
     it('should add players to result', () => {
       let result = new Result();
       let player1 = new Player('Player 1');
-      result.add(player1, new Trick());
       let player2 = new Player('Player 2');
-      result.add(player2, new Trick());
+      result.add(player1, []);
+      result.add(player2, []);
       let players = Array.from(result.players);
       Assert.deepEqual(players, [player1, player2]);
     });
@@ -70,13 +70,13 @@ describe('Result', () => {
       let result = new Result();
       let player = new Player('Player 1');
 
-      var trick = new Trick();
-      trick.add(player, Card[Suit.leaf][Rank.ace]);
-      result.add(player, trick);
+      let trick1 = new Trick();
+      trick1.add(player, Card[Suit.leaf][Rank.ace]);
 
-      var trick = new Trick();
-      trick.add(player, Card[Suit.leaf][Rank.king]);
-      result.add(player, trick);
+      let trick2 = new Trick();
+      trick2.add(player, Card[Suit.leaf][Rank.king]);
+
+      result.add(player, [trick1, trick2]);
 
       Assert.equal(result.points(), 15);
     });
@@ -87,13 +87,13 @@ describe('Result', () => {
     let player1 = new Player('Player 1');
     let trick1 = new Trick();
     trick1.add(player1, Card[Suit.leaf][Rank.ace]);
-    result1.add(player1, trick1);
+    result1.add(player1, [trick1]);
 
     let result2 = new Result();
     let player2 = new Player('Player 2');
     let trick2 = new Trick();
     trick2.add(player2, Card[Suit.leaf][Rank.king]);
-    result2.add(player2, trick2);
+    result2.add(player2, [trick2]);
 
     it('should return result with higher points as winner', () => {
       let { winner } = Result.compare(result1, result2);

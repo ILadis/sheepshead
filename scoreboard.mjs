@@ -1,8 +1,8 @@
 
 export function Scoreboard(players, tariff = 5) {
+  this.tariff = tariff;
   this.scores = new Map();
   this.claims = new Map();
-  this.tariff = tariff;
 
   for (let player of players) {
     this.scores.set(player, 0);
@@ -15,7 +15,7 @@ Scoreboard.prototype.claim = function(player, trick) {
 };
 
 Scoreboard.prototype.score = function(result) {
-  let { winner } = result;
+  let { winner, loser } = result;
 
   for (let player of winner.players) {
     let score = this.scores.get(player);
@@ -24,22 +24,28 @@ Scoreboard.prototype.score = function(result) {
     this.scores.set(player, score);
     this.claims.get(player).clear();
   }
+
+  for (let player of loser.players) {
+    this.claims.get(player).clear();
+  }
 };
 
 Scoreboard.prototype.result = function(contract) {
+  if (!contract) {
+    return null;
+  }
+
   let declarer = new Result();
   let defender = new Result();
 
   for (let [player, tricks] of this.claims) {
-    for (let trick of tricks) {
-      switch (player) {
-      case contract.owner:
-      case contract.partner:
-        declarer.add(player, trick);
-        break;
-      default:
-        defender.add(player, trick);
-      }
+    switch (player) {
+    case contract.owner:
+    case contract.partner:
+      declarer.add(player, tricks);
+      break;
+    default:
+      defender.add(player, tricks);
     }
   }
 
@@ -67,16 +73,18 @@ function multiplier(result) {
   }
 
   return multiplier;
-};
+}
 
 export function Result() {
   this.players = new Set();
   this.tricks = new Set();
 };
 
-Result.prototype.add = function(player, trick) {
+Result.prototype.add = function(player, tricks) {
   this.players.add(player);
-  this.tricks.add(trick);
+  for (let trick of tricks) {
+    this.tricks.add(trick);
+  }
 };
 
 Result.prototype.points = function() {

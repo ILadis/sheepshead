@@ -54,7 +54,7 @@ export function Result(result) {
 Result.prototype.toJSON = function() {
   let players = Array.from(this.result.players);
   players = players.map(p => new Player(p));
-  let points = this.result.points;
+  let points = this.result.points();
   return { players, points };
 };
 

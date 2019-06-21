@@ -23,7 +23,7 @@ env PORT='8080' node --experimental-modules sheepshead-master/web/index.mjs
 ```
 
 #### Base URI
-The server can be launched with a base URI. This may be useful when running behind a reverse proxy. This setting is optional, no base URI is used when ommitted.
+The server can be launched with a base URI. This may be useful when running behind a reverse proxy. This setting is optional, no base URI is used when omitted.
 
 Example:
 ```sh

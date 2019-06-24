@@ -11,6 +11,15 @@ Trick.prototype.cards = function() {
   return this.plays.values();
 };
 
+Trick.prototype.moveBy = function(card) {
+  let iterator = this.plays.entries();
+  for (let [player, c] of iterator) {
+    if (card == c) {
+      return player;
+    }
+  }
+};
+
 Trick.prototype.points = function() {
   let points = 0;
   for (let card of this.plays.values()) {
@@ -31,7 +40,8 @@ Trick.prototype.empty = function() {
 Trick.prototype.winner = function(order) {
   let winner, highest = 0;
 
-  for (let [player, card] of this.plays) {
+  let iterator = this.plays.entries();
+  for (let [player, card] of iterator) {
     let value = order.valueOf(card);
 
     if (value > highest) {

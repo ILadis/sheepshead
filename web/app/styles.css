@@ -191,8 +191,10 @@ body {
 .toast {
   position: absolute;
   width: 100%;
-  top: 30%;
+  top: 19%;
   text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
   pointer-events: none;
 }
 
@@ -206,8 +208,6 @@ body {
   border-radius: 2pt;
   background-color: #fff;
   box-shadow: 0 2pt 6pt 1pt #bfbfbf;
-  opacity: 0;
-  transition: opacity 0.3s;
   display: inline-block;
 }
 
@@ -215,7 +215,7 @@ body {
   position: absolute;
   padding: 14pt 10pt 10pt 24pt;
   min-width: 160pt;
-  top: 20%;
+  top: 27%;
   left: 50%;
   border-style: solid;
   border-width: 1pt;
@@ -239,11 +239,22 @@ body {
 
 .dialog ul li {
   padding: 4pt 0 4pt 14pt;
+  cursor: pointer;
 }
 
 .dialog ul li:hover {
   background-color: #ececec;
   transition: background-color 0.6s;
+}
+
+.dialog table {
+  margin-top: 10pt;
+  width: 100%;
+}
+
+.dialog table th {
+  text-align: left;
+  font-weight: 600;
 }
 
 .textfield {
@@ -286,6 +297,7 @@ body {
   border-width: 1pt;
   border-color: #f2f2f2;
   border-bottom-style: solid;
+  cursor: pointer;
 }
 
 .list ul li:hover {
@@ -316,6 +328,7 @@ body {
   border: none;
   border-radius: 50%;
   outline: none;
+  cursor: pointer;
   box-shadow: 0 4pt 6pt 1pt #bfbfbf;
   z-index: 2;
 }

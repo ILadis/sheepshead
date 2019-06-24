@@ -161,9 +161,8 @@ export async function award({ contract, trick, scores, players }) {
   let order = contract.order;
 
   let winner = trick.winner(order);
-  this.oncompleted(trick, winner);
-
   scores.claim(winner, trick);
+  this.oncompleted(trick, winner);
 
   let sequence = Player.sequence(players, winner);
   this.sequence = sequence;
@@ -184,6 +183,7 @@ export async function award({ contract, trick, scores, players }) {
 }
 
 export async function proceed({ players, head }) {
+  this.actor = null;
   for (let player of players) {
     player.cards.clear();
   }

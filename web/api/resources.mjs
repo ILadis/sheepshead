@@ -154,7 +154,7 @@ Resources.players['POST'] = PreFilter.chain(
   registry.register(player, token);
   input.resolve(player);
 
-  var entity = new Entities.Player(player, false, token);
+  var entity = new Entities.Player(player, false, 0, token);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -167,14 +167,18 @@ Resources.players['POST'] = PreFilter.chain(
 Resources.players['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  var { game: { actor, players }, url } = request;
+  var { game: { actor, players, scores }, url } = request;
 
   let index = Number(url.query['index']);
+  var players = Array.from(players);
   if (!Number.isNaN(index)) {
     players = players.filter(p => p.index == index);
   }
 
-  let entity = players.map(p => new Entities.Player(p, p == actor));
+  let score = (p) => scores.scoreOf(p);
+  players.sort((p1, p2) => score(p2) - score(p1));
+
+  let entity = players.map(p => new Entities.Player(p, p == actor, score(p)));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);

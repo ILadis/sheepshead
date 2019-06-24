@@ -20,6 +20,20 @@ describe('Trick', () => {
   let player3 = new Player('Player 3');
   trick.add(player3, card3);
 
+  describe('#moveBy()', () => {
+    it('should return player of card', () => {
+      var player = trick.moveBy(card1);
+      Assert.equal(player, player1);
+      var player = trick.moveBy(card3);
+      Assert.equal(player, player3);
+    });
+
+    it('should return undefined for unknown card', () => {
+      let player = trick.moveBy(Card[Suit.heart][Rank.eight]);
+      Assert.equal(player, undefined);
+    });
+  });
+
   describe('#cards()', () => {
     it('should return iterator of added cards', () => {
       let it = trick.cards();

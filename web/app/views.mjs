@@ -158,12 +158,12 @@ Toast.prototype.show = function() {
   }
 
   let span = this.node.querySelector('span');
-  getComputedStyle(span).opacity;
-
-  span.style.opacity = 1;
   span.textContent = next.text;
 
-  span.ontransitionend = () => {
+  getComputedStyle(this.node).opacity;
+  this.node.style.opacity = 1;
+
+  this.node.ontransitionend = () => {
     let dismiss = this.dismiss.bind(this);
     this.timeout = setTimeout(dismiss, next.duration);
   };
@@ -172,10 +172,10 @@ Toast.prototype.show = function() {
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  let span = this.node.querySelector('span');
-  span.style.opacity = 0;
+  getComputedStyle(this.node).opacity;
+  this.node.style.opacity = 0;
 
-  span.ontransitionend = () => {
+  this.node.ontransitionend = () => {
     this.queue.shift();
     this.show();
   };
@@ -196,12 +196,18 @@ Dialog.prototype.setTitle = function(title) {
   h1.textContent = title;
 };
 
-Dialog.prototype.withOptions = function() {
-  let ul = this.node.querySelector('ul');
-
-  while (ul.firstChild) {
-    ul.firstChild.remove();
+Dialog.prototype.withContent = function(content) {
+  let child = this.node.querySelector('h1 + *');
+  if (child) {
+    child.remove();
   }
+
+  this.node.appendChild(content);
+};
+
+Dialog.prototype.withOptions = function() {
+  let ul = document.createElement('ul');
+  this.withContent(ul);
 
   let onItemSelected = (item) => { };
   let addItem = function(label, item) {
@@ -213,6 +219,25 @@ Dialog.prototype.withOptions = function() {
   };
 
   return { addItem, onItemSelected };
+};
+
+Dialog.prototype.withTable = function() {
+  let table = document.createElement('table');
+  this.withContent(table);
+
+  let hasCols = false;
+  let addRow = (...contents) => {
+    let tr = document.createElement('tr');
+    for (let content of contents) {
+      let td = document.createElement(hasCols ? 'td' : 'th');
+      td.textContent = content;
+      tr.appendChild(td);
+    }
+    hasCols = true;
+    table.appendChild(tr);
+  };
+
+  return { addRow };
 };
 
 Dialog.prototype.show = function() {

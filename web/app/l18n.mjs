@@ -40,15 +40,15 @@ export const de = {
     }) + ` ${ref('contract-label', contract, variant)}`,
 
   'trick-completed-toast': (player, points) => points.case({
-    one: `${player} gewinnt +1 Punkt`,
-    other: `${player} gewinnt +${points} Punkte`
+    one: `${player} gewinnt +1 Auge`,
+    other: `${player} gewinnt +${points} Augen`
   }),
 
-  'finished-toast': (players, points) => ''
+  'finished-toast': (players, points, score) => ''
     + players.format('join', ' und ') + ' ' + players.case({
       one: `hat`,
       other: `haben`
-    }) + ` mit ${points} Punkten gewonnen`,
+    }) + ` mit ${points} Augen gewonnen und +${score} Punkte erzielt`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Was möchtest du spielen?',
@@ -70,7 +70,11 @@ export const de = {
   'concede-label': () => 'Aussteigen',
 
   'game-label': (id, players) => ''
-    + `Spiel #${id} (${players.format('join', ', ')})`
+    + `Spiel #${id} (${players.format('join', ', ')})`,
+
+  'standings-title': () => 'Punktestand',
+  'standings-players': () => 'Spieler',
+  'standings-scores': () => 'Punkte'
 };
 
 export const en = {
@@ -109,9 +113,9 @@ export const en = {
     other: `${player} wins +${points} points`
   }),
 
-  'finished-toast': (players, points) => ''
+  'finished-toast': (players, points, score) => ''
     + players.format('join', ' and ') + ` won with ${points} `
-    + 'points',
+    + `points and scored +${score}`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Choose what to play!',
@@ -133,6 +137,10 @@ export const en = {
   'concede-label': () => 'Concede',
 
   'game-label': (id, players) => ''
-    + `Game #${id} (${players.format('join', ', ')})`
+    + `Game #${id} (${players.format('join', ', ')})`,
+
+  'standings-title': () => 'Current standings',
+  'standings-players': () => 'Player',
+  'standings-scores': () => 'Scores'
 };
 

@@ -10,6 +10,10 @@ export function Scoreboard(players, tariff = 5) {
   }
 }
 
+Scoreboard.prototype.scoreOf = function(player) {
+  return this.scores.get(player);
+};
+
 Scoreboard.prototype.claim = function(player, trick) {
   this.claims.get(player).add(trick);
 };
@@ -19,7 +23,7 @@ Scoreboard.prototype.award = function(result) {
 
   for (let player of winner.players) {
     let score = this.scores.get(player);
-    score += result.score;
+    score += winner.score;
 
     this.scores.set(player, score);
     this.claims.get(player).clear();
@@ -38,7 +42,8 @@ Scoreboard.prototype.result = function(contract) {
   let declarer = new Result();
   let defender = new Result();
 
-  for (let [player, tricks] of this.claims) {
+  let iterator = this.claims.entries();
+  for (let [player, tricks] of iterator) {
     switch (player) {
     case contract.owner:
     case contract.partner:
@@ -111,12 +116,20 @@ Result.prototype.points = function() {
 
 Result.prototype.matadors = function(trumps) {
   let cards = new Set();
+  let iterator = this.tricks.values();
 
-  for (let trick of this.tricks) {
-    for (let [player, card] of trick.plays) {
-      if (this.players.has(player) && trumps.contains(card)) {
-        cards.add(card);
+  for (let trick of iterator) {
+    for (let card of trick.cards()) {
+      if (!trumps.contains(card)) {
+        continue;
       }
+
+      let player = trick.moveBy(card);
+      if (!this.players.has(player)) {
+        continue;
+      }
+
+      cards.add(card);
     }
   }
 
@@ -137,7 +150,7 @@ Result.compare = function(result, other) {
   let winner = result, loser = other;
   if (other.points() >= result.points()) {
     winner = other;
-    loser = other;
+    loser = result;
   }
 
   return { winner, loser };

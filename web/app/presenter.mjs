@@ -200,7 +200,10 @@ Presenter.prototype.listContracts = async function(phase) {
 };
 
 Presenter.prototype.bidContract = function(contract) {
-  this.client.bidContract(contract);
+  let dialog = this.views.dialog;
+  this.client.bidContract(contract).then(() => {
+    dialog.dismiss();
+  });
 };
 
 Presenter.prototype.onContested = function(player) {
@@ -237,10 +240,37 @@ Presenter.prototype.onCompleted = function({ winner, points }) {
 };
 
 Presenter.prototype.onFinished = function({ winner }) {
-  let { players, points } = winner;
+  let { players, points, score } = winner;
   let names = players.map(p => p.name);
-  let message = this.stringFor('finished-toast', names, points);
+  let message = this.stringFor('finished-toast', names, points, score);
   this.showToast(message, 5000);
+  this.showStandings();
+};
+
+Presenter.prototype.showStandings = async function() {
+  let { dialog, trick } = this.views;
+  let players = await this.client.fetchPlayers();
+
+  let labels = [
+    this.stringFor('standings-players'),
+    this.stringFor('standings-scores')
+  ];
+
+  let table = dialog.withTable();
+  table.addRow('№', ...labels);
+
+  let position = 0;
+  for (let player of players) {
+    table.addRow(++position, player.name, player.score);
+  }
+
+  let title = this.stringFor('standings-title');
+  dialog.setTitle(title);
+
+  setTimeout(() => {
+    dialog.show();
+    trick.clearCards();
+  }, 2000);
 };
 
 Presenter.prototype.isSelf = function(other) {

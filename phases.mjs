@@ -76,6 +76,8 @@ export async function attendance({ sequence }) {
   }
 
   let lead = auction.lead();
+  this.contract = lead;
+
   return lead ? bidding : proceed;
 }
 
@@ -120,7 +122,7 @@ export async function bidding({ auction }) {
   return playing;
 }
 
-export async function playing({ scores, contract, sequence, players }) {
+export async function playing({ contract, sequence }) {
   let rules = Ruleset.forPlaying(this);
 
   let trick = new Trick();
@@ -152,38 +154,43 @@ export async function playing({ scores, contract, sequence, players }) {
     }
   }
 
-  let winner = trick.winner(order);
-  scores.claim(winner, trick);
-
-  this.sequence = Player.sequence(players, winner);
-  this.oncompleted(trick, winner);
-
-  return winner.cards.empty() ? proceed : playing;
+  return award;
 }
 
-export async function proceed({ scores, contract, players, head }) {
+export async function award({ contract, trick, scores, players }) {
+  let order = contract.order;
+
+  let winner = trick.winner(order);
+  this.oncompleted(trick, winner);
+
+  scores.claim(winner, trick);
+
+  let sequence = Player.sequence(players, winner);
+  this.sequence = sequence;
+
+  if (!winner.cards.empty()) {
+    return playing;
+  }
+
   let result = scores.result(contract);
   if (result) {
-    scores.score(result);
+    scores.award(result);
 
     let { winner, loser } = result;
     this.onfinished(winner, loser);
   }
 
-  this.contract = null;
-  this.trick = null;
+  return proceed;
+}
 
+export async function proceed({ players, head }) {
   for (let player of players) {
     player.cards.clear();
+  }
 
-    this.actor = player;
-    this.onturn(player, proceed);
-
-    let resume = await this.onproceed(player);
-    if (!resume) {
-      this.onexited(player);
-      return exit;
-    }
+  let proceed = await this.onproceed();
+  if (!proceed) {
+    return finish;
   }
 
   let next = Player.next(players, head);
@@ -192,6 +199,6 @@ export async function proceed({ scores, contract, players, head }) {
   return dealing;
 }
 
-export async function exit() {
+export async function finish() {
 }
 

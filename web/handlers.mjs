@@ -52,11 +52,11 @@ Registry.prototype.register = function(value, key) {
   return key;
 };
 
-Registry.prototype.lookup = function(key, value) {
-  if (!this.registry.has(key)) {
-    this.registry.set(key, value);
-    return value;
-  }
+Registry.prototype.unregister = function(key) {
+  this.registry.delete(key);
+};
+
+Registry.prototype.lookup = function(key) {
   return this.registry.get(key);
 };
 

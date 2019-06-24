@@ -85,6 +85,22 @@ Resources.state['GET'] = PreFilter.chain(
   return response.end();
 });
 
+Resources.state['DELETE'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.proceed),
+  PreFilter.requiresPlayer()
+).then((request, response) => {
+  var { game, registry } = request;
+
+  let { id, input } = registry.lookup(game);
+  input.resolve(false);
+
+  registry.unregister(id);
+  registry.unregister(game);
+
+  response.writeHead(204);
+  return response.end();
+});
+
 Resources.events = new Resource(
   ['GET'], '/api/games/(?<id>\\d+)/events');
 

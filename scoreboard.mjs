@@ -14,7 +14,7 @@ Scoreboard.prototype.claim = function(player, trick) {
   this.claims.get(player).add(trick);
 };
 
-Scoreboard.prototype.score = function(result) {
+Scoreboard.prototype.award = function(result) {
   let { winner, loser } = result;
 
   for (let player of winner.players) {

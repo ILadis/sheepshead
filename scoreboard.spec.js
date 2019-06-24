@@ -7,9 +7,9 @@ import { Trick } from './trick.mjs';
 import { Card, Suit, Rank } from './card.mjs';
 
 describe('Scoreboard', () => {
-  let player1 = new Player('Player 1');
-  let player2 = new Player('Player 2');
-  let player3 = new Player('Player 3');
+  let player1 = new Player();
+  let player2 = new Player();
+  let player3 = new Player();
 
   let contract = Contract.normal.leaf;
   contract.partner = player3;
@@ -56,8 +56,8 @@ describe('Result', () => {
   describe('#add()', () => {
     it('should add players to result', () => {
       let result = new Result();
-      let player1 = new Player('Player 1');
-      let player2 = new Player('Player 2');
+      let player1 = new Player();
+      let player2 = new Player();
       result.add(player1, []);
       result.add(player2, []);
       let players = Array.from(result.players);
@@ -68,29 +68,55 @@ describe('Result', () => {
   describe('#points()', () => {
     it('should return total result points', () => {
       let result = new Result();
-      let player = new Player('Player 1');
+      let player = new Player();
 
-      let trick1 = new Trick();
+      var trick1 = new Trick();
       trick1.add(player, Card[Suit.leaf][Rank.ace]);
 
       let trick2 = new Trick();
       trick2.add(player, Card[Suit.leaf][Rank.king]);
 
       result.add(player, [trick1, trick2]);
-
       Assert.equal(result.points(), 15);
+    });
+  });
+
+  describe('#matadors', () => {
+    it('should return number of matadors', () => {
+      let result = new Result();
+      let player1 = new Player();
+      let player2 = new Player();
+
+      let trick1 = new Trick();
+      trick1.add(player2, Card[Suit.leaf][Rank.officer]);
+      trick1.add(player1, Card[Suit.heart][Rank.officer]);
+
+      let trick2 = new Trick();
+      trick2.add(player2, Card[Suit.acorn][Rank.officer]);
+
+      let trick3 = new Trick();
+      trick3.add(player2, Card[Suit.acorn][Rank.sergeant]);
+
+      result.add(player1, [trick1]);
+      result.add(player2, [trick2, trick3]);
+
+      let contract = Contract.normal.leaf;
+      let trumps = contract.order.trumps;
+
+      let matadors = result.matadors(trumps);
+      Assert.equal(matadors, 3);
     });
   });
 
   describe('#compare()', () => {
     let result1 = new Result();
-    let player1 = new Player('Player 1');
+    let player1 = new Player();
     let trick1 = new Trick();
     trick1.add(player1, Card[Suit.leaf][Rank.ace]);
     result1.add(player1, [trick1]);
 
     let result2 = new Result();
-    let player2 = new Player('Player 2');
+    let player2 = new Player();
     let trick2 = new Trick();
     trick2.add(player2, Card[Suit.leaf][Rank.king]);
     result2.add(player2, [trick2]);

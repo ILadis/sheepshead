@@ -35,7 +35,7 @@ Presenter.prototype.showLobby = function() {
 };
 
 Presenter.prototype.refreshGames = async function() {
-  let { name, list, fab } = this.views;
+  let { list, fab } = this.views;
   list.clearItems();
 
   let games = await this.client.listGames();

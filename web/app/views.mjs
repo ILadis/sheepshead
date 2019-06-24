@@ -318,18 +318,15 @@ Textfield.prototype.onValueChanged = function(value) {
 
 export const Button = function() {
   this.node = importNode(Button.template);
+
+  let button = this.node.querySelector('button');
+  button.onclick = () => this.onClicked();
 }
 
 Button.template = html`
 <div class="fab">
   <button></button>
 </div>`;
-
-Button.prototype.setLabel = function(label) {
-  let button = this.node.querySelector('button');
-  button.textContent = label;
-  button.onclick = () => this.onClicked();
-}
 
 Button.prototype.onClicked = function() {
 };

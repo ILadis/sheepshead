@@ -320,12 +320,12 @@ body {
   position: relative;
   width: 44pt;
   height: 44pt;
-  font-size: 36pt;
-  font-weight: 300;
-  text-align: center;
-  line-height: 44pt;
   color: #fff;
-  background: #3b833b;
+  background-color: #3b833b;
+  background-image: url('create.svg');
+  background-size: 32pt;
+  background-position: center;
+  background-repeat: no-repeat;
   border: none;
   border-radius: 50%;
   outline: none;

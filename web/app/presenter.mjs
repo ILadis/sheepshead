@@ -48,7 +48,6 @@ Presenter.prototype.refreshGames = async function() {
   let hint = this.stringFor('no-games-hint');
   list.setHint(hint);
 
-  fab.setLabel('+');
   fab.onClicked = () => this.createGame();
   list.onItemClicked = (game) => this.joinGame(game);
 };

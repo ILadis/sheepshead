@@ -251,8 +251,8 @@ Presenter.prototype.showStandings = async function() {
   let players = await this.client.fetchPlayers();
 
   let labels = [
-    this.stringFor('standings-players'),
-    this.stringFor('standings-scores')
+    this.stringFor('standings-player'),
+    this.stringFor('standings-score')
   ];
 
   let table = dialog.withTable();

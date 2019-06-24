@@ -73,8 +73,8 @@ export const de = {
     + `Spiel #${id} (${players.format('join', ', ')})`,
 
   'standings-title': () => 'Punktestand',
-  'standings-players': () => 'Spieler',
-  'standings-scores': () => 'Punkte'
+  'standings-player': () => 'Spieler',
+  'standings-score': () => 'Punkte'
 };
 
 export const en = {
@@ -140,7 +140,7 @@ export const en = {
     + `Game #${id} (${players.format('join', ', ')})`,
 
   'standings-title': () => 'Current standings',
-  'standings-players': () => 'Player',
-  'standings-scores': () => 'Scores'
+  'standings-player': () => 'Player',
+  'standings-score': () => 'Score'
 };
 

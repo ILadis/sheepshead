@@ -8,24 +8,24 @@ import { Card, Suit, Rank } from './card.mjs';
 describe('Trick', () => {
   let trick = new Trick();
 
-  let first = Card[Suit.leaf][Rank.ace];
+  let card1 = Card[Suit.leaf][Rank.ace];
   let player1 = new Player('Player 1');
-  trick.add(player1, first);
+  trick.add(player1, card1);
 
-  let second = Card[Suit.leaf][Rank.sergeant];
+  let card2 = Card[Suit.leaf][Rank.sergeant];
   let player2 = new Player('Player 2');
-  trick.add(player2, second);
+  trick.add(player2, card2);
 
-  let third = Card[Suit.leaf][Rank.seven];
+  let card3 = Card[Suit.leaf][Rank.seven];
   let player3 = new Player('Player 3');
-  trick.add(player3, third);
+  trick.add(player3, card3);
 
   describe('#cards()', () => {
     it('should return iterator of added cards', () => {
       let it = trick.cards();
-      Assert.equal(it.next().value, first);
-      Assert.equal(it.next().value, second);
-      Assert.equal(it.next().value, third);
+      Assert.equal(it.next().value, card1);
+      Assert.equal(it.next().value, card2);
+      Assert.equal(it.next().value, card3);
       Assert.ok(it.next().done);
     });
   });
@@ -40,7 +40,7 @@ describe('Trick', () => {
   describe('#lead()', () => {
     it('should return first card of trick', () => {
       let lead = trick.lead();
-      Assert.equal(lead, first);
+      Assert.equal(lead, card1);
     });
 
     it('should return undefined on new trick', () => {

@@ -51,7 +51,7 @@ Scoreboard.prototype.result = function(contract) {
 
   let result = Result.compare(declarer, defender);
 
-  let mult = multiplier(result);
+  let mult = multiplier(result, contract);
   let { winner, loser } = result;
 
   winner.score = this.tariff * mult;
@@ -60,9 +60,21 @@ Scoreboard.prototype.result = function(contract) {
   return result;
 };
 
-function multiplier(result) {
-  let { loser } = result;
+function multiplier(result, contract) {
+  let { winner, loser } = result;
+  let { order: { trumps } } = contract;
+
   let multiplier = 1;
+
+  var matadors = winner.matadors(trumps);
+  if (matadors >= 3) {
+    multiplier += matadors;
+  }
+
+  var matadors = loser.matadors(trumps);
+  if (matadors >= 3) {
+    multiplier += matadors;
+  }
 
   if (loser.points() <= 30) {
     multiplier++;
@@ -95,6 +107,30 @@ Result.prototype.points = function() {
   }
 
   return points;
+};
+
+Result.prototype.matadors = function(trumps) {
+  let cards = new Set();
+
+  for (let trick of this.tricks) {
+    for (let [player, card] of trick.plays) {
+      if (this.players.has(player) && trumps.contains(card)) {
+        cards.add(card);
+      }
+    }
+  }
+
+  let order = Array.from(trumps).reverse();
+  let count = 0;
+
+  for (let card of order) {
+    if (!cards.has(card)) {
+      break;
+    }
+    count++;
+  }
+
+  return count;
 };
 
 Result.compare = function(result, other) {

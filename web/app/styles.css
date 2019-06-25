@@ -216,7 +216,7 @@ body {
   position: absolute;
   padding: 14pt 10pt 10pt 24pt;
   min-width: 160pt;
-  top: 27%;
+  top: 50%;
   left: 50%;
   border-style: solid;
   border-width: 1pt;
@@ -224,7 +224,7 @@ body {
   border-radius: 2pt;
   background-color: #fff;
   box-shadow: 0 2pt 6pt 1pt #bfbfbf;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-50%);
   opacity: 0;
   transition: opacity 0.3s;
 }

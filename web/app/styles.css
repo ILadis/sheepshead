@@ -364,3 +364,10 @@ body {
   }
 }
 
+@media (max-width: 330pt) {
+  .hand .card {  margin-left: -15pt; }
+  .hand.top { margin-top: -38pt; }
+  .hand.left { margin-left: -38pt; }
+  .hand.right { margin-right: -38pt; }
+}
+

@@ -67,9 +67,13 @@ Scoreboard.prototype.result = function(contract) {
 
 function multiplier(result, contract) {
   let { winner, loser } = result;
-  let { order: { trumps } } = contract;
+  let { partner, order: { trumps } } = contract;
 
   let multiplier = 1;
+
+  if (!partner) {
+    multiplier += 3;
+  }
 
   var matadors = winner.matadors(trumps);
   if (matadors >= 3) {

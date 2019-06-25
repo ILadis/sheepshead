@@ -219,12 +219,15 @@ Presenter.prototype.onBidded = function(contract) {
   }
 };
 
-Presenter.prototype.onSettled = function(contract) {
+Presenter.prototype.onSettled = async function(contract) {
   let player = contract.owner;
   if (!this.isSelf(player)) {
     this.showToast(this.stringFor('settled-toast',
       player.name, contract.name, contract.variant));
   }
+
+  let players = await this.client.fetchPlayers();
+  this.refreshPlayers(...players);
 };
 
 Presenter.prototype.onPlayed = function({ player, card }) {

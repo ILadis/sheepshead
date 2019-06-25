@@ -195,9 +195,9 @@ Resources.hand['GET'] = PreFilter.chain(
   PreFilter.requiresGame(),
   PreFilter.requiresPlayer()
 ).then((request, response) => {
-  var { game: { contract }, player } = request;
+  var { game: { phase, contract }, player } = request;
 
-  if (!contract) {
+  if (phase != Phases.playing) {
     let variants = Contract.normal;
     contract = variants.acorn;
   }

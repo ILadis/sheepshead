@@ -56,6 +56,22 @@ Client.prototype.joinGame = async function(game, name) {
   return json;
 };
 
+Client.prototype.leaveGame = async function() {
+  let id = this.id;
+  let token = this.token;
+  let request = new Request(`api/games/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+};
+
 Client.prototype.fetchContracts = async function() {
   let id = this.id;
   let token = this.token;

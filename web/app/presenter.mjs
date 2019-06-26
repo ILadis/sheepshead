@@ -30,22 +30,31 @@ Presenter.prototype.showLobby = function() {
     fab: new View.Button(),
     toast: new View.Toast()
   });
-  this.refreshGames();
+  this.shell.setRefreshable(true);
+  this.shell.onRefreshClicked = () => this.refreshGames();
+  this.refreshGames(true);
   this.changePlayerName();
 };
 
-Presenter.prototype.refreshGames = async function() {
+Presenter.prototype.refreshGames = async function(initial) {
   let { list, fab } = this.views;
+  let games = await this.client.listGames();
+
+  if (!initial) {
+    var hint = this.stringFor('refreshed-games-toast');
+    this.showToast(hint, 1500);
+  }
+
+  list.setHint();
   list.clearItems();
 
-  let games = await this.client.listGames();
   for (let game of games) {
     let { id, players } = game;
     let label = this.stringFor('game-label', id, players);
     list.addItem(label, game);
   }
 
-  let hint = this.stringFor('no-games-hint');
+  var hint = this.stringFor('no-games-hint');
   list.setHint(hint);
 
   fab.onClicked = () => this.createGame();
@@ -104,6 +113,7 @@ Presenter.prototype.showGame = function() {
     dialog: new View.Dialog(),
     toast: new View.Toast()
   });
+  this.shell.setRefreshable(false);
   this.listenEvents();
 };
 
@@ -246,10 +256,10 @@ Presenter.prototype.onFinished = function({ winner }) {
   let names = players.map(p => p.name);
   let message = this.stringFor('finished-toast', names, points, score);
   this.showToast(message, 5000);
-  this.showStandings();
+  setTimeout(() => this.listStandings(), 2000);
 };
 
-Presenter.prototype.showStandings = async function() {
+Presenter.prototype.listStandings = async function() {
   let { dialog, trick } = this.views;
   let players = await this.client.fetchPlayers();
 
@@ -269,10 +279,13 @@ Presenter.prototype.showStandings = async function() {
   let title = this.stringFor('standings-title');
   dialog.setTitle(title);
 
-  setTimeout(() => {
-    dialog.show();
-    trick.clearCards();
-  }, 2000);
+  let label = this.stringFor('leave-game-action');
+  dialog.addAction(label, () => {
+    this.client.leaveGame().then(() => this.showLobby());
+  });
+
+  dialog.show();
+  trick.clearCards();
 };
 
 Presenter.prototype.isSelf = function(other) {

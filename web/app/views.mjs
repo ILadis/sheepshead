@@ -17,6 +17,23 @@ Shell.prototype.setTitle = function(title) {
   document.title = title;
 };
 
+Shell.prototype.setRefreshable = function(enable) {
+  let header = this.node.querySelector('header');
+
+  let button = header.querySelector('button.refresh');
+  if (!enable && button) {
+    header.removeChild(button);
+  }
+
+  if (enable && !button) {
+    button = document.createElement('button');
+    button.className = 'refresh';
+    button.onclick = () => this.onRefreshClicked();
+
+    header.appendChild(button);
+  }
+};
+
 Shell.prototype.setContents = function(views) {
   let sections = this.node.querySelectorAll('main > section');
   for (let i = 0; i < sections.length; i++) {
@@ -31,6 +48,9 @@ Shell.prototype.setContents = function(views) {
 
   let main = this.node.querySelector('main');
   main.appendChild(section);
+};
+
+Shell.prototype.onRefreshClicked = function() {
 };
 
 export const Hand = function() {
@@ -188,7 +208,7 @@ export const Dialog = function() {
 Dialog.template = html`
 <div class="dialog">
   <h1></h1>
-  <ul></ul>
+  <section></section>
 </div>`;
 
 Dialog.prototype.setTitle = function(title) {
@@ -197,12 +217,17 @@ Dialog.prototype.setTitle = function(title) {
 };
 
 Dialog.prototype.withContent = function(content) {
-  let child = this.node.querySelector('h1 + *');
-  if (child) {
-    child.remove();
+  let container = this.node.querySelector('section');
+  while (container.firstChild) {
+    container.firstChild.remove();
   }
 
-  this.node.appendChild(content);
+  let buttons = this.node.querySelectorAll('button');
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].remove();
+  }
+
+  container.appendChild(content);
 };
 
 Dialog.prototype.withOptions = function() {
@@ -238,6 +263,14 @@ Dialog.prototype.withTable = function() {
   };
 
   return { addRow };
+};
+
+Dialog.prototype.addAction = function(label, callback) {
+  let button = document.createElement('button');
+  button.textContent = label;
+  button.onclick = () => callback();
+
+  this.node.appendChild(button);
 };
 
 Dialog.prototype.show = function() {

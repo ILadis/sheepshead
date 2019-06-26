@@ -15,6 +15,7 @@ for (let path of [
   filepath`./acorn.svg`,
   filepath`./back.svg`,
   filepath`./create.svg`,
+  filepath`./refresh.svg`,
   filepath`./app.mjs`,
   filepath`./presenter.mjs`,
   filepath`./strings.mjs`,

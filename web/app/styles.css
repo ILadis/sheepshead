@@ -24,16 +24,36 @@ body {
 
 .shell header {
   position: relative;
-  padding: 12pt 18pt;
+  height: 23pt;
+  padding: 9pt 18pt;
   background-color: #3b833b;
-  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  border-bottom-style: solid;
+  border-color: #a5c3a5;
+  border-width: 1pt;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
   z-index: 2;
 }
 
 .shell header h1 {
-  font-size: 14pt;
+  font-size: 15pt;
   font-weight: 500;
   color: #fff;
+  flex-grow: 1;
+}
+
+.shell header button {
+  width: 23pt;
+  height: 23pt;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-size: contain;
+}
+
+.shell header button.refresh {
+  background: url(refresh.svg);
 }
 
 .shell main {
@@ -44,7 +64,7 @@ body {
   z-index: 1;
 }
 
-.shell section {
+.shell main > section {
   position: relative;
   width: 100%;
   height: 100%;
@@ -258,6 +278,24 @@ body {
   font-weight: 600;
 }
 
+.dialog button {
+  margin: 10pt 4pt 0 0;
+  padding: 3pt 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #3b833b;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  float: right;
+  transition: background-color 0.6s;
+}
+
+.dialog button:hover {
+  background-color: rgba(59, 131, 59, 0.1);
+}
+
 .textfield {
   padding: 12pt 24pt 10pt;
   background: #e9ebeb;
@@ -336,7 +374,6 @@ body {
 
 .fab:after {
   content: ' ';
-  display: block;
   position: absolute;
   top: -10%; left: -10%;
   width: 120%;
@@ -345,6 +382,7 @@ body {
   background: rgba(59, 131, 59, 0.2);
   opacity: 0;
   transition: opacity 0.4s;
+  display: block;
   z-index: 1;
 }
 
@@ -353,7 +391,7 @@ body {
 }
 
 @media (min-width: 580pt) {
-  .shell section {
+  .shell main > section {
     top: 50%;
     left: 50%;
     margin: -250pt -290pt;

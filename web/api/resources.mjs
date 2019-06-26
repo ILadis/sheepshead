@@ -66,7 +66,7 @@ Resources.games['POST'] = (request, response) => {
 };
 
 Resources.state = new Resource(
-  ['GET'], '/api/games/(?<id>\\d+)');
+  ['GET', 'DELETE'], '/api/games/(?<id>\\d+)');
 
 Resources.state['GET'] = PreFilter.chain(
   PreFilter.requiresGame()

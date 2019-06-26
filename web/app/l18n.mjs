@@ -20,6 +20,10 @@ export const de = {
   'joined-game-toast': (player) => ''
     + `${player} ist dem Spiel beigetreten`,
 
+  'refreshed-games-toast': () => 'Spieleliste wurde aktualisiert',
+
+  'leave-game-action': () => 'Spiel verlassen',
+
   'contested-toast': (player) => ''
     + `${player} möchte spielen`,
 
@@ -96,6 +100,10 @@ export const en = {
 
   'joined-game-toast': (player) => ''
     + `${player} joined the game`,
+
+  'refreshed-games-toast': () => 'Available games refreshed',
+
+  'leave-game-action': () => 'Leave game',
 
   'contested-toast': (player) => ''
     + `${player} wants to play`,

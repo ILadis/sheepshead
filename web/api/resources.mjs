@@ -159,7 +159,7 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   registry.register(player, token);
-  context.input.resolve(player);
+  input.resolve(player);
 
   var entity = new Entities.Player(player, false, 0, token);
   let json = JSON.stringify(entity);

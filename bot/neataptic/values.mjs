@@ -1,7 +1,7 @@
 
-import { Contract } from '../contract.mjs';
-import { Deck } from '../deck.mjs';
-import { Card, Suit, Rank } from '../card.mjs';
+import { Contract } from '../../contract.mjs';
+import { Deck } from '../../deck.mjs';
+import { Card, Suit, Rank } from '../../card.mjs';
 
 const order = Contract.normal.acorn.order;
 const deck = new Deck();

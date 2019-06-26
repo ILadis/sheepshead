@@ -12,19 +12,16 @@ export function Brain() {
 };
 
 Brain.prototype.ondealt = function(game, players) {
+  this.actions.clear();
+
   for (let player of players) {
-    if (!this.actions.has(player)) {
-      this.actions.set(player, new Set());
-    }
+    this.actions.set(player, new Set());
   }
 };
 
 Brain.prototype.onturn = function(game, player) {
   let tensor = new Tensor();
   let { trick, contract, players } = game;
-
-  let declarer = new Set();
-  let defender = new Set();
 
   // add player hand cards
   var states = tensor.append(8);
@@ -50,6 +47,9 @@ Brain.prototype.onturn = function(game, player) {
     states[index] = 1;
   }
   states.commit();
+
+  let declarer = new Set();
+  let defender = new Set();
 
   // add declarer/defender state
   var states = tensor.append(1);

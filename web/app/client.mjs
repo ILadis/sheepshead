@@ -67,9 +67,11 @@ Client.prototype.leaveGame = async function() {
   });
 
   let response = await fetch(request);
-  if (!response.ok) {
-    throw response;
+  if (response.ok || response.status == 404) {
+    return true;
   }
+
+  throw response;
 };
 
 Client.prototype.fetchContracts = async function() {

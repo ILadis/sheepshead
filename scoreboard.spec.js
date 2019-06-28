@@ -15,7 +15,7 @@ describe('Scoreboard', () => {
   contract.partner = player3;
   contract.assign(player1);
 
-  describe('#result', () => {
+  describe('#result()', () => {
     it('should return results/scores for winner/loser', () => {
       let board = new Scoreboard([player1, player2, player3]);
 
@@ -38,6 +38,24 @@ describe('Scoreboard', () => {
 
       let players = Array.from(winner.players);
       Assert.deepEqual(players, [player1, player3]);
+    });
+  });
+
+  describe('#award()', () => {
+    it('should add winning result scores to board', () => {
+      let board = new Scoreboard([player1, player2, player3]);
+
+      let winner = new Result();
+      winner.score = 12;
+      winner.add(player1, []);
+      winner.add(player2, []);
+
+      let loser = new Result();
+      board.award({ winner, loser });
+
+      Assert.equal(board.scoreOf(player1), 12);
+      Assert.equal(board.scoreOf(player2), 12);
+      Assert.equal(board.scoreOf(player3), 0);
     });
   });
 });
@@ -70,7 +88,7 @@ describe('Result', () => {
       let result = new Result();
       let player = new Player();
 
-      var trick1 = new Trick();
+      let trick1 = new Trick();
       trick1.add(player, Card[Suit.leaf][Rank.ace]);
 
       let trick2 = new Trick();

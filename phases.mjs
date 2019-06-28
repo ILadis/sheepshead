@@ -76,8 +76,6 @@ export async function attendance({ sequence }) {
   }
 
   let lead = auction.lead();
-  this.contract = lead;
-
   return lead ? bidding : proceed;
 }
 
@@ -162,6 +160,7 @@ export async function award({ contract, trick, scores, players }) {
 
   let winner = trick.winner(order);
   scores.claim(winner, trick);
+
   this.oncompleted(trick, winner);
 
   let sequence = Player.sequence(players, winner);

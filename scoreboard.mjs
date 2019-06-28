@@ -35,7 +35,7 @@ Scoreboard.prototype.award = function(result) {
 };
 
 Scoreboard.prototype.result = function(contract) {
-  if (!contract) {
+  if (this.claims.size == 0) {
     return null;
   }
 
@@ -85,11 +85,11 @@ function multiplier(result, contract) {
     multiplier += matadors;
   }
 
-  if (loser.points() <= 30) {
+  if (partner && loser.points() <= 30) {
     multiplier++;
   }
 
-  if (loser.points() == 0) {
+  if (partner && loser.points() == 0) {
     multiplier++;
   }
 

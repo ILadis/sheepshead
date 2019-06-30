@@ -18,25 +18,26 @@ body {
 .shell {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .shell header {
   position: relative;
-  height: 23pt;
+  width: 100%;
+  height: 41pt;
   padding: 9pt 18pt;
   background-color: #3b833b;
   border-bottom-style: solid;
   border-color: #a5c3a5;
   border-width: 1pt;
+  box-sizing: border-box;
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   z-index: 2;
 }
 
 .shell header h1 {
+  padding-right: 24pt;
   font-size: 15pt;
   font-weight: 500;
   color: #fff;
@@ -50,17 +51,22 @@ body {
   outline: none;
   cursor: pointer;
   background-size: contain;
+  background-color: transparent;
+  flex-shrink: 0;
 }
 
 .shell header button.refresh {
-  background: url(refresh.svg);
+  background-image: url(refresh.svg);
 }
 
 .shell main {
-  position: relative;
+  position: absolute;
+  top: 0;
+  width: 100%;
   height: 100%;
+  padding-top: 41pt;
   background-color: #dbdbd3;
-  flex-grow: 1;
+  box-sizing: border-box;
   z-index: 1;
 }
 
@@ -133,15 +139,15 @@ body {
 
 .trick .card {
   position: absolute;
-  top: 45%;
+  top: 50%;
   left: 50%;
   animation: 0.5s forwards;
 }
 
-.trick .card.top { transform: translateX(-50%) rotateZ(180deg) translateY(60%); }
-.trick .card.bottom { transform: translateX(-50%) rotateZ(0deg) translateY(60%); }
-.trick .card.left { transform: translateX(-50%) rotateZ(90deg) translateY(60%); }
-.trick .card.right { transform: translateX(-50%)  rotateZ(270deg) translateY(60%); }
+.trick .card.top { transform: translateX(-50%) translateY(-50%) rotateZ(180deg) translateY(60%); }
+.trick .card.bottom { transform: translateX(-50%) translateY(-50%) rotateZ(0deg) translateY(60%); }
+.trick .card.left { transform: translateX(-50%) translateY(-50%)  rotateZ(90deg) translateY(60%); }
+.trick .card.right { transform: translateX(-50%) translateY(-50%) rotateZ(270deg) translateY(60%); }
 
 @keyframes slidein-top {
   from { margin-top: -50%; }
@@ -167,7 +173,7 @@ body {
   position: absolute;
   white-space: nowrap;
 }
-.hand .card:first-of-type { margin-left: 0; }
+.hand .card:first-of-type { margin-left: 0 !important; }
 .hand .card { margin-left: -12pt; }
 
 .hand span {
@@ -302,19 +308,24 @@ body {
   border-width: 1pt;
   border-color: #dadbdb;
   border-bottom-style: solid;
+  display: flex;
+  align-items: center;
 }
 
 .textfield span {
-  margin-right: 3pt;
+  margin-right: 5pt;
+  white-space: nowrap
 }
 
 .textfield input {
   padding: 5pt 10pt;
   width: 140pt;
+  min-width: 60pt;
   border: none;
   border-radius: 16pt;
   outline: none;
   background: #fff;
+  flex-shrink: 1;
 }
 
 .list {
@@ -349,15 +360,17 @@ body {
 }
 
 .fab {
-  position: absolute;
+  position: fixed;
   right: 30pt;
   bottom: 20pt;
+  width: 44pt;
+  height: 44pt;
 }
 
 .fab button {
   position: relative;
-  width: 44pt;
-  height: 44pt;
+  width: 100%;
+  height: 100%;
   color: #fff;
   background-color: #3b833b;
   background-image: url('create.svg');
@@ -394,18 +407,30 @@ body {
   .shell main > section {
     top: 50%;
     left: 50%;
-    margin: -250pt -290pt;
-    width: 580pt;
-    height: 500pt;
+    max-width: 580pt;
+    max-height: 500pt;
+    width: 90%;
+    height: 90%;
     border-radius: 3pt;
     box-shadow: 0 1pt 3pt 1pt #bfbfbf;
+    transform: translateX(-50%) translateY(-50%);
+  }
+
+  .fab {
+    position: absolute;
   }
 }
 
 @media (max-width: 330pt) {
-  .hand .card {  margin-left: -15pt; }
-  .hand.top { margin-top: -38pt; }
-  .hand.left { margin-left: -38pt; }
-  .hand.right { margin-right: -38pt; }
+  .card { width: 38pt; }
+  .card:before { font-size: 20pt; }
+
+  .hand.top { margin-top: -21pt; }
+  .hand.left { margin-left: -42pt; }
+  .hand.right { margin-right: -42pt; }
+
+  .hand.top .card { margin-left: -16pt; }
+  .hand.left .card { margin-left: -18pt; }
+  .hand.right .card { margin-left: -18pt; }
 }
 

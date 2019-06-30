@@ -173,29 +173,32 @@ Toast.prototype.show = function() {
   clearTimeout(this.timeout);
 
   let next = this.queue[0];
-  if (!next) {
-    return;
+  if (next) {
+    let span = this.node.querySelector('span');
+    span.textContent = next.text;
+
+    let div = this.node;
+    getComputedStyle(div).opacity;
+    div.style.opacity = 1;
+    div.style.visibility = 'visible';
+
+    div.ontransitionend = () => {
+      let dismiss = this.dismiss.bind(this);
+      this.timeout = setTimeout(dismiss, next.duration);
+    };
   }
-
-  let span = this.node.querySelector('span');
-  span.textContent = next.text;
-
-  getComputedStyle(this.node).opacity;
-  this.node.style.opacity = 1;
-
-  this.node.ontransitionend = () => {
-    let dismiss = this.dismiss.bind(this);
-    this.timeout = setTimeout(dismiss, next.duration);
-  };
 };
 
 Toast.prototype.dismiss = function() {
   clearTimeout(this.timeout);
 
-  getComputedStyle(this.node).opacity;
-  this.node.style.opacity = 0;
+  let div = this.node;
+  getComputedStyle(div).opacity;
+  div.style.opacity = 0;
 
-  this.node.ontransitionend = () => {
+  div.ontransitionend = () => {
+    div.style.visibility = 'hidden';
+
     this.queue.shift();
     this.show();
   };
@@ -274,11 +277,22 @@ Dialog.prototype.addAction = function(label, callback) {
 };
 
 Dialog.prototype.show = function() {
-  this.node.style.opacity = 1;
+  let div = this.node;
+  getComputedStyle(div).opacity;
+  div.style.opacity = 1;
+  div.style.visibility = 'visible';
+
+  div.ontransitionend = () => { };
 };
 
 Dialog.prototype.dismiss = function() {
-  this.node.style.opacity = 0;
+  let div = this.node;
+  getComputedStyle(div).opacity;
+  div.style.opacity = 0;
+
+  div.ontransitionend = () => {
+    div.style.visibility = 'hidden';
+  };
 };
 
 export const List = function() {
@@ -374,4 +388,5 @@ function importNode(template) {
   let node = document.importNode(template, true);
   return node.firstElementChild;
 }
+
 

@@ -19,9 +19,8 @@ Strings.forLanguage = function(lang) {
 Strings.prototype.get = function(name, ...args) {
   let string = this.strings[name];
   let values = args.map(arg => this.wrap(arg));
-  let self = this.get.bind(this);
 
-  return string(...values, self);
+  return string(...values);
 };
 
 Strings.prototype.wrap = function(arg) {
@@ -41,7 +40,10 @@ const Selectors = {
 const Formatter = {
   join: (value, word) => value.length <= 1
     ? value[0] || ''
-    : value.slice(0, -1).join(', ') + word + value.slice(-1)
+    : value.slice(0, -1).join(', ') + word + value.slice(-1),
+  bound: (value, pre, post) => value.length
+    ? pre + value + post
+    : ''
 };
 
 function Value(value, selectors, formatter) {
@@ -54,23 +56,27 @@ Value.prototype.case = function(options, fallback = '') {
   let value = this.value;
   let selectors = this.selectors;
 
+  let newValue = fallback;
   for (let kind in selectors) {
     let selector = selectors[kind];
 
     let key = selector(value);
     if (key && key in options) {
-      return options[key];
+      newValue = options[key];
+      break;
     }
   }
 
-  return fallback;
+  return new Value(newValue, this.selectors, this.formatter);
 };
 
-Value.prototype.format = function(kind, options) {
+Value.prototype.format = function(kind, ...options) {
   let value = this.value;
   let formatter = this.formatter[kind];
 
-  return formatter(value, options);
+  let newValue = formatter(value, ...options);
+
+  return new Value(newValue, this.selectors, this.formatter);
 };
 
 Value.prototype.toString =

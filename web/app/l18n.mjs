@@ -27,21 +27,21 @@ export const de = {
   'contested-toast': (player) => ''
     + `${player} möchte spielen`,
 
-  'bidded-toast': (player, contract, variant, ref) => ''
+  'bidded-toast': (player, contract, variant) => ''
     + `${player} möchte ` + contract.case({
       normal: 'ein',
       wenz: 'einen',
       geier: 'einen',
       solo: 'ein'
-    }) + ` ${ref('contract-label', contract, variant)} spielen`,
+    }) + ` ${de['contract-label'](contract, variant)} spielen`,
 
-  'settled-toast': (player, contract, variant, ref) => ''
+  'settled-toast': (player, contract, variant) => ''
     + `${player} spielt ` + contract.case({
       normal: 'ein',
       wenz: 'einen',
       geier: 'einen',
       solo: 'ein'
-    }) + ` ${ref('contract-label', contract, variant)}`,
+    }) + ` ${de['contract-label'](contract, variant)}`,
 
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} gewinnt +1 Auge`,
@@ -74,7 +74,8 @@ export const de = {
   'concede-label': () => 'Aussteigen',
 
   'game-label': (id, players) => ''
-    + `Spiel #${id} (${players.format('join', ', ')})`,
+    + `Spiel #${id} `
+    + `${players.format('join', ', ').format('bound', '(', ')')}`,
 
   'standings-title': () => 'Punktestand',
   'standings-player': () => 'Spieler',
@@ -108,13 +109,13 @@ export const en = {
   'contested-toast': (player) => ''
     + `${player} wants to play`,
 
-  'bidded-toast': (player, contract, variant, ref) => ''
+  'bidded-toast': (player, contract, variant) => ''
     + `${player} wants to play a `
-    + `${ref('contract-label', contract, variant)}`,
+    + `${en['contract-label'](contract, variant)}`,
 
-  'settled-toast': (player, contract, variant, ref) => ''
+  'settled-toast': (player, contract, variant) => ''
     + `${player} is playing a `
-    + `${ref('contract-label', contract, variant)}`,
+    + `${en['contract-label'](contract, variant)}`,
 
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} wins +1 point`,
@@ -145,7 +146,8 @@ export const en = {
   'concede-label': () => 'Concede',
 
   'game-label': (id, players) => ''
-    + `Game #${id} (${players.format('join', ', ')})`,
+    + `Game #${id} `
+    + `${players.format('join', ', ').format('bound', '(', ')')}`,
 
   'standings-title': () => 'Current standings',
   'standings-player': () => 'Player',

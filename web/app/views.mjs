@@ -346,7 +346,7 @@ export const Textfield = function() {
 Textfield.template = html`
 <div class="textfield">
   <span></span>
-  <input type="text">
+  <input type="text" autocorrect="off" autocapitalize="words">
 </div>`;
 
 Textfield.prototype.setLabel = function(label) {

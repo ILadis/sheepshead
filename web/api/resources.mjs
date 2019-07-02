@@ -134,16 +134,18 @@ Resources.players['POST'] = PreFilter.chain(
 ).then((request, response) => {
   var { game, registry, entity } = request;
 
-  let name = String(entity.name);
-  if (!name.length) {
+  let input = registry.lookup(game).input;
+
+  let token = Token.generate();
+  let index = input.args[0];
+
+  let player = new Player(entity.name, index);
+
+  let rules = input.args[1];
+  if (!rules.valid(player)) {
     response.writeHead(422);
     return response.end();
   }
-
-  let token = Token.generate();
-  let input = registry.lookup(game).input;
-  let index = input.args[0];
-  let player = new Player(name, index);
 
   if (player.name == 'Bot') {
     let brain = new Brainless();
@@ -253,7 +255,7 @@ Resources.auction['POST'] = PreFilter.chain(
 
   let input = registry.lookup(game).input;
 
-  if (!entity.name && !entity.variant) {
+  if (!entity) {
     input.resolve();
     response.writeHead(200);
     return response.end();
@@ -284,7 +286,7 @@ Resources.auction['POST'] = PreFilter.chain(
 });
 
 Resources.trick = new Resource(
-  ['GET', 'POST'], '/api/games/(?<id>\\d+)/trick');
+  ['POST'], '/api/games/(?<id>\\d+)/trick');
 
 Resources.trick['POST'] = PreFilter.chain(
   PreFilter.requiresGame(Phases.playing),
@@ -314,28 +316,6 @@ Resources.trick['POST'] = PreFilter.chain(
   input.resolve(card);
 
   response.writeHead(200);
-  return response.end();
-});
-
-Resources.trick['GET'] = PreFilter.chain(
-  PreFilter.requiresGame(Phases.playing)
-).then((request, response) => {
-  var { game: { trick } } = request;
-
-  if (!trick) {
-    response.writeHead(204);
-    return response.end();
-  }
-
-  let cards = Array.from(trick.cards());
-
-  let entities = cards.map(c => new Entities.Card(c));
-  let json = JSON.stringify(entities);
-
-  response.setHeader('Content-Type', MediaType.json);
-  response.setHeader('Content-Length', Buffer.byteLength(json));
-  response.writeHead(200);
-  response.write(json);
   return response.end();
 });
 

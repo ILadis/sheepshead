@@ -9,11 +9,16 @@ import { Scoreboard } from './scoreboard.mjs';
 import { Ruleset } from './ruleset.mjs';
 
 export async function joining() {
+  let rules = Ruleset.forJoining(this);
+
   let players = new Array();
   this.players = players;
 
   for (let index of [1, 2, 3, 4]) {
-    let player = await this.onjoin(index);
+    do {
+      var player = await this.onjoin(index, rules);
+    } while (!rules.valid(player));
+
     players.push(player);
 
     this.onjoined(player);

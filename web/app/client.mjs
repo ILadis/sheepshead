@@ -131,26 +131,10 @@ Client.prototype.fetchCards = async function() {
   return json;
 };
 
-Client.prototype.fetchTrick = async function() {
-  let id = this.id;
-  let request = new Request(`api/games/${id}/trick`, {
-    method: 'GET',
-  });
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw response;
-  }
-
-  let json = await response.json();
-
-  return json;
-};
-
 Client.prototype.bidContract = async function(contract) {
   let id = this.id;
   let token = this.token;
-  var json = JSON.stringify(contract);
+  let json = contract ? JSON.stringify(contract) : 'null';
 
   let request = new Request(`api/games/${id}/auction`, {
     method: 'POST',

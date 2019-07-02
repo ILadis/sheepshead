@@ -194,7 +194,7 @@ Presenter.prototype.listContracts = async function(phase) {
   let options = dialog.withOptions();
 
   let concede = this.stringFor('concede-label');
-  options.addItem(concede, { });
+  options.addItem(concede);
   for (let contract of contracts) {
     let { name, variant } = contract;
     let label = this.stringFor('contract-label', name, variant);

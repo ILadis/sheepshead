@@ -32,6 +32,32 @@ Ruleset.prototype.options = function(iterator) {
   return { [Symbol.iterator]: next };
 }
 
+Ruleset.forJoining = function(game) {
+  return new Ruleset(nextIndex, nonEmptyName);
+
+  function nextIndex(player, next) {
+    let { players } = game;
+    let index = players.length + 1;
+
+    if (player.index !== index) {
+      return false;
+    }
+    return next();
+  }
+
+  function nonEmptyName(player, next) {
+    if (typeof player.name !== 'string') {
+      return false;
+    }
+
+    if (!player.name.length) {
+      return false;
+    }
+
+    return next();
+  }
+};
+
 Ruleset.forBidding = function(game) {
   return new Ruleset(honorConcede, enforceValue, enforcePartner);
 

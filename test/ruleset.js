@@ -1,11 +1,11 @@
 
 import Assert from 'assert';
-import { Ruleset } from './ruleset.mjs';
-import { Player } from './player.mjs';
-import { Trick } from './trick.mjs';
-import { Contract } from './contract.mjs';
-import { Auction } from './auction.mjs';
-import { Card, Suit, Rank } from './card.mjs';
+import { Ruleset } from '../ruleset.mjs';
+import { Player } from '../player.mjs';
+import { Trick } from '../trick.mjs';
+import { Contract } from '../contract.mjs';
+import { Auction } from '../auction.mjs';
+import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Ruleset', () => {
   describe('#valid()', () => {

@@ -1,10 +1,10 @@
 
 import Assert from 'assert';
-import { Scoreboard, Result } from './scoreboard.mjs';
-import { Contract } from './contract.mjs';
-import { Player } from './player.mjs';
-import { Trick } from './trick.mjs';
-import { Card, Suit, Rank } from './card.mjs';
+import { Scoreboard, Result } from '../scoreboard.mjs';
+import { Contract } from '../contract.mjs';
+import { Player } from '../player.mjs';
+import { Trick } from '../trick.mjs';
+import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Scoreboard', () => {
   let player1 = new Player();

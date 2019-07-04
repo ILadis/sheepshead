@@ -1,9 +1,9 @@
 
 import Assert from 'assert';
-import { Trick } from './trick.mjs';
-import { Player } from './player.mjs';
-import { Contract } from './contract.mjs';
-import { Card, Suit, Rank } from './card.mjs';
+import { Trick } from '../trick.mjs';
+import { Player } from '../player.mjs';
+import { Contract } from '../contract.mjs';
+import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Trick', () => {
   let trick = new Trick();

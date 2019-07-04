@@ -1,7 +1,7 @@
 
 import Assert from 'assert';
-import { Player } from './player.mjs';
-import { Deck } from './deck.mjs';
+import { Player } from '../player.mjs';
+import { Deck } from '../deck.mjs';
 
 describe('Player', () => {
   let player1 = new Player();

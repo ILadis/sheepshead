@@ -1,6 +1,6 @@
 
 import Assert from 'assert';
-import { Card, Suit, Rank } from './card.mjs';
+import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Card', () => {
   it('should hold instances for all suits and ranks', () => {

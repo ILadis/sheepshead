@@ -1,8 +1,8 @@
 
 import Assert from 'assert';
-import { Deck } from './deck.mjs';
-import { Order } from './order.mjs';
-import { Card, Suit, Rank } from './card.mjs';
+import { Deck } from '../deck.mjs';
+import { Order } from '../order.mjs';
+import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Order', () => {
   it('should have trumps property', () => {

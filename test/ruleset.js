@@ -41,10 +41,10 @@ describe('Ruleset', () => {
       let rules = new Ruleset(validator);
       let numbers = [1, 2, 3];
       let factory = rules.options(numbers);
-      let it1 = factory[Symbol.iterator]();
-      Assert.ok(it1.next);
-      let it2 = factory[Symbol.iterator]();
-      Assert.ok(it2.next);
+      var it = factory[Symbol.iterator]();
+      Assert.ok(it.next);
+      var it2 = factory[Symbol.iterator]();
+      Assert.ok(it.next);
     });
 
     it('should return iterator of unique options', () => {

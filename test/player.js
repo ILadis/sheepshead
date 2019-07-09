@@ -4,10 +4,9 @@ import { Player } from '../player.mjs';
 import { Deck } from '../deck.mjs';
 
 describe('Player', () => {
-  let player1 = new Player();
-  let player2 = new Player();
-  let player3 = new Player('Some Player', 3);
-  let player4 = new Player();
+  let player1 = new Player(),
+    player2 = new Player(),
+    player3 = new Player();
 
   it('should have cards property', () => {
     let player = new Player();
@@ -15,25 +14,25 @@ describe('Player', () => {
   });
 
   it('should have name/index property from constructor', () => {
-    Assert.equal(player3.name, 'Some Player');
-    Assert.equal(player3.index, 3);
+    let player = new Player('Player', 3);
+    Assert.equal(player.name, 'Player');
+    Assert.equal(player.index, 3);
   });
 
   describe('#sequence()', () => {
     it('should return iterator factory', () => {
       let factory = Player.sequence([player1, player2], player1);
-      let it1 = factory[Symbol.iterator]();
-      Assert.ok(it1.next);
-      let it2 = factory[Symbol.iterator]();
-      Assert.ok(it2.next);
+      var it = factory[Symbol.iterator]();
+      Assert.ok(it.next);
+      var it = factory[Symbol.iterator]();
+      Assert.ok(it.next);
     });
 
     it('should iterate through players from given start', () => {
-      let players = [player1, player2, player3, player4];
+      let players = [player1, player2, player3];
       let factory = Player.sequence(players, player3);
       let it = factory[Symbol.iterator]();
       Assert.equal(it.next().value, player3);
-      Assert.equal(it.next().value, player4);
       Assert.equal(it.next().value, player1);
       Assert.equal(it.next().value, player2);
       Assert.ok(it.next().done);
@@ -42,14 +41,12 @@ describe('Player', () => {
 
   describe('#next()', () => {
     it('should return next player from given start', () => {
-      let players = [player1, player2, player3, player4];
+      let players = [player1, player2, player3];
       var next = Player.next(players, player1);
       Assert.equal(next, player2);
       var next = Player.next(players, player2);
       Assert.equal(next, player3);
       var next = Player.next(players, player3);
-      Assert.equal(next, player4);
-      var next = Player.next(players, player4);
       Assert.equal(next, player1);
     });
   });

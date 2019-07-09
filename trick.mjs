@@ -11,7 +11,7 @@ Trick.prototype.cards = function() {
   return this.plays.values();
 };
 
-Trick.prototype.moveBy = function(card) {
+Trick.prototype.origin = function(card) {
   let iterator = this.plays.entries();
   for (let [player, c] of iterator) {
     if (card == c) {

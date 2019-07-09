@@ -4,14 +4,14 @@ import { Deck } from '../deck.mjs';
 import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Deck', () => {
-  let deck = new Deck(),
+  const deck = new Deck(),
     card1 = Card[Suit.leaf][Rank.ace],
     card2 = Card[Suit.leaf][Rank.sergeant],
     card3 = Card[Suit.leaf][Rank.seven],
     card4 = Card[Suit.leaf][Rank.king];
 
   beforeEach(() => {
-    deck = new Deck();
+    deck.clear();
     deck.add(card1, card2, card3, card4);
   });
 

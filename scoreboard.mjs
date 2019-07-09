@@ -128,7 +128,7 @@ Result.prototype.matadors = function(trumps) {
         continue;
       }
 
-      let player = trick.moveBy(card);
+      let player = trick.origin(card);
       if (!this.players.has(player)) {
         continue;
       }

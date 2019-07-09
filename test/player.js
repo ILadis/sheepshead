@@ -4,9 +4,10 @@ import { Player } from '../player.mjs';
 import { Deck } from '../deck.mjs';
 
 describe('Player', () => {
-  let player1 = new Player(),
+  const player1 = new Player(),
     player2 = new Player(),
-    player3 = new Player();
+    player3 = new Player(),
+    players = new Array(player1, player2, player3);
 
   it('should have cards property', () => {
     let player = new Player();
@@ -20,18 +21,14 @@ describe('Player', () => {
   });
 
   describe('#sequence()', () => {
-    it('should return iterator factory', () => {
-      let factory = Player.sequence([player1, player2], player1);
-      var it = factory[Symbol.iterator]();
-      Assert.ok(it.next);
-      var it = factory[Symbol.iterator]();
-      Assert.ok(it.next);
+    it('should be iterable', () => {
+      let sequence = Player.sequence(players, player1);
+      Assert.ok(sequence[Symbol.iterator]);
     });
 
-    it('should iterate through players from given start', () => {
-      let players = [player1, player2, player3];
-      let factory = Player.sequence(players, player3);
-      let it = factory[Symbol.iterator]();
+    it('should yield players from given start', () => {
+      let sequence = Player.sequence(players, player3);
+      let it = sequence[Symbol.iterator]();
       Assert.equal(it.next().value, player3);
       Assert.equal(it.next().value, player1);
       Assert.equal(it.next().value, player2);
@@ -41,12 +38,7 @@ describe('Player', () => {
 
   describe('#next()', () => {
     it('should return next player from given start', () => {
-      let players = [player1, player2, player3];
-      var next = Player.next(players, player1);
-      Assert.equal(next, player2);
-      var next = Player.next(players, player2);
-      Assert.equal(next, player3);
-      var next = Player.next(players, player3);
+      let next = Player.next(players, player3);
       Assert.equal(next, player1);
     });
   });

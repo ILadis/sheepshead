@@ -6,7 +6,7 @@ export function Brainless(rand = Math.random) {
 }
 
 Brainless.prototype.chooseFrom = function(options) {
-  let index = Math.round(this.rand() * options.length);
+  let index = Math.floor(this.rand() * options.length);
   return options[index];
 };
 

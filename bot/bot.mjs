@@ -59,6 +59,10 @@ Bot.prototype.connect = function(event) {
 
 Bot.prototype.defer = function(result) {
   let time = this.thinktime;
+  if (time <= 0) {
+    return result;
+  }
+
   return new Promise((resolve) => {
     setTimeout(() => resolve(result), time);
   });

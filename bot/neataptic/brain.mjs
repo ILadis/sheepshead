@@ -80,7 +80,7 @@ Brain.prototype.onturn = function(game, player) {
 
   // add current trick winner
   var states = tensor.append(1);
-  if (trick) {
+  if (trick && contract) {
     let winner = trick.winner(contract.order);
 
     if (declarer.has(player) && declarer.has(winner)) {

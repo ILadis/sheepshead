@@ -6,8 +6,6 @@ import { Brainless } from '../brainless.mjs';
 
 export async function train(brain, iterations) {
   let bot = new Bot(1, brain);
-  let step = 1/4;
-
   let rand = mulberry(12345);
 
   let game = new Game();
@@ -26,8 +24,7 @@ export async function train(brain, iterations) {
   };
 
   game.onproceed = () => {
-    iterations -= step;
-    return iterations > 0;
+    return --iterations > 0;
   };
 
   await game.run();

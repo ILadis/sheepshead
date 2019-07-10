@@ -4,17 +4,19 @@ import { Game } from '../../game.mjs';
 import { Bot } from '../bot.mjs';
 import { Brainless } from '../brainless.mjs';
 
-export async function train(brain, iterations) {
-  let bot = new Bot(1, brain);
+export async function train(trainee, iterations) {
   let rand = mulberry(12345);
 
   let game = new Game();
   game.rand = rand;
 
-  bot.attach(game);
-
   game.onjoin = (index) => {
     let brain = new Brainless(rand);
+
+    if (index == 1) {
+      brain = trainee;
+    }
+
     let bot = new Bot(index, brain);
     bot.thinktime = 0;
 
@@ -29,7 +31,7 @@ export async function train(brain, iterations) {
 
   await game.run();
 
-  return brain;
+  return trainee;
 }
 
 function mulberry(seed) {

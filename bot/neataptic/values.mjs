@@ -1,26 +1,22 @@
 
-import { Contract } from '../../contract.mjs';
-import { Deck } from '../../deck.mjs';
 import { Card, Suit, Rank } from '../../card.mjs';
 
-const order = Contract.normal.acorn.order;
-const deck = new Deck();
-
+const values = new Map();
 for (let suit of Suit) {
   for (let rank of Rank) {
-    deck.add(Card[suit][rank]);
+    var index = ++index || 0;
+    var card = Card[suit][rank];
+
+    values.set(index, card);
+    values.set(card, index);
   }
 }
 
-export function stateOf(card) {
-  return order.orderOf(card) / 32;
-}
-
 export function indexOf(card) {
-  return order.orderOf(card) - 1;
-}
+  return values.get(card);
+};
 
 export function cardOf(index) {
-  return deck.cards[index];
-}
+  return values.get(index);
+};
 

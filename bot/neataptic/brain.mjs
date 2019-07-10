@@ -1,14 +1,13 @@
 
+import { Card, Suit, Rank } from '../../card.mjs';
 import { Tensor } from './tensor.mjs';
 import * as Values from './values.mjs';
 
 import Neataptic from 'neataptic';
 
 export function Brain() {
-  this.environment = new Tensor();
-  this.occurrences = new Set();
   this.actions = new Map();
-  this.network = new Neataptic.architect.Perceptron(46, 32, 32);
+  this.network = new Neataptic.architect.Perceptron(102, 60, 32);
 };
 
 Brain.prototype.ondealt = function(game, players) {
@@ -19,92 +18,85 @@ Brain.prototype.ondealt = function(game, players) {
   }
 };
 
-Brain.prototype.onturn = function(game, player) {
-  let tensor = new Tensor();
+Brain.prototype.onbid = function() {
+  return undefined;
+};
+
+Brain.prototype.onplay = function(game, actor, rules) {
   let { trick, contract, players } = game;
 
+  let input = new Tensor();
+
   // add player hand cards
-  var states = tensor.append(8);
-  for (let card of player.cards) {
-    states.next(Values.stateOf(card));
+  var states = input.append(32);
+  for (let card of actor.cards) {
+    let index = Values.indexOf(card);
+    states[index] = 1;
   }
-  states.sort((s1, s2) => s2 - s1);
   states.commit();
 
   // add current trick cards
-  var states = tensor.append(4);
-  if (trick) {
-    for (let card of trick.cards()) {
-      states.next(Values.stateOf(card));
+  var states = input.append(32);
+  for (let card of trick.cards()) {
+    let index = Values.indexOf(card);
+    states[index] = 1;
+  }
+  states.commit();
+
+  // add dominant suit
+  let lead = trick.lead();
+
+  var states = input.append(4);
+  if (lead) {
+    if (contract.order.trumps.contains(lead)) {
+      states[0] = 1;
+    } else switch (lead.suit) {
+      case Suit.bell:
+        states[1] = 1;
+        break;
+      case Suit.leaf:
+        states[2] = 1;
+        break;
+      case Suit.acorn:
+        states[3] = 1;
+        break;
     }
   }
   states.commit();
 
   // add known cards
-  var states = tensor.append(32);
-  for (let card of this.occurrences) {
-    let index = Values.indexOf(card)
+  let cards = determinePlayedCards(players);
+
+  var states = input.append(32);
+  for (let card of cards) {
+    let index = Values.indexOf(card);
     states[index] = 1;
   }
   states.commit();
 
-  let declarer = new Set();
-  let defender = new Set();
-
   // add declarer/defender state
-  var states = tensor.append(1);
-  if (contract) {
-    for (let player of players) {
-      switch (player) {
-      case contract.owner:
-      case contract.partner:
-        declarer.add(player);
-        break;
-      default:
-        defender.add(player);
-      }
-    }
-
-    if (player.cards.contains(contract.partner)) {
-      declarer.add(player);
-    }
-
-    if (declarer.has(player)) {
-      states.next(1);
-    }
-    else if (defender.has(player)) {
-      states.next(0.5);
-    }
+  let parties = determineParties(contract, players, actor);
+  let { declarer, defender } = parties;
+  
+  var states = input.append(1);
+  if (declarer.has(actor)) {
+    states.next(1);
   }
   states.commit();
 
   // add current trick winner
-  var states = tensor.append(1);
-  if (trick && contract) {
-    let winner = trick.winner(contract.order);
-
-    if (declarer.has(player) && declarer.has(winner)) {
-      states.next(1);
-    }
-    else if (defender.has(player) && defender.has(winner)) {
-      states.next(1);
-    }
-    else {
-      states.next(0.5);
-    }
+  let winner = trick.winner(contract.order);
+  
+  var states = input.append(1);
+  if (declarer.has(actor) && declarer.has(winner)) {
+    states.next(1);
+  }
+  else if (defender.has(actor) && defender.has(winner)) {
+    states.next(1);
   }
   states.commit();
 
-  this.environment = tensor;
-};
-
-Brain.prototype.onbid = function(game, player, rules) {
-  return undefined;
-};
-
-Brain.prototype.onplay = function(game, player, rules) {
-  let input = this.environment.states;
-  let output = this.network.activate(input);
+  var output = this.network.activate(input.states);
 
   do {
     let highest = 0, index = 0;
@@ -121,40 +113,68 @@ Brain.prototype.onplay = function(game, player, rules) {
     var card = Values.cardOf(index);
   } while (!rules.valid(card));
 
+  var output = new Tensor();
+
+  var states = output.append(32);
+  if (card) {
+    let index = Values.indexOf(card);
+    states[index] = 1;
+  }
+  states.commit();
+
+  this.actions.get(actor).add({ input, output });
+
   return card;
 };
 
-Brain.prototype.onplayed = function(game, player, card) {
-  this.occurrences.add(card);
-
-  let tensor = new Tensor();
-
-  let states = tensor.append(32);
-  let index = Values.indexOf(card);
-  states[index] = 1;
-  states.commit();
-
-  let input = this.environment.states;
-  let output = tensor.states;
-
-  this.actions.get(player).add({ input, output });
+Brain.prototype.onfinished = function(game, winner) {
+  for (let player of winner.players) {
+    for (let action of this.actions.get(player)) {
+      this.network.activate(action.input.states, true);
+      this.network.propagate(0.3, 0.1, true, action.output.states);
+    }
+  }
 };
 
-Brain.prototype.onfinished = function(game, winner, loser) {
-  for (let player of winner.players) {
-    if (winner.points > 90) {
-      for (let action of this.actions.get(player)) {
-        this.network.activate(action.input, true);
-        this.network.propagate(0.3, 0.1, true, action.output);
+function determineParties(contract, players, actor) {
+  let declarer = new Set();
+  let defender = new Set();
+
+  if (contract) {
+    for (let player of players) {
+      switch (player) {
+      case contract.owner:
+      case contract.partner:
+        declarer.add(player);
+        break;
+      default:
+        defender.add(player);
       }
     }
 
-    this.actions.get(player).clear();
+    if (actor.cards.contains(contract.partner)) {
+      declarer.add(actor);
+      defender.delete(actor);
+    }
   }
 
-  this.occurrences.clear();
-  for (let player of loser.players) {
-    this.actions.get(player).clear();
+  return { declarer, defender };
+}
+
+function determinePlayedCards(players) {
+  let cards = new Set();
+  for (let suit of Suit) {
+    for (let rank of Rank) {
+      cards.add(Card[suit][rank]);
+    }
   }
-};
+
+  for (let player of players) {
+    for (let card of player.cards) {
+      cards.delete(card);
+    }
+  }
+
+  return cards;
+}
 

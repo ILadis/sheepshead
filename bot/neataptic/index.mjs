@@ -5,6 +5,7 @@ import { Brain } from './brain.mjs';
 let brain = new Brain();
 
 Trainer.train(brain, 1000).then(() => {
-  // finished training
+  let json = Brain.toJSON(brain);
+  console.log(JSON.stringify(json));
 });
 

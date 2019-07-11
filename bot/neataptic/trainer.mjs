@@ -12,7 +12,6 @@ export async function train(trainee, iterations) {
 
   game.onjoin = (index) => {
     let brain = new Brainless(rand);
-
     if (index == 1) {
       brain = trainee;
     }

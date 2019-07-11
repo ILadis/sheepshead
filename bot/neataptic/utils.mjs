@@ -1,6 +1,5 @@
 
 import { Card, Suit, Rank } from '../../card.mjs';
-import { Tensor } from './tensor.mjs';
 
 export function Tensor() {
   this.states = new Array();
@@ -24,11 +23,11 @@ Tensor.prototype.append = function(slots) {
   return states;
 };
 
-export function Builder(tensor) {
+export function Model(tensor) {
   this.tensor = tensor;
 }
 
-Builder.prototype.addCards = function(cards) {
+Model.prototype.addCardStash = function(cards) {
   let states = this.tensor.append(Indices.cards.size());
   if (cards) {
     for (let card of cards) {
@@ -37,10 +36,9 @@ Builder.prototype.addCards = function(cards) {
     }
   }
   states.commit();
-  return this;
 };
 
-Builder.prototype.addSuits = function(card) {
+Model.prototype.addSuits = function(card) {
   let states = this.tensor.append(Indices.suits.size());
   if (card) {
     let suit = card.suit;
@@ -48,19 +46,17 @@ Builder.prototype.addSuits = function(card) {
     states[index] = 1;
   }
   states.commit();
-  return this;
 };
 
-Builder.prototype.addTrump = function(card, order) {
+Model.prototype.addTrumpFlag = function(card, order) {
   let states = this.tensor.append(1);
   if (order.trumps.contains(card)) {
     states.next(1);
   }
   states.commit();
-  return this;
 };
 
-Builder.prototype.addDeclarer = function(parties, actor) {
+Model.prototype.addDeclarerFlag = function(parties, actor) {
   let states = this.tensor.append(1);
   if (parties) {
     let declarer = parties.declarer;
@@ -69,10 +65,9 @@ Builder.prototype.addDeclarer = function(parties, actor) {
     }
   }
   states.commit();
-  return this;
 };
 
-Builder.prototype.addWinner = function(parties, winner, actor) {
+Model.prototype.addWinnerFlag = function(parties, winner, actor) {
   let states = this.tensor.append(1);
   if (parties && winner) {
     let { declarer, defender } = parties;
@@ -84,7 +79,6 @@ Builder.prototype.addWinner = function(parties, winner, actor) {
     }
   }
   states.commit();
-  return this;
 };
 
 export function Indices(define) {
@@ -123,4 +117,54 @@ Indices.suits = new Indices((values) => {
     values.set(suit, index);
   }
 });
+
+export function Inspector(game) {
+  this.game = game;
+}
+
+Inspector.prototype.determineParties = function() {
+  let { contract, players, actor } = this.game;
+
+  let declarer = new Set();
+  let defender = new Set();
+
+  if (contract) {
+    for (let player of players) {
+      switch (player) {
+      case contract.owner:
+      case contract.partner:
+        declarer.add(player);
+        break;
+      default:
+        defender.add(player);
+      }
+    }
+
+    if (actor.cards.contains(contract.partner)) {
+      declarer.add(actor);
+      defender.delete(actor);
+    }
+  }
+
+  return { declarer, defender };
+};
+
+Inspector.prototype.determinePlayedCards = function() {
+  let { players } = this.game;
+
+  let cards = new Set();
+  for (let suit of Suit) {
+    for (let rank of Rank) {
+      cards.add(Card[suit][rank]);
+    }
+  }
+
+  for (let player of players) {
+    for (let card of player.cards) {
+      cards.delete(card);
+    }
+  }
+
+  return cards;
+};
 

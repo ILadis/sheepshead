@@ -1,13 +1,26 @@
 
 import * as Phases from '../../phases.mjs';
-import { Card, Suit, Rank } from '../../card.mjs';
-import { Tensor, Builder, Indices } from './model.mjs';
+import { Tensor, Model, Indices, Inspector } from './utils.mjs';
 
 import Neataptic from 'neataptic';
 
 export function Brain() {
   this.actions = new Map();
-  this.network = new Neataptic.architect.Perceptron(102, 60, 32);
+  this.threshold = new Map();
+  this.network = new Neataptic.architect.Perceptron(103, 60, 32);
+};
+
+Brain.fromJSON = function(json) {
+  let network = Neataptic.Network.fromJSON(json);
+  let brain = new Brain();
+  brain.network = network;
+
+  return brain;
+};
+
+Brain.toJSON = function(brain) {
+  let json = brain.network.toJSON();
+  return json;
 };
 
 Brain.prototype.ondealt = function(game, players) {
@@ -18,26 +31,46 @@ Brain.prototype.ondealt = function(game, players) {
   }
 };
 
+Brain.prototype.onsettled = function(game, contract) {
+  this.threshold.clear();
+
+  let players = game.players;
+  let order = contract.order;
+
+  for (let player of players) {
+    let points = 0;
+    for (let card of player.cards) {
+      if (order.trumps.contains(card)) {
+        points += 15;
+      }
+    }
+
+    this.threshold.set(player, points);
+  }
+};
+
 Brain.prototype.onturn = function(game, actor) {
-  let { phase, trick, contract, players } = game;
+  let { phase, trick, contract } = game;
 
   if (phase == Phases.playing) {
     let order = contract.order;
     let lead = trick.lead();
     let winner = trick.winner(order);
 
-    let cards = determinePlayedCards(players);
-    let parties = determineParties(contract, players, actor);
+    let inspector = new Inspector(game);
+    let cards = inspector.determinePlayedCards();
+    let parties = inspector.determineParties();
 
     var tensor = new Tensor();
-    let builder = new Builder(tensor)
-      .addCards(actor.cards)
-      .addCards(cards)
-      .addCards(trick.cards())
-      .addTrump(lead, order)
-      .addSuits(lead)
-      .addDeclarer(parties, actor)
-      .addWinner(parties, winner, actor);
+    let model = new Model(tensor);
+
+    model.addCardStash(actor.cards);
+    model.addCardStash(cards);
+    model.addCardStash(trick.cards());
+    model.addTrumpFlag(lead, order);
+    model.addSuits(lead);
+    model.addDeclarerFlag(parties, actor);
+    model.addWinnerFlag(parties, winner, actor);
   }
 
   this.input = tensor;
@@ -77,61 +110,32 @@ Brain.prototype.onplay = function(game, actor, rules) {
 
       output[index] = 0;
 
-      var card = Values.cardOf(index);
+      var card = Indices.cards.valueOf(index);
     } while (!rules.valid(card));
 
     return card;
   }
 };
 
-Brain.prototype.onfinished = function(game, winner) {
-  for (let player of winner.players) {
-    for (let action of this.actions.get(player)) {
-      this.network.activate(action.input.states, true);
-      this.network.propagate(0.3, 0.1, true, action.output.states);
+Brain.prototype.onfinished = function(game, winner, loser) {
+  for (let result of [winner, loser]) {
+    for (let player of result.players) {
+      let points = this.threshold.get(player);
+      let actions = this.actions.get(player);
+
+      if (result.points() > points) {
+        this.remember(actions);
+      }
     }
   }
 };
 
-function determineParties(contract, players, actor) {
-  let declarer = new Set();
-  let defender = new Set();
+Brain.prototype.remember = function(actions) {
+  for (let action of actions) {
+    let { input, output } = action;
 
-  if (contract) {
-    for (let player of players) {
-      switch (player) {
-      case contract.owner:
-      case contract.partner:
-        declarer.add(player);
-        break;
-      default:
-        defender.add(player);
-      }
-    }
-
-    if (actor.cards.contains(contract.partner)) {
-      declarer.add(actor);
-      defender.delete(actor);
-    }
+    this.network.activate(input.states, true);
+    this.network.propagate(0.03, 0, true, output.states);
   }
-
-  return { declarer, defender };
-}
-
-function determinePlayedCards(players) {
-  let cards = new Set();
-  for (let suit of Suit) {
-    for (let rank of Rank) {
-      cards.add(Card[suit][rank]);
-    }
-  }
-
-  for (let player of players) {
-    for (let card of player.cards) {
-      cards.delete(card);
-    }
-  }
-
-  return cards;
 }
 

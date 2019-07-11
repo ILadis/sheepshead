@@ -4,8 +4,9 @@ import { Game } from '../../game.mjs';
 import { Bot } from '../bot.mjs';
 import { Brainless } from '../brainless.mjs';
 
-export async function train(trainee, iterations) {
+export async function train(trainee, callback) {
   let rand = mulberry(12345);
+  let iterations = 0;
 
   let game = new Game();
   game.rand = rand;
@@ -24,8 +25,8 @@ export async function train(trainee, iterations) {
     return bot;
   };
 
-  game.onproceed = () => {
-    return --iterations > 0;
+  game.onproceed = async () => {
+    return await callback(++iterations, trainee);
   };
 
   await game.run();

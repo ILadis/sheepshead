@@ -2,8 +2,30 @@
 import { Card, Suit, Rank } from '../../card.mjs';
 import { Tensor } from './tensor.mjs';
 
-export function Builder() {
-  this.tensor = new Tensor();
+export function Tensor() {
+  this.states = new Array();
+}
+
+Tensor.prototype.append = function(slots) {
+  let states = new Array(slots);
+  states.fill(0);
+
+  let index = 0;
+  states.next = (value) => {
+    states[index++] = value;
+  };
+
+  states.commit = () => {
+    for (let value of states) {
+      this.states.push(value);
+    }
+  };
+
+  return states;
+};
+
+export function Builder(tensor) {
+  this.tensor = tensor;
 }
 
 Builder.prototype.addCards = function(cards) {

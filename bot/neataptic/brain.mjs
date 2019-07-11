@@ -10,17 +10,13 @@ export function Brain() {
   this.network = new Neataptic.architect.Perceptron(103, 60, 32);
 };
 
-Brain.fromJSON = function(json) {
-  let network = Neataptic.Network.fromJSON(json);
+Brain.from = function(entity) {
+  let network = Neataptic.Network.fromJSON(entity);
+
   let brain = new Brain();
   brain.network = network;
 
   return brain;
-};
-
-Brain.toJSON = function(brain) {
-  let json = brain.network.toJSON();
-  return json;
 };
 
 Brain.prototype.ondealt = function(game, players) {

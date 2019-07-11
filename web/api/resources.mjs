@@ -15,8 +15,7 @@ import { Contract } from '../../contract.mjs';
 import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
-import { Brain } from '../../bot/neataptic/brain.mjs';
-import * as Trainer from '../../bot/neataptic/trainer.mjs';
+import { Brainless } from '../../bot/brainless.mjs';
 
 const Resources = Object.create(null);
 
@@ -126,6 +125,49 @@ Resources.events['GET'] = PreFilter.chain(
   });
 });
 
+Resources.bots = new Resource(
+  ['POST'], '/api/games/(?<id>\\d+)/bots');
+
+Resources.bots['POST'] = PreFilter.chain(
+  PreFilter.requiresGame(Phases.joining),
+  PreFilter.requiresEntity(JSON)
+).then(async (request, response) => {
+  var { game, registry, entity } = request;
+
+  let input = registry.lookup(game).input;
+  let index = input.args[0];
+
+  try {
+    var { Brain } = await import('../../bot/neataptic/brain.mjs');
+  } catch {
+    response.writeHead(501);
+    return response.end();
+  }
+
+  let brain = Brain.from(entity);
+
+  let player = new Bot(index, brain);
+  player.name = entity.name;
+
+  let rules = input.args[1];
+  if (!rules.valid(player)) {
+    response.writeHead(422);
+    return response.end();
+  }
+
+  player.attach(game);
+  input.resolve(player);
+
+  var entity = new Entities.Player(player, false, 0);
+  let json = JSON.stringify(entity);
+
+  response.setHeader('Content-Type', MediaType.json);
+  response.setHeader('Content-Length', Buffer.byteLength(json));
+  response.writeHead(201);
+  response.write(json);
+  return response.end();
+});
+
 Resources.players = new Resource(
   ['GET', 'POST'], '/api/games/(?<id>\\d+)/players');
 
@@ -149,13 +191,10 @@ Resources.players['POST'] = PreFilter.chain(
   }
 
   if (player.name == 'Bot') {
-    let brain = new Brain();
-    player = new Bot(index, brain);
+    let brain = new Brainless();
 
-    Trainer.train(brain, 100).then(() => {
-      player.name += ' (trained)';
-      player.attach(game);
-    });
+    player = new Bot(index, brain);
+    player.attach(game);
   }
 
   registry.register(player, token);

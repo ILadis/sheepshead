@@ -6,28 +6,33 @@ import { Brain } from './brain.mjs';
 import * as Trainer from './trainer.mjs';
 
 let brain = new Brain();
-let limit = Number(Process.argv[2] || 10000);
-let name = String(Process.argv[3] || `Brain #${limit}`);
+
+const options = {
+  callback
+
+  /* additional settings:
+   *   iterations: number of iterations for each generation,
+   *   generations: number of generations to evolve
+   */
+};
+
+const name = `Brain Gen #${options.generations}`;
 
 Process.stderr.write(''
-  + `Starting training for '${name}' with ${limit} iterations`
+  + `Starting training for '${name}':`
   + `${OS.EOL}`);
 
-Trainer.train(brain, callback).then(() => {
-  let json = brain.network.toJSON();
+Trainer.train(brain, options).then((brain) => {
+  let json = brain.serialize();
   json.name = name;
 
   Process.stdout.write(JSON.stringify(json));
 });
 
-function callback(iterations) {
-  if (iterations % 1000 == 0) {
-    Process.stderr.write(''
-      + `Currently at ${iterations} iterations, `
-      + `${limit - iterations} iterations left...`
-      + `${OS.EOL}`);
-  }
-
-  return iterations < limit;
+function callback(epoch) {
+  Process.stderr.write(''
+    + `Currently at generation #${epoch} `
+    + `of ${options.generations}`
+    + `${OS.EOL}`);
 };
 

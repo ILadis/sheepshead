@@ -1,45 +1,58 @@
 
 import { Game } from '../../game.mjs';
-
 import { Bot } from '../bot.mjs';
-import { Brainless } from '../brainless.mjs';
 
-export async function train(trainee, callback) {
-  let rand = mulberry(12345);
-  let iterations = 0;
+export async function train(brain, options = {}) {
+  let epoch = 0;
 
-  let game = new Game();
-  game.rand = rand;
+  let {
+    iterations = 1000,
+    generations = 10,
+    callback = () => {}
+  } = options;
 
-  game.onjoin = (index) => {
-    let brain = new Brainless(rand);
-    if (index == 1) {
-      brain = trainee;
-    }
+  do {
+    let game = new Game();
+    let runs = 0;
 
-    let bot = new Bot(index, brain);
-    bot.thinktime = 0;
+    game.onjoin = (index) => {
+      let bot = new Bot(index, brain.clone());
+      bot.thinktime = 0;
+      bot.wins = 0;
 
-    bot.attach(game);
+      bot.attach(game);
 
-    return bot;
-  };
+      return bot;
+    };
 
-  game.onproceed = async () => {
-    return await callback(++iterations, trainee);
-  };
+    game.onfinished = (winner) => {
+      for (let bot of winner.players) {
+        bot.wins++;
+      }
+    };
 
-  await game.run();
+    game.onproceed = () => {
+      return ++runs % iterations != 0;
+    };
 
-  return trainee;
+    await game.run();
+
+    brain = elitism(game.players);
+    callback(epoch);
+  } while (++epoch < generations);
+
+  return brain;
 }
 
-function mulberry(seed) {
-  return () => {
-    let value = seed += 0x6D2B79F5;
-    value = Math.imul(value ^ value >>> 15, value | 1);
-    value ^= value + Math.imul(value ^ value >>> 7, value | 61);
-    return ((value ^ value >>> 14) >>> 0) / 4294967296;
-  };
+function elitism(bots) {
+  let highest = 0, brain;
+  for (let bot of bots) {
+    if (bot.wins > highest) {
+      brain = bot.brain;
+      highest = bot.wins;
+    }
+  }
+
+  return brain;
 }
 

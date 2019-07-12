@@ -144,7 +144,8 @@ Resources.bots['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let brain = Brain.from(entity);
+  let brain = new Brain()
+  brain.deserialize(entity);
 
   let player = new Bot(index, brain);
   player.name = entity.name;

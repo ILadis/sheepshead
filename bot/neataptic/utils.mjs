@@ -23,11 +23,11 @@ Tensor.prototype.append = function(slots) {
   return states;
 };
 
-export function Model(tensor) {
+export function Builder(tensor) {
   this.tensor = tensor;
 }
 
-Model.prototype.addCardStash = function(cards) {
+Builder.prototype.cards = function(cards) {
   let states = this.tensor.append(Indices.cards.size());
   if (cards) {
     for (let card of cards) {
@@ -36,9 +36,10 @@ Model.prototype.addCardStash = function(cards) {
     }
   }
   states.commit();
+  return this;
 };
 
-Model.prototype.addSuits = function(card) {
+Builder.prototype.suits = function(card) {
   let states = this.tensor.append(Indices.suits.size());
   if (card) {
     let suit = card.suit;
@@ -46,17 +47,19 @@ Model.prototype.addSuits = function(card) {
     states[index] = 1;
   }
   states.commit();
+  return this;
 };
 
-Model.prototype.addTrumpFlag = function(card, order) {
+Builder.prototype.trumpFlag = function(card, order) {
   let states = this.tensor.append(1);
   if (order.trumps.contains(card)) {
     states.next(1);
   }
   states.commit();
+  return this;
 };
 
-Model.prototype.addDeclarerFlag = function(parties, actor) {
+Builder.prototype.declarerFlag = function(parties, actor) {
   let states = this.tensor.append(1);
   if (parties) {
     let declarer = parties.declarer;
@@ -65,9 +68,10 @@ Model.prototype.addDeclarerFlag = function(parties, actor) {
     }
   }
   states.commit();
+  return this;
 };
 
-Model.prototype.addWinnerFlag = function(parties, winner, actor) {
+Builder.prototype.winnerFlag = function(parties, winner, actor) {
   let states = this.tensor.append(1);
   if (parties && winner) {
     let { declarer, defender } = parties;
@@ -79,6 +83,7 @@ Model.prototype.addWinnerFlag = function(parties, winner, actor) {
     }
   }
   states.commit();
+  return this;
 };
 
 export function Indices(define) {
@@ -122,7 +127,7 @@ export function Inspector(game) {
   this.game = game;
 }
 
-Inspector.prototype.determineParties = function() {
+Inspector.prototype.currentParties = function() {
   let { contract, players, actor } = this.game;
 
   let declarer = new Set();
@@ -149,7 +154,7 @@ Inspector.prototype.determineParties = function() {
   return { declarer, defender };
 };
 
-Inspector.prototype.determinePlayedCards = function() {
+Inspector.prototype.playedCards = function() {
   let { players } = this.game;
 
   let cards = new Set();

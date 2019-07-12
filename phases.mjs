@@ -33,7 +33,7 @@ export async function joining() {
   return dealing;
 }
 
-export async function dealing({ players, head, rand }) {
+export async function dealing({ players, head }) {
   let sequence = Player.sequence(players, head);
   this.sequence = sequence;
 
@@ -44,7 +44,7 @@ export async function dealing({ players, head, rand }) {
     }
   }
 
-  deck.shuffle(rand);
+  deck.shuffle();
 
   do {
     for (let player of sequence) {

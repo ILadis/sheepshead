@@ -8,7 +8,8 @@ Trick.prototype.add = function(player, card) {
 };
 
 Trick.prototype.cards = function() {
-  return this.plays.values();
+  let next = () => this.plays.values();
+  return { [Symbol.iterator]: next };
 };
 
 Trick.prototype.origin = function(card) {

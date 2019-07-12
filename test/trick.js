@@ -35,8 +35,14 @@ describe('Trick', () => {
   });
 
   describe('#cards()', () => {
-    it('should return iterator of added cards', () => {
-      let it = trick.cards();
+    it('should be iterable', () => {
+      let cards = trick.cards();
+      Assert.ok(cards[Symbol.iterator]);
+    });
+
+    it('should yield played cards', () => {
+      let cards = trick.cards();
+      let it = cards[Symbol.iterator]();
       Assert.equal(it.next().value, card1);
       Assert.equal(it.next().value, card2);
       Assert.equal(it.next().value, card3);

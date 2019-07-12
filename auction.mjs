@@ -17,7 +17,8 @@ Auction.prototype.concede = function(player) {
 };
 
 Auction.prototype.bidders = function() {
-  return this.bids.keys();
+  let next = () => this.bids.keys();
+  return { [Symbol.iterator]: next };
 };
 
 Auction.prototype.lead = function() {

@@ -7,7 +7,7 @@ export function Bot(index, brain) {
 
   this.callbacks = new Map();
   this.brain = brain;
-  this.thinktime = 500;
+  this.thinktime = 800;
 }
 
 Bot.prototype = Object.create(Player.prototype);

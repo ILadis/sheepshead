@@ -159,7 +159,7 @@ Resources.bots['POST'] = PreFilter.chain(
   player.attach(game);
   input.resolve(player);
 
-  var entity = new Entities.Player(player, false, 0);
+  var entity = new Entities.Player(player, false);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -201,7 +201,7 @@ Resources.players['POST'] = PreFilter.chain(
   registry.register(player, token);
   input.resolve(player);
 
-  var entity = new Entities.Player(player, false, 0, token);
+  var entity = new Entities.Player(player, false, token);
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);
@@ -214,7 +214,7 @@ Resources.players['POST'] = PreFilter.chain(
 Resources.players['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  var { game: { actor, players, scores }, url } = request;
+  var { game: { actor, players/*, scores*/ }, url } = request;
 
   let index = Number(url.query['index']);
   var players = Array.from(players);
@@ -222,10 +222,31 @@ Resources.players['GET'] = PreFilter.chain(
     players = players.filter(p => p.index == index);
   }
 
+  let entity = players.map(p => new Entities.Player(p, p == actor));
+  let json = JSON.stringify(entity);
+
+  response.setHeader('Content-Type', MediaType.json);
+  response.setHeader('Content-Length', Buffer.byteLength(json));
+  response.writeHead(200);
+  response.write(json);
+  return response.end();
+});
+
+Resources.scores = new Resource(
+  ['GET'], '/api/games/(?<id>\\d+)/scores');
+
+Resources.scores['GET'] = PreFilter.chain(
+  PreFilter.requiresGame()
+).then((request, response) => {
+  var { game: { players, scores } } = request;
+
   let score = (p) => scores.scoreOf(p);
+  let total = (p) => scores.totalOf(p);
+
+  var players = Array.from(players);
   players.sort((p1, p2) => score(p2) - score(p1));
 
-  let entity = players.map(p => new Entities.Player(p, p == actor, score(p)));
+  let entity = players.map(p => new Entities.Score(p, score(p), total(p)));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);

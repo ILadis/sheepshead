@@ -277,11 +277,31 @@ body {
 .dialog table {
   margin-top: 10pt;
   width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
 }
 
 .dialog table th {
+  padding-right: 10pt;
   text-align: left;
   font-weight: 600;
+}
+
+.dialog table td {
+  max-width: 100pt;
+  padding: 2pt 12pt 0 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.dialog table td:nth-child(1) {
+  text-align: center;
+}
+
+.dialog table td:nth-child(3),
+.dialog table td:nth-child(4){
+  text-align: right;
 }
 
 .dialog button {

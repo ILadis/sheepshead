@@ -2,16 +2,22 @@
 export function Scoreboard(players, tariff = 5) {
   this.tariff = tariff;
   this.scores = new Map();
+  this.totals = new Map();
   this.claims = new Map();
 
   for (let player of players) {
     this.scores.set(player, 0);
+    this.totals.set(player, 0);
     this.claims.set(player, new Set());
   }
 }
 
 Scoreboard.prototype.scoreOf = function(player) {
   return this.scores.get(player);
+};
+
+Scoreboard.prototype.totalOf = function(player) {
+  return this.totals.get(player);
 };
 
 Scoreboard.prototype.claim = function(player, trick) {
@@ -25,7 +31,12 @@ Scoreboard.prototype.award = function(result) {
     let score = this.scores.get(player);
     score += winner.score;
 
+    let total = this.totals.get(player);
+    total += 1;
+
     this.scores.set(player, score);
+    this.totals.set(player, total);
+
     this.claims.get(player).clear();
   }
 

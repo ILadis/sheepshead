@@ -261,11 +261,12 @@ Presenter.prototype.onFinished = function({ winner }) {
 
 Presenter.prototype.listStandings = async function() {
   let { dialog, trick } = this.views;
-  let players = await this.client.fetchPlayers();
+  let players = await this.client.fetchScores();
 
   let labels = [
     this.stringFor('standings-player'),
-    this.stringFor('standings-score')
+    this.stringFor('standings-score'),
+    this.stringFor('standings-total'),
   ];
 
   let table = dialog.withTable();
@@ -273,7 +274,7 @@ Presenter.prototype.listStandings = async function() {
 
   let position = 0;
   for (let player of players) {
-    table.addRow(++position, player.name, player.score);
+    table.addRow(++position, player.name, player.score, player.total);
   }
 
   let title = this.stringFor('standings-title');

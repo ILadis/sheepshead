@@ -111,6 +111,22 @@ Client.prototype.fetchPlayers = async function(index) {
   return json;
 };
 
+Client.prototype.fetchScores = async function() {
+  let id = this.id;
+  let request = new Request(`api/games/${id}/scores`, {
+    method: 'GET'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  let json = await response.json();
+
+  return json;
+};
+
 Client.prototype.fetchCards = async function() {
   let id = this.id;
   let token = this.token;

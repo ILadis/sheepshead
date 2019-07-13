@@ -2,8 +2,8 @@
 import OS from 'os';
 import Process from 'process';
 
+import { Trainer } from '../trainer.mjs';
 import { Brain } from './brain.mjs';
-import * as Trainer from './trainer.mjs';
 
 let brain = new Brain();
 
@@ -11,28 +11,23 @@ const options = {
   callback
 
   /* additional settings:
-   *   iterations: number of iterations for each generation,
-   *   generations: number of generations to evolve
+   *   runs: number of iterations for each generation,
+   *   target: number of generations to evolve
    */
 };
 
-const name = `Brain Gen #${options.generations}`;
+Process.stderr.write('Starting training');
 
-Process.stderr.write(''
-  + `Starting training for '${name}':`
-  + `${OS.EOL}`);
+function callback() {
+  Process.stderr.write('.');
+};
 
 Trainer.train(brain, options).then((brain) => {
-  let json = brain.serialize();
-  json.name = name;
+  Process.stderr.write(`${OS.EOL}Finished!`);
 
-  Process.stdout.write(JSON.stringify(json));
+  let network = brain.serialize();
+  let json = JSON.stringify(network);
+
+  Process.stdout.write();
 });
-
-function callback(epoch) {
-  Process.stderr.write(''
-    + `Currently at generation #${epoch} `
-    + `of ${options.generations}`
-    + `${OS.EOL}`);
-};
 

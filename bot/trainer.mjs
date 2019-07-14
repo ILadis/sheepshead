@@ -1,6 +1,5 @@
 
 import { Arena } from './arena.mjs';
-import { Bot } from './bot.mjs';
 
 export const Trainer = Object.create(null);
 

@@ -6,7 +6,7 @@ export function Arena() {
   this.brains = new Set();
 }
 
-Arena.prototype.add = function(brain) {
+Arena.prototype.join = function(brain) {
   this.brains.add(brain);
 };
 
@@ -18,6 +18,8 @@ Arena.prototype.compete = async function(runs = 100) {
     let brain = brains.next().value;
 
     let bot = new Bot(index, brain);
+    bot.thinktime = 0;
+
     bot.attach(game);
 
     return bot;

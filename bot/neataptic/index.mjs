@@ -23,11 +23,11 @@ function callback() {
 };
 
 Trainer.train(brain, options).then((brain) => {
-  Process.stderr.write(`${OS.EOL}Finished!`);
+  Process.stderr.write(` Finished!${OS.EOL}`);
 
   let network = brain.serialize();
   let json = JSON.stringify(network);
 
-  Process.stdout.write();
+  Process.stdout.write(json);
 });
 

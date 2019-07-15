@@ -5,6 +5,7 @@ import { Tensor, Builder, Indices, Inspector } from './utils.mjs';
 import Neataptic from 'neataptic';
 
 export function Brain() {
+  this.actions = new Set();
   this.network = new Neataptic.architect.Perceptron(103, 60, 32);
 }
 
@@ -40,11 +41,25 @@ Brain.prototype.onplay = function(game, actor, rules) {
       var card = Indices.cards.valueOf(index);
     } while (!rules.valid(card));
 
-    this.remember(input, output, index);
+    output.fill(0);
+    output[index] = 1;
+
+    this.actions.add({ input, output });
 
     return card;
   }
 };
+
+Brain.prototype.onfinished = function(game, winner) {
+  for (let player of winner.players) {
+    if (player.brain == this) {
+      this.remember(this.actions);
+      break;
+    }
+  }
+
+  this.actions.clear();
+}
 
 Brain.prototype.observe = function(game) {
   let { actor, trick, contract } = game;
@@ -56,7 +71,7 @@ Brain.prototype.observe = function(game) {
   let inspect = new Inspector(game);
 
   let cards = inspect.playedCards();
-  let parties = inspect.currentParties();
+  let parties = inspect.currentParties(actor);
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
@@ -72,12 +87,13 @@ Brain.prototype.observe = function(game) {
   return tensor.states;
 };
 
-Brain.prototype.remember = function(input, output, index) {
-  output.fill(0);
-  output[index] = 1;
+Brain.prototype.remember = function(actions) {
+  for (let action of actions) {
+    let { input, output } = action;
 
-  this.network.activate(input, true);
-  this.network.propagate(0.03, 0, true, output);
+    this.network.activate(input, true);
+    this.network.propagate(0.0001, 0, true, output);
+  }
 };
 
 Brain.prototype.clone = function() {

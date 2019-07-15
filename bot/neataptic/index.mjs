@@ -2,7 +2,7 @@
 import OS from 'os';
 import Process from 'process';
 
-import { Trainer } from '../trainer.mjs';
+import { Trainer } from './trainer.mjs';
 import { Brain } from './brain.mjs';
 
 const options = {

@@ -1,6 +1,6 @@
 
-import { Game } from '../game.mjs';
-import { Bot } from './bot.mjs';
+import { Game } from '../../game.mjs';
+import { Bot } from '../bot.mjs';
 
 export function Arena() {
   this.brains = new Set();

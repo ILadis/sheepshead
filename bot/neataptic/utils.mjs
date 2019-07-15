@@ -127,8 +127,8 @@ export function Inspector(game) {
   this.game = game;
 }
 
-Inspector.prototype.currentParties = function() {
-  let { contract, players, actor } = this.game;
+Inspector.prototype.currentParties = function(actor) {
+  let { contract, players } = this.game;
 
   let declarer = new Set();
   let defender = new Set();
@@ -148,6 +148,16 @@ Inspector.prototype.currentParties = function() {
     if (actor.cards.contains(contract.partner)) {
       declarer.add(actor);
       defender.delete(actor);
+    }
+    else {
+      if (declarer.has(actor) && !declarer.has(contract.partner)) {
+        defender.clear();
+      }
+
+      if (defender.has(actor) && !declarer.has(contract.partner)) {
+        defender.clear();
+        defender.add(actor);
+      }
     }
   }
 

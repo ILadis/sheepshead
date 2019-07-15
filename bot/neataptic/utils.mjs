@@ -59,18 +59,6 @@ Builder.prototype.trumpFlag = function(card, order) {
   return this;
 };
 
-Builder.prototype.declarerFlag = function(parties, actor) {
-  let states = this.tensor.append(1);
-  if (parties) {
-    let declarer = parties.declarer;
-    if (declarer.has(actor)) {
-      states.next(1);
-    }
-  }
-  states.commit();
-  return this;
-};
-
 Builder.prototype.winnerFlag = function(parties, winner, actor) {
   let states = this.tensor.append(1);
   if (parties && winner) {

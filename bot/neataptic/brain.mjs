@@ -6,7 +6,7 @@ import Neataptic from 'neataptic';
 
 export function Brain() {
   this.actions = new Set();
-  this.network = new Neataptic.architect.Perceptron(103, 60, 32);
+  this.network = new Neataptic.architect.Perceptron(102, 60, 32);
 }
 
 Brain.prototype.onbid = function(game, actor, rules) {
@@ -51,13 +51,16 @@ Brain.prototype.onplay = function(game, actor, rules) {
 };
 
 Brain.prototype.onfinished = function(game, winner) {
+  let positive = false;
+
   for (let player of winner.players) {
     if (player.brain == this) {
-      this.remember(this.actions);
+      positive = true;
       break;
     }
   }
 
+  this.remember(this.actions, positive);
   this.actions.clear();
 }
 
@@ -79,20 +82,20 @@ Brain.prototype.observe = function(game) {
   builder.cards(actor.cards)
     .cards(cards)
     .cards(trick.cards())
-    .trumpFlag(lead, order)
     .suits(lead)
-    .declarerFlag(parties, actor)
+    .trumpFlag(lead, order)
     .winnerFlag(parties, winner, actor);
 
   return tensor.states;
 };
 
-Brain.prototype.remember = function(actions) {
+Brain.prototype.remember = function(actions, positive) {
   for (let action of actions) {
     let { input, output } = action;
+    let rate = positive ? +0.001 : -0.0008;
 
     this.network.activate(input, true);
-    this.network.propagate(0.0001, 0, true, output);
+    this.network.propagate(rate, 0, true, output);
   }
 };
 

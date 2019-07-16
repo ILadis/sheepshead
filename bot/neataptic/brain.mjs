@@ -51,16 +51,13 @@ Brain.prototype.onplay = function(game, actor, rules) {
 };
 
 Brain.prototype.onfinished = function(game, winner) {
-  let positive = false;
-
   for (let player of winner.players) {
     if (player.brain == this) {
-      positive = true;
+      this.remember(this.actions);
       break;
     }
   }
 
-  this.remember(this.actions, positive);
   this.actions.clear();
 }
 
@@ -89,13 +86,12 @@ Brain.prototype.observe = function(game) {
   return tensor.states;
 };
 
-Brain.prototype.remember = function(actions, positive) {
+Brain.prototype.remember = function(actions) {
   for (let action of actions) {
     let { input, output } = action;
-    let rate = positive ? +0.001 : -0.0008;
 
     this.network.activate(input, true);
-    this.network.propagate(rate, 0, true, output);
+    this.network.propagate(0.001, 0, true, output);
   }
 };
 

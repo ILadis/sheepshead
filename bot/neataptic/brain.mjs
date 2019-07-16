@@ -1,5 +1,6 @@
 
-import { Tensor, Builder, Indices, Inspector } from './utils.mjs';
+import { Inspector } from './inspector.mjs';
+import { Tensor, Builder, Indices } from './model.mjs';
 
 import Neataptic from 'neataptic';
 

@@ -42,6 +42,25 @@ Inspector.prototype.currentParties = function(actor) {
   return { declarer, defender };
 };
 
+Inspector.prototype.victoriousParty = function(party) {
+  let { contract, trick } = this.game;
+
+  let order = contract.order;
+  let winner = trick.winner(order);
+
+  if (winner) {
+    let { declarer, defender } = party;
+
+    if (declarer.has(winner)) {
+      return declarer;
+    }
+
+    if (defender.has(winner)) {
+      return defender;
+    }
+  }
+};
+
 Inspector.prototype.playedCards = function() {
   let { players } = this.game;
 

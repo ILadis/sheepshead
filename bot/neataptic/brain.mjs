@@ -5,7 +5,6 @@ import { Tensor, Builder, Indices } from './model.mjs';
 import Neataptic from 'neataptic';
 
 export function Brain() {
-  this.actions = new Set();
   this.network = new Neataptic.architect.Perceptron(102, 60, 32);
 }
 
@@ -36,22 +35,26 @@ Brain.prototype.onplay = function(game, actor, rules) {
     output.fill(0);
     output[index] = 1;
 
-    this.actions.add({ input, output });
+    this.action = { input, output };
 
     return card;
   }
 };
 
-Brain.prototype.onfinished = function(game, winner) {
-  for (let player of winner.players) {
+Brain.prototype.oncompleted = function(game, trick) {
+  let inspect = new Inspector(game);
+
+  for (let player of game.players) {
     if (player.brain == this) {
-      this.remember(this.actions);
-      break;
+      let parties = inspect.currentParties(player);
+      let winner = inspect.victoriousParty(parties);
+
+      if (winner && winner.has(player)) {
+        this.remember(this.action, trick.points() || 1);
+      }
     }
   }
-
-  this.actions.clear();
-}
+};
 
 Brain.prototype.observe = function(game) {
   let { actor, trick, contract } = game;
@@ -78,13 +81,14 @@ Brain.prototype.observe = function(game) {
   return tensor.states;
 };
 
-Brain.prototype.remember = function(actions) {
-  for (let action of actions) {
-    let { input, output } = action;
+Brain.prototype.remember = function(action, reward) {
+  let { input, output } = action;
 
-    this.network.activate(input, true);
-    this.network.propagate(0.001, 0, true, output);
-  }
+  let rate = 0.0001 * reward;
+  let momentum = 0;
+
+  this.network.activate(input, true);
+  this.network.propagate(rate, momentum, true, output);
 };
 
 Brain.prototype.clone = function() {

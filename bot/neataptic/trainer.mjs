@@ -1,4 +1,5 @@
 
+import { Contract } from '../../contract.mjs';
 import { Arena } from './arena.mjs';
 
 export const Trainer = Object.create(null);
@@ -13,7 +14,10 @@ Trainer.train = async function(brain, options = {}) {
   do {
     let arena = new Arena();
     for (let index of [1, 2, 3, 4]) {
-      arena.join(brain.clone());
+      let clone = brain.clone();
+      clone.onbid = bidder(clone);
+
+      arena.join(clone);
     }
 
     let result = await arena.compete(runs);
@@ -22,8 +26,24 @@ Trainer.train = async function(brain, options = {}) {
     callback();
   } while (--target >= 0);
 
-  return brain;
+  return brain.clone();
 };
+
+function bidder(brain) {
+  return (game, actor, rules) => {
+    if (actor.brain != brain) {
+      return undefined
+    }
+
+    let contracts = Array.from(Contract).filter(c => c.value == 1);
+    let options = Array.from(rules.options(contracts));
+
+    let index = Math.floor(Math.random() * options.length);
+    let contract = options[index];
+
+    return contract;
+  };
+}
 
 function elitism({ scores, bots }) {
   let highest = 0, brain;

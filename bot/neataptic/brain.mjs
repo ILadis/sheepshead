@@ -1,5 +1,4 @@
 
-import { Contract } from '../../contract.mjs';
 import { Tensor, Builder, Indices, Inspector } from './utils.mjs';
 
 import Neataptic from 'neataptic';
@@ -9,16 +8,8 @@ export function Brain() {
   this.network = new Neataptic.architect.Perceptron(102, 60, 32);
 }
 
-Brain.prototype.onbid = function(game, actor, rules) {
-  if (actor.brain == this) {
-    let contracts = Array.from(Contract).filter(c => c.value == 1);
-    let options = Array.from(rules.options(contracts));
-
-    let index = Math.floor(Math.random() * options.length);
-    let contract = options[index];
-
-    return contract;
-  }
+Brain.prototype.onbid = function() {
+  return undefined;
 };
 
 Brain.prototype.onplay = function(game, actor, rules) {

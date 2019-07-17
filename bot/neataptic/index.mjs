@@ -25,6 +25,8 @@ import('../../brains/network.json').then((network) => {
   let brain = new Brain();
   brain.deserialize(network.default);
 
+  Process.stderr.write(' (loaded network from json)');
+
   return brain;
 }, () => {
   return new Brain();

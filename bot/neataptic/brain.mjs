@@ -6,6 +6,7 @@ import Neataptic from 'neataptic';
 
 export function Brain() {
   this.network = new Neataptic.architect.Perceptron(102, 60, 32);
+  this.actions = new Set();
 }
 
 Brain.prototype.onbid = function() {
@@ -18,17 +19,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
     let output = this.network.activate(input);
 
     do {
-      var highest = 0, index = 0;
-      for (let i = 0; i < output.length; i++) {
-        let value = output[i];
-        if (value > highest) {
-          highest = value;
-          index = i;
-        }
-      }
-
-      output[index] = 0;
-
+      var index = this.sample(output);
       var card = Indices.cards.valueOf(index);
     } while (!rules.valid(card));
 
@@ -36,6 +27,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
     output[index] = 1;
 
     this.action = { input, output };
+    this.actions.add({ input, output });
 
     return card;
   }
@@ -49,9 +41,38 @@ Brain.prototype.oncompleted = function(game, trick) {
       let parties = inspect.currentParties(player);
       let winner = inspect.victoriousParty(parties);
 
+      let reward = trick.points() || 1;
+
       if (winner && winner.has(player)) {
-        this.remember(this.action, trick.points() || 1);
+        this.remember(this.action, reward);
       }
+    }
+  }
+};
+
+Brain.prototype.onfinished = function(game, winner) {
+  for (let player of winner.players) {
+    if (player.brain == this) {
+      let reward = winner.points();
+
+      for (let action of this.actions) {
+        this.remember(action, reward);
+      }
+    }
+  }
+
+  this.actions.clear();
+};
+
+Brain.prototype.sample = function(output) {
+  let distribution = output.reduce((v1, v2) => v1 + v2);
+  let sample = Math.random() * distribution;
+
+  for (let i = 0; i < output.length; i++) {
+    sample -= output[i];
+    if (sample < 0) {
+      output[i] = 0;
+      return i;
     }
   }
 };

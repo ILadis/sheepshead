@@ -6,20 +6,14 @@ import { Trainer } from './trainer.mjs';
 import { Brain } from './brain.mjs';
 
 const options = {
-  // Function called after each new generation
-  callback,
+  // Function called after each simulation
+  callback: every(100),
 
-  // Number of iterations for each generation
-  runs: 1000,
-  // Number of generations to evolve
-  target: 500
+  // Number of games to simulate
+  runs: 100000
 };
 
 Process.stderr.write('Starting training');
-
-function callback() {
-  Process.stderr.write('.');
-};
 
 import('../../brains/network.json').then((network) => {
   let brain = new Brain();
@@ -40,4 +34,13 @@ import('../../brains/network.json').then((network) => {
 
   Process.stdout.write(json);
 });
+
+function every(count) {
+  let runs = 0;
+  return () => {
+    if (++runs % count == 0) {
+      Process.stderr.write('.');
+    }
+  };
+};
 

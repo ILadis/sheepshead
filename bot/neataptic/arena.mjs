@@ -10,7 +10,7 @@ Arena.prototype.join = function(brain) {
   this.brains.add(brain);
 };
 
-Arena.prototype.compete = async function(runs = 100) {
+Arena.prototype.compete = async function(runs, callback) {
   let game = new Game();
   let brains = this.brains.values();
 
@@ -26,14 +26,15 @@ Arena.prototype.compete = async function(runs = 100) {
   };
 
   game.onproceed = () => {
+    callback();
     return --runs >= 0;
   };
 
   await game.run();
 
-  let scores = game.scores;
-  let bots = game.players;
-
-  return { scores, bots };
+  return {
+    scores: game.scores,
+    bots: game.players
+  };
 };
 

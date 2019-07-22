@@ -16,35 +16,13 @@ Brain.prototype.onbid = function() {
 
 Brain.prototype.onturn = function(game, actor) {
   if (actor.brain == this) {
-    let state = this.state;
-    let action = this.action;
-
-    // TODO last turn won't save experience
-    if (state && action) {
-      let reward = this.reward || 0;
-      let next = this.observe(game);
-
-      let exp = { state, action, reward, next };
-      this.memory.save(exp);
-    }
-
-    let sample = this.memory.sample(100);
-    if (sample) {
-      for (let exp of sample) {
-        this.remember(exp);
-      }
-    }
-
-    let evolve = this.step % 10 == 0;
-    if (evolve) {
-      this.target = this.policy.clone();
-    }
+    this.remember(game, actor);
   }
 };
 
 Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
-    let state = this.observe(game);
+    let state = this.observe(game, actor);
 
     if (this.explore()) {
       var card = this.randomly(actor, rules);
@@ -52,6 +30,9 @@ Brain.prototype.onplay = function(game, actor, rules) {
       var card = this.greedy(state, rules);
     }
 
+    let options = new Set(rules.options(actor.cards));
+
+    this.options = options;
     this.state = state;
     this.action = card;
 
@@ -74,10 +55,24 @@ Brain.prototype.oncompleted = function(game, trick) {
       } else {
         reward = -reward;
       }
+
+      break;
     }
   }
 
   this.reward = reward;
+};
+
+Brain.prototype.onfinished = function(game) {
+  for (let player of game.players) {
+    if (player.brain == this) {
+      this.remember(game, player, true);
+      break;
+    }
+  }
+
+  this.optimize();
+  this.evolve();
 };
 
 Brain.prototype.explore = function() {
@@ -121,8 +116,8 @@ Brain.prototype.greedy = function(state, rules) {
   return card;
 };
 
-Brain.prototype.observe = function(game) {
-  let { actor, trick, contract } = game;
+Brain.prototype.observe = function(game, actor) {
+  let { trick, contract } = game;
 
   let order = contract.order;
   let lead = trick.lead();
@@ -146,30 +141,72 @@ Brain.prototype.observe = function(game) {
   return tensor.states;
 };
 
-Brain.prototype.remember = function(exp) {
-  let { state, action, reward, next } = exp;
+Brain.prototype.remember = function(game, actor, final = false) {
+  let state = this.state;
+  let action = this.action;
 
-  var output = this.target.activate(next);
-  let max = output.reduce((p, v) => p > v ? p : v);
+  if (state && action) {
+    let options = this.options;
+    let reward = this.reward || 0;
+    let next = this.observe(game, actor);
 
-  let discount = 0.9;
+    let exp = { state, action, options, reward, next, final };
+    this.memory.save(exp);
+  }
 
-  let value = reward + discount * max;
-  let index = Indices.cards.indexOf(action);
+  this.state = null;
+  this.action = null;
+};
 
-  let rate = 0.001;
-  let momentum = 0;
+Brain.prototype.evolve = function() {
+  let episodes = this.episodes || 0;
 
-  output[index] = value;
+  let evolve = episodes % 10 == 0;
+  if (evolve) {
+    this.target = this.policy.clone();
+  }
 
-  this.policy.activate(state, true);
-  this.policy.propagate(rate, momentum, true, output);
+  this.episodes = episodes + 1;
+};
+
+Brain.prototype.optimize = function() {
+  let sample = this.memory.sample(100) || [];
+
+  for (let exp of sample) {
+    let { state, action, options, reward, next, final } = exp;
+
+    var output = this.target.activate(next);
+    let max = 0;
+
+    if (!final) {
+      max = output.reduce((p, v) => p > v ? p : v);
+    }
+
+    let discount = 0.7;
+
+    let value = reward + discount * max;
+    let index = Indices.cards.indexOf(action);
+
+    let rate = 0.001;
+    let momentum = 0;
+
+    output[index] = value;
+
+    for (let i = 0; i < output.length; i++) {
+      let card = Indices.cards.valueOf(i);
+      if (!options.has(card)) {
+        output[i] = 0;
+      }
+    }
+
+    this.policy.activate(state, true);
+    this.policy.propagate(rate, momentum, true, output);
+  }
 };
 
 Brain.prototype.clone = function() {
   let network = this.serialize();
-  let brain = new Brain(network);
-  return brain;
+  return new Brain(network);
 };
 
 Brain.prototype.serialize = function() {

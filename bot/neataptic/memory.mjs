@@ -5,11 +5,16 @@ export function Memory(capacity) {
 }
 
 Memory.prototype.save = function(experience) {
+  if (!experience) {
+    return false;
+  }
+
   let capacity = this.experiences.length;
   let index = this.size;
 
   this.experiences[index % capacity] = experience;
-  this.size++;
+
+  return ++this.size;
 };
 
 Memory.prototype.sample = function(batch) {

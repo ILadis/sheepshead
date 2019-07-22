@@ -50,25 +50,10 @@ Builder.prototype.suits = function(card) {
   return this;
 };
 
-Builder.prototype.trumpFlag = function(card, order) {
+Builder.prototype.flag = function(flag) {
   let states = this.tensor.append(1);
-  if (order.trumps.contains(card)) {
+  if (flag) {
     states.next(1);
-  }
-  states.commit();
-  return this;
-};
-
-Builder.prototype.winnerFlag = function(parties, winner, actor) {
-  let states = this.tensor.append(1);
-  if (parties && winner) {
-    let { declarer, defender } = parties;
-    if (declarer.has(actor) && declarer.has(winner)) {
-      states.next(1);
-    }
-    else if (defender.has(actor) && defender.has(winner)) {
-      states.next(1);
-    }
   }
   states.commit();
   return this;

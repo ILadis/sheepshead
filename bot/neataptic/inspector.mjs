@@ -42,7 +42,7 @@ Inspector.prototype.currentParties = function(actor) {
   return { declarer, defender };
 };
 
-Inspector.prototype.victoriousParty = function(party) {
+Inspector.prototype.winningParty = function(party) {
   let { contract, trick } = this.game;
 
   let order = contract.order;
@@ -60,6 +60,13 @@ Inspector.prototype.victoriousParty = function(party) {
     }
   }
 };
+
+Inspector.prototype.isWinner = function(actor) {
+  let parties = this.currentParties(actor);
+  let winner = this.winningParty(parties);
+
+  return winner && winner.has(actor);
+}
 
 Inspector.prototype.playedCards = function() {
   let { players } = this.game;

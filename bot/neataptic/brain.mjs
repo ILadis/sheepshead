@@ -5,9 +5,9 @@ import { Memory } from './memory.mjs';
 import { Tensor, Builder, Indices } from './model.mjs';
 
 export function Brain(network) {
-  this.policy = network ? DeepQ.from(network) : new DeepQ(102, 60, 32);
-  this.target = this.policy.clone();
   this.memory = new Memory(1000);
+  this.policy = network ? DeepQ.from(network) : new DeepQ(102, 32, 32, 32, 32);
+  this.target = this.policy.clone();
 }
 
 Brain.prototype.onbid = function() {
@@ -16,7 +16,8 @@ Brain.prototype.onbid = function() {
 
 Brain.prototype.onturn = function(game, actor) {
   if (actor.brain == this) {
-    this.remember(game, actor);
+    let exp = this.experience(game, actor);
+    this.memory.save(exp);
   }
 };
 
@@ -30,9 +31,6 @@ Brain.prototype.onplay = function(game, actor, rules) {
       var card = this.greedy(state, rules);
     }
 
-    let options = new Set(rules.options(actor.cards));
-
-    this.options = options;
     this.state = state;
     this.action = card;
 
@@ -45,17 +43,8 @@ Brain.prototype.oncompleted = function(game, trick) {
 
   for (let player of game.players) {
     if (player.brain == this) {
-      let parties = inspect.currentParties(player);
-      let winner = inspect.victoriousParty(parties);
-
-      var reward = trick.points() || 1;
-
-      if (winner && winner.has(player)) {
-        reward = +reward;
-      } else {
-        reward = -reward;
-      }
-
+      let winner = inspect.isWinner(player);
+      var reward = (winner ? +1 : -1) * (trick.points() || 1);
       break;
     }
   }
@@ -66,7 +55,8 @@ Brain.prototype.oncompleted = function(game, trick) {
 Brain.prototype.onfinished = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      this.remember(game, player, true);
+      let exp = this.experience(game, player, true);
+      this.memory.save(exp);
       break;
     }
   }
@@ -121,41 +111,37 @@ Brain.prototype.observe = function(game, actor) {
 
   let order = contract.order;
   let lead = trick.lead();
-  let winner = trick.winner(order);
 
   let inspect = new Inspector(game);
-
-  let cards = inspect.playedCards();
-  let parties = inspect.currentParties(actor);
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
   builder.cards(actor.cards)
-    .cards(cards)
+    .cards(inspect.playedCards())
     .cards(trick.cards())
     .suits(lead)
-    .trumpFlag(lead, order)
-    .winnerFlag(parties, winner, actor);
+    .flag(order.trumps.contains(lead))
+    .flag(inspect.isWinner(actor));
 
   return tensor.states;
 };
 
-Brain.prototype.remember = function(game, actor, final = false) {
+Brain.prototype.experience = function(game, actor, final = false) {
   let state = this.state;
   let action = this.action;
 
   if (state && action) {
-    let options = this.options;
     let reward = this.reward || 0;
     let next = this.observe(game, actor);
 
-    let exp = { state, action, options, reward, next, final };
-    this.memory.save(exp);
+    var exp = { state, action, reward, next, final };
+
+    this.state = null;
+    this.action = null;
   }
 
-  this.state = null;
-  this.action = null;
+  return exp;
 };
 
 Brain.prototype.evolve = function() {
@@ -173,7 +159,7 @@ Brain.prototype.optimize = function() {
   let sample = this.memory.sample(100) || [];
 
   for (let exp of sample) {
-    let { state, action, options, reward, next, final } = exp;
+    let { state, action, reward, next, final } = exp;
 
     var output = this.target.activate(next);
     let max = 0;
@@ -191,13 +177,6 @@ Brain.prototype.optimize = function() {
     let momentum = 0;
 
     output[index] = value;
-
-    for (let i = 0; i < output.length; i++) {
-      let card = Indices.cards.valueOf(i);
-      if (!options.has(card)) {
-        output[i] = 0;
-      }
-    }
 
     this.policy.activate(state, true);
     this.policy.propagate(rate, momentum, true, output);

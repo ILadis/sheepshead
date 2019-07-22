@@ -10,7 +10,7 @@ const options = {
   callback: every(100),
 
   // Number of games to simulate
-  runs: 100000
+  episodes: 100000
 };
 
 Process.stderr.write('Starting training');

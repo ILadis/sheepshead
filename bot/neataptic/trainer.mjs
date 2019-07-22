@@ -1,56 +1,51 @@
 
+import { Game } from '../../game.mjs';
 import { Contract } from '../../contract.mjs';
-import { Arena } from './arena.mjs';
+import { Bot } from '../bot.mjs';
 
 export const Trainer = Object.create(null);
 
 Trainer.train = async function(brain, options = {}) {
   let {
-    runs = 1000,
+    episodes = 1000,
     callback = () => {}
   } = options;
 
-  let arena = new Arena();
-  for (let index of [1, 2, 3, 4]) {
+  let game = new Game();
+
+  game.onjoin = (index) => {
     let clone = brain.clone();
-    clone.onbid = bidder(clone);
+    clone.onbid = bidder;
 
-    arena.join(clone);
-  }
-  
-  let result = await arena.compete(runs, callback);
-  let fittest = elitism(result);
+    let bot = new Bot(index, clone);
+    bot.thinktime = 0;
 
-  return fittest.brain;
+    bot.attach(game);
+
+    return bot;
+  };
+
+  game.onproceed = () => {
+    callback();
+    return --episodes >= 0;
+  };
+
+  await game.run();
+
+  return game.players[0].brain;
 };
 
-function bidder(brain) {
-  return (game, actor, rules) => {
-    if (actor.brain != brain) {
-      return undefined
-    }
-
-    let contracts = Array.from(Contract).filter(c => c.value == 1);
-    let options = Array.from(rules.options(contracts));
-
-    let index = Math.floor(Math.random() * options.length);
-    let contract = options[index];
-
-    return contract;
-  };
-}
-
-function elitism({ scores, bots }) {
-  let highest = 0, fittest;
-  for (let bot of bots) {
-    let wins = scores.totalOf(bot);
-
-    if (wins > highest) {
-      fittest = bot;
-      highest = wins;
-    }
+function bidder(game, actor, rules) {
+  if (actor.brain != this) {
+    return undefined
   }
 
-  return fittest;
+  let contracts = Array.from(Contract).filter(c => c.value == 1);
+  let options = Array.from(rules.options(contracts));
+
+  let index = Math.floor(Math.random() * options.length);
+  let contract = options[index];
+
+  return contract;
 }
 

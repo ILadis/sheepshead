@@ -1,33 +1,59 @@
 
 import { Inspector } from './inspector.mjs';
+import { DeepQ } from './network.mjs';
+import { Memory } from './memory.mjs';
 import { Tensor, Builder, Indices } from './model.mjs';
 
-import Neataptic from 'neataptic';
-
-export function Brain() {
-  this.network = new Neataptic.architect.Perceptron(102, 60, 32);
-  this.actions = new Set();
+export function Brain(network) {
+  this.policy = network ? DeepQ.from(network) : new DeepQ(102, 60, 32);
+  this.target = this.policy.clone();
+  this.memory = new Memory(1000);
 }
 
 Brain.prototype.onbid = function() {
   return undefined;
 };
 
+Brain.prototype.onturn = function(game, actor) {
+  if (actor.brain == this) {
+    let state = this.state;
+    let action = this.action;
+
+    // TODO last turn won't save experience
+    if (state && action) {
+      let reward = this.reward || 0;
+      let next = this.observe(game);
+
+      let exp = { state, action, reward, next };
+      this.memory.save(exp);
+    }
+
+    let sample = this.memory.sample(100);
+    if (sample) {
+      for (let exp of sample) {
+        this.remember(exp);
+      }
+    }
+
+    let evolve = this.step % 10 == 0;
+    if (evolve) {
+      this.target = this.policy.clone();
+    }
+  }
+};
+
 Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
-    let input = this.observe(game);
-    let output = this.network.activate(input);
+    let state = this.observe(game);
 
-    do {
-      var index = this.sample(output);
-      var card = Indices.cards.valueOf(index);
-    } while (!rules.valid(card));
+    if (this.explore()) {
+      var card = this.randomly(actor, rules);
+    } else {
+      var card = this.greedy(state, rules);
+    }
 
-    output.fill(0);
-    output[index] = 1;
-
-    this.action = { input, output };
-    this.actions.add({ input, output });
+    this.state = state;
+    this.action = card;
 
     return card;
   }
@@ -41,40 +67,58 @@ Brain.prototype.oncompleted = function(game, trick) {
       let parties = inspect.currentParties(player);
       let winner = inspect.victoriousParty(parties);
 
-      let reward = trick.points() || 1;
+      var reward = trick.points() || 1;
 
       if (winner && winner.has(player)) {
-        this.remember(this.action, reward);
-      }
-    }
-  }
-};
-
-Brain.prototype.onfinished = function(game, winner) {
-  for (let player of winner.players) {
-    if (player.brain == this) {
-      let reward = winner.points();
-
-      for (let action of this.actions) {
-        this.remember(action, reward);
+        reward = +reward;
+      } else {
+        reward = -reward;
       }
     }
   }
 
-  this.actions.clear();
+  this.reward = reward;
 };
 
-Brain.prototype.sample = function(output) {
-  let distribution = output.reduce((v1, v2) => v1 + v2);
-  let sample = Math.random() * distribution;
+Brain.prototype.explore = function() {
+  let step = this.step || 0;
 
-  for (let i = 0; i < output.length; i++) {
-    sample -= output[i];
-    if (sample < 0) {
-      output[i] = 0;
-      return i;
+  let end = 0.1;
+  let start = 1;
+  let decay = 0.0001;
+
+  let explore = end + (start - end) * Math.exp(-1 * step * decay);
+  let rand = Math.random();
+
+  this.step = step + 1;
+
+  return explore > rand;
+};
+
+Brain.prototype.randomly = function(actor, rules) {
+  let options = Array.from(rules.options(actor.cards));
+  let index = Math.floor(Math.random() * options.length);
+  return options[index];
+};
+
+Brain.prototype.greedy = function(state, rules) {
+  let output = this.policy.activate(state);
+
+  do {
+    var highest = -Infinity, index = 0;
+    for (let i = 0; i < output.length; i++) {
+      if (output[i] > highest) {
+        highest = output[i];
+        index = i;
+      }
     }
-  }
+
+    output[index] = NaN;
+
+    var card = Indices.cards.valueOf(index);
+  } while (!rules.valid(card));
+
+  return card;
 };
 
 Brain.prototype.observe = function(game) {
@@ -102,33 +146,33 @@ Brain.prototype.observe = function(game) {
   return tensor.states;
 };
 
-Brain.prototype.remember = function(action, reward) {
-  let { input, output } = action;
+Brain.prototype.remember = function(exp) {
+  let { state, action, reward, next } = exp;
 
-  let rate = 0.0001 * reward;
+  var output = this.target.activate(next);
+  let max = output.reduce((p, v) => p > v ? p : v);
+
+  let discount = 0.9;
+
+  let value = reward + discount * max;
+  let index = Indices.cards.indexOf(action);
+
+  let rate = 0.001;
   let momentum = 0;
 
-  this.network.activate(input, true);
-  this.network.propagate(rate, momentum, true, output);
+  output[index] = value;
+
+  this.policy.activate(state, true);
+  this.policy.propagate(rate, momentum, true, output);
 };
 
 Brain.prototype.clone = function() {
-  let json = this.network.toJSON();
-  let network = Neataptic.Network.fromJSON(json);
-
-  let brain = new Brain();
-  brain.network = network;
-
+  let network = this.serialize();
+  let brain = new Brain(network);
   return brain;
 };
 
 Brain.prototype.serialize = function() {
-  let json = this.network.toJSON();
-  return json;
-};
-
-Brain.prototype.deserialize = function(json) {
-  let network = Neataptic.Network.fromJSON(json);
-  this.network = network;
+  return this.policy.serialize();
 };
 

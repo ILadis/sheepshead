@@ -144,8 +144,9 @@ Resources.bots['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let brain = new Brain()
-  brain.deserialize(entity);
+  let brain = new Brain(entity)
+  brain.explore = () => false;
+  brain.remember = () => false;
 
   let player = new Bot(index, brain);
   player.name = entity.name;
@@ -214,7 +215,7 @@ Resources.players['POST'] = PreFilter.chain(
 Resources.players['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  var { game: { actor, players/*, scores*/ }, url } = request;
+  var { game: { actor, players }, url } = request;
 
   let index = Number(url.query['index']);
   var players = Array.from(players);

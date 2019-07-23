@@ -61,21 +61,24 @@ Brain.prototype.onfinished = function(game) {
     }
   }
 
-  this.optimize();
-  this.evolve();
+  let sample = this.memory.sample(100);
+  if (sample) {
+    this.optimize(sample);
+    this.evolve();
+  }
 };
 
 Brain.prototype.explore = function() {
-  let step = this.step || 0;
+  let expls = this.expls || 0;
 
   let end = 0.1;
   let start = 1;
   let decay = 0.0001;
 
-  let explore = end + (start - end) * Math.exp(-1 * step * decay);
+  let explore = end + (start - end) * Math.exp(-1 * expls * decay);
   let rand = Math.random();
 
-  this.step = step + 1;
+  this.expls = expls + 1;
 
   return explore > rand;
 };
@@ -145,19 +148,17 @@ Brain.prototype.experience = function(game, actor, final = false) {
 };
 
 Brain.prototype.evolve = function() {
-  let episodes = this.episodes || 0;
+  let evols = this.evols || 0;
 
-  let evolve = episodes % 10 == 0;
+  let evolve = evols % 10 == 0;
   if (evolve) {
     this.target = this.policy.clone();
   }
 
-  this.episodes = episodes + 1;
+  this.evols = evols + 1;
 };
 
-Brain.prototype.optimize = function() {
-  let sample = this.memory.sample(100) || [];
-
+Brain.prototype.optimize = function(sample) {
   for (let exp of sample) {
     let { state, action, reward, next, final } = exp;
 

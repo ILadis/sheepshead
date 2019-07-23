@@ -138,7 +138,7 @@ Resources.bots['POST'] = PreFilter.chain(
   let index = input.args[0];
 
   try {
-    var { Brain } = await import('../../bot/neataptic/brain.mjs');
+    var { Brain } = await import('../../bot/deepq/brain.mjs');
   } catch {
     response.writeHead(501);
     return response.end();

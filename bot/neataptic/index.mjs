@@ -16,8 +16,8 @@ const options = {
 Process.stderr.write('Starting training');
 
 import('../../brains/network.json').then((network) => {
-  let brain = new Brain();
-  brain.deserialize(network.default);
+  let brain = new Brain(network.default);
+  brain.explore = () => false;
 
   Process.stderr.write(' (loaded network from json)');
 

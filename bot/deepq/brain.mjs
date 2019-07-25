@@ -55,7 +55,7 @@ Brain.prototype.oncompleted = function(game, trick) {
 Brain.prototype.onfinished = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      let exp = this.experience(game, player, true);
+      let exp = this.experience(game, player);
       this.memory.save(exp);
       break;
     }
@@ -73,7 +73,7 @@ Brain.prototype.explore = function() {
 
   let end = 0.1;
   let start = 1;
-  let decay = 0.0001;
+  let decay = 0.000021;
 
   let explore = end + (start - end) * Math.exp(-1 * expls * decay);
   let rand = Math.random();
@@ -130,12 +130,13 @@ Brain.prototype.observe = function(game, actor) {
   return tensor.states;
 };
 
-Brain.prototype.experience = function(game, actor, final = false) {
+Brain.prototype.experience = function(game, actor) {
   let state = this.state;
   let action = this.action;
 
   if (state && action) {
     let reward = this.reward || 0;
+    let final = game.phase.name != 'playing';
     let next = this.observe(game, actor);
 
     var exp = { state, action, reward, next, final };

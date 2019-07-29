@@ -163,10 +163,10 @@ Brain.prototype.optimize = function(sample) {
   for (let exp of sample) {
     let { state, action, reward, next, final } = exp;
 
-    var output = this.target.activate(next);
     let max = 0;
 
     if (!final) {
+      let output = this.target.activate(next);
       max = output.reduce((p, v) => p > v ? p : v);
     }
 
@@ -178,9 +178,9 @@ Brain.prototype.optimize = function(sample) {
     let rate = 0.001;
     let momentum = 0;
 
+    let output = this.policy.activate(state, true);
     output[index] = value;
 
-    this.policy.activate(state, true);
     this.policy.propagate(rate, momentum, true, output);
   }
 };

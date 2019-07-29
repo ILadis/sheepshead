@@ -1,46 +1,41 @@
 
-import OS from 'os';
-import Process from 'process';
-
+import File from 'fs';
 import { Trainer } from './trainer.mjs';
-import { Brain } from './brain.mjs';
 
 const options = {
   // Function called after each simulation
-  callback: every(100),
+  callback: every(10_000, save()),
 
   // Number of games to simulate
-  episodes: 100000
+  episodes: 10_000_000
 };
 
-Process.stderr.write('Starting training');
+Trainer.train(options);
 
-import('../../brains/network.json').then((network) => {
-  let brain = new Brain(network.default);
-  brain.explore = () => false;
 
-  Process.stderr.write(' (loaded network from json)');
+function save() {
+  let version = 1;
+  return ([brain]) => {
+    let name = `Snapshot Gen #${version}`;
 
-  return brain;
-}, () => {
-  return new Brain();
-}).then((brain) => {
-  return Trainer.train(brain, options)
-}).then((brain) => {
-  Process.stderr.write(` Finished!${OS.EOL}`);
+    let network = brain.serialize();
+    network.name = name;
 
-  let network = brain.serialize();
-  let json = JSON.stringify(network);
+    let json = JSON.stringify(network);
 
-  Process.stdout.write(json);
-});
+    let file = `snapshot-${version}.json`;
+    File.writeFileSync(file, json);
 
-function every(count) {
-  let runs = 0;
-  return () => {
-    if (++runs % count == 0) {
-      Process.stderr.write('.');
+    version++;
+  };
+}
+
+function every(count, fn) {
+  let steps = 1;
+  return (...args) => {
+    if (steps++ % count == 0) {
+      fn(...args);
     }
   };
-};
+}
 

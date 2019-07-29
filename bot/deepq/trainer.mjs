@@ -2,22 +2,26 @@
 import { Game } from '../../game.mjs';
 import { Contract } from '../../contract.mjs';
 import { Bot } from '../bot.mjs';
+import { Brain } from './brain.mjs';
 
 export const Trainer = Object.create(null);
 
-Trainer.train = async function(brain, options = {}) {
+Trainer.train = async function(options = {}) {
   let {
     episodes = 1000,
     callback = () => {}
   } = options;
 
   let game = new Game();
+  let brains = new Array();
 
   game.onjoin = (index) => {
-    let clone = brain.clone();
-    clone.onbid = bidder;
+    let brain = new Brain();
+    brain.onbid = bidder;
 
-    let bot = new Bot(index, clone);
+    brains.push(brain);
+
+    let bot = new Bot(index, brain);
     bot.thinktime = 0;
 
     bot.attach(game);
@@ -26,13 +30,13 @@ Trainer.train = async function(brain, options = {}) {
   };
 
   game.onproceed = () => {
-    callback();
+    callback(brains);
     return --episodes >= 0;
   };
 
   await game.run();
 
-  return game.players[0].brain;
+  return brains;
 };
 
 function bidder(game, actor, rules) {

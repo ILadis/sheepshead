@@ -142,29 +142,27 @@ Brain.prototype.count = function(game) {
 Brain.prototype.winning = function(game, actor) {
   let { contract, trick, players } = game;
 
+  let winner = trick.winner(contract.order);
+  if (winner == actor) {
+    return true;
+  }
+
   let declarer = new Set();
   let { owner, partner } = contract;
 
-  if (actor.cards.contains(partner)) {
-    partner = actor;
-  }
+  declarer.add(owner);
 
-  for (let player of players) {
-    switch (player) {
-    case owner:
-    case partner:
-      declarer.add(player);
-      break;
-    }
+  if (players.includes(partner)) {
+    declarer.add(partner);
+  } else if (actor.cards.contains(partner)) {
+    declarer.add(partner = actor);
   }
-
-  let winner = trick.winner(contract.order);
 
   if (declarer.has(partner)) {
     return declarer.has(winner) == declarer.has(actor);
   }
   
-  return winner == actor;
+  return false;
 };
 
 Brain.prototype.experience = function(game, actor) {

@@ -4,14 +4,13 @@ import { Trainer } from './trainer.mjs';
 
 const options = {
   // Function called after each simulation
-  callback: every(10_000, save()),
+  callback: every(10000, save()),
 
   // Number of games to simulate
-  episodes: 10_000_000
+  episodes: 10000000
 };
 
 Trainer.train(options);
-
 
 function save() {
   let version = 1;

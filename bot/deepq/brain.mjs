@@ -85,7 +85,7 @@ Brain.prototype.randomly = function(actor, rules) {
 };
 
 Brain.prototype.greedy = function(state, rules) {
-  let output = this.policy.activate(state);
+  let output = this.policy.noTraceActivate(state);
 
   do {
     var highest = -Infinity, index = 0;
@@ -158,7 +158,7 @@ Brain.prototype.winning = function(game, actor) {
     declarer.add(partner = actor);
   }
 
-  if (declarer.has(partner)) {
+  if (!partner || declarer.has(partner)) {
     return declarer.has(winner) == declarer.has(actor);
   }
   
@@ -210,7 +210,7 @@ Brain.prototype.optimize = function(experiences) {
 
     let max = 0;
     if (!final) {
-      let output = this.target.activate(next);
+      let output = this.target.noTraceActivate(next);
       max = output.reduce((p, v) => p > v ? p : v);
     }
 

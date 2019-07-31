@@ -143,8 +143,8 @@ Brain.prototype.winning = function(game, actor) {
   let { contract, trick, players } = game;
 
   let winner = trick.winner(contract.order);
-  if (winner == actor) {
-    return true;
+  if (!winner) {
+    return false;
   }
 
   let declarer = new Set();
@@ -161,8 +161,8 @@ Brain.prototype.winning = function(game, actor) {
   if (!partner || declarer.has(partner)) {
     return declarer.has(winner) == declarer.has(actor);
   }
-  
-  return false;
+
+  return winner == actor;
 };
 
 Brain.prototype.experience = function(game, actor) {

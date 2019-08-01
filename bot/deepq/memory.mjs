@@ -31,11 +31,10 @@ Memory.prototype.sample = function(batch) {
   }
 };
 
-export function Experience({ state, action, reward, next, final }) {
+export function Experience({ state, action, reward, next }) {
   this.state = state;
   this.action = action;
   this.reward = reward;
   this.next = next;
-  this.final = final;
 }
 

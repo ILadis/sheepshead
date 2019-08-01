@@ -173,12 +173,14 @@ Brain.prototype.gainExperience = function(game, player) {
     let reward = this.reward || 0;
     let final = game.phase.name != 'playing';
 
-    let next = this.observe(game, player);
+    if (!final) {
+      var next = this.observe(game, player);
+    }
 
     this.state = null;
     this.action = null;
 
-    return new Experience({ state, action, reward, next, final });
+    return new Experience({ state, action, reward, next });
   }
 };
 
@@ -204,10 +206,10 @@ Brain.prototype.evolve = function() {
 
 Brain.prototype.optimize = function(experiences) {
   for (let exp of experiences) {
-    let { state, action, reward, next, final } = exp;
+    let { state, action, reward, next } = exp;
 
     let max = 0;
-    if (!final) {
+    if (next) {
       let output = this.target.noTraceActivate(next);
       max = output.reduce((p, v) => p > v ? p : v);
     }

@@ -145,7 +145,7 @@ Resources.bots['POST'] = PreFilter.chain(
   }
 
   let brain = new Brain(entity);
-  brain.explore = () => false;
+  brain.wantExplore = () => false;
 
   let player = new Bot(index, brain);
   player.name = entity.name;

@@ -15,7 +15,7 @@ Brain.prototype.onbid = function() {
 
 Brain.prototype.onturn = function(game, actor) {
   if (actor.brain == this) {
-    let exp = this.experience(game, actor);
+    let exp = this.gainExperience(game, actor);
     this.memory.save(exp);
   }
 };
@@ -24,10 +24,10 @@ Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
     let state = this.observe(game, actor);
 
-    if (this.explore()) {
-      var card = this.randomly(actor, rules);
+    if (this.wantExplore()) {
+      var card = this.actRandomly(actor, rules);
     } else {
-      var card = this.greedy(state, rules);
+      var card = this.actGreedy(state, rules);
     }
 
     this.state = state;
@@ -40,7 +40,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
 Brain.prototype.oncompleted = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      let reward = this.gather(game, player);
+      let reward = this.gainReward(game, player);
       this.reward = reward;
       break;
     }
@@ -50,7 +50,7 @@ Brain.prototype.oncompleted = function(game) {
 Brain.prototype.onfinished = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      let exp = this.experience(game, player);
+      let exp = this.gainExperience(game, player);
       this.memory.save(exp);
       break;
     }
@@ -63,7 +63,7 @@ Brain.prototype.onfinished = function(game) {
   }
 };
 
-Brain.prototype.explore = function() {
+Brain.prototype.wantExplore = function() {
   let expls = this.expls || 0;
 
   let end = 0.1;
@@ -78,13 +78,13 @@ Brain.prototype.explore = function() {
   return explore > rand;
 };
 
-Brain.prototype.randomly = function(actor, rules) {
-  let options = Array.from(rules.options(actor.cards));
+Brain.prototype.actRandomly = function(player, rules) {
+  let options = Array.from(rules.options(player.cards));
   let index = Math.floor(Math.random() * options.length);
   return options[index];
 };
 
-Brain.prototype.greedy = function(state, rules) {
+Brain.prototype.actGreedy = function(state, rules) {
   let output = this.policy.noTraceActivate(state);
 
   do {
@@ -104,19 +104,19 @@ Brain.prototype.greedy = function(state, rules) {
   return card;
 };
 
-Brain.prototype.observe = function(game, actor) {
+Brain.prototype.observe = function(game, player) {
   let { trick, contract } = game;
 
   let order = contract.order;
   let lead = trick.lead();
 
-  let cards = this.count(game);
-  let winning = this.winning(game, actor);
+  let cards = this.countCards(game);
+  let winning = this.winning(game, player);
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
-  builder.cards(actor.cards)
+  builder.cards(player.cards)
     .cards(cards)
     .cards(trick.cards())
     .suits(lead)
@@ -126,7 +126,7 @@ Brain.prototype.observe = function(game, actor) {
   return tensor.states;
 };
 
-Brain.prototype.count = function(game) {
+Brain.prototype.countCards = function(game) {
   let { players } = game;
 
   let cards = new Set();
@@ -139,7 +139,7 @@ Brain.prototype.count = function(game) {
   return cards;
 };
 
-Brain.prototype.winning = function(game, actor) {
+Brain.prototype.winning = function(game, player) {
   let { contract, trick, players } = game;
 
   let winner = trick.winner(contract.order);
@@ -154,18 +154,18 @@ Brain.prototype.winning = function(game, actor) {
 
   if (players.includes(partner)) {
     declarer.add(partner);
-  } else if (actor.cards.contains(partner)) {
-    declarer.add(partner = actor);
+  } else if (player.cards.contains(partner)) {
+    declarer.add(partner = player);
   }
 
   if (!partner || declarer.has(partner)) {
-    return declarer.has(winner) == declarer.has(actor);
+    return declarer.has(winner) == declarer.has(player);
   }
 
-  return winner == actor;
+  return winner == player;
 };
 
-Brain.prototype.experience = function(game, actor) {
+Brain.prototype.gainExperience = function(game, player) {
   let state = this.state;
   let action = this.action;
 
@@ -173,21 +173,19 @@ Brain.prototype.experience = function(game, actor) {
     let reward = this.reward || 0;
     let final = game.phase.name != 'playing';
 
-    let next = this.observe(game, actor);
-
-    var exp = new Experience({ state, action, reward, next, final });
+    let next = this.observe(game, player);
 
     this.state = null;
     this.action = null;
-  }
 
-  return exp;
+    return new Experience({ state, action, reward, next, final });
+  }
 };
 
-Brain.prototype.gather = function(game, actor) {
+Brain.prototype.gainReward = function(game, player) {
   let { trick } = game;
 
-  let won = this.winning(game, actor);
+  let won = this.winning(game, player);
   let points = trick.points() || 1;
 
   return (won ? +1 : -1) * points;

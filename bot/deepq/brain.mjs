@@ -105,13 +105,13 @@ Brain.prototype.actGreedy = function(state, rules) {
 };
 
 Brain.prototype.observe = function(game, player) {
-  let { trick, contract } = game;
+  let { trick, contract: { order } } = game;
 
-  let order = contract.order;
   let lead = trick.lead();
+  let winner = trick.winner(order);
 
   let cards = this.countCards(game);
-  let winning = this.winning(game, player);
+  let party = this.determineParty(game, player);
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
@@ -121,7 +121,7 @@ Brain.prototype.observe = function(game, player) {
     .cards(trick.cards())
     .suits(lead)
     .flag(order.trumps.contains(lead))
-    .flag(winning);
+    .flag(party.has(winner));
 
   return tensor.states;
 };
@@ -139,30 +139,32 @@ Brain.prototype.countCards = function(game) {
   return cards;
 };
 
-Brain.prototype.winning = function(game, player) {
-  let { contract, trick, players } = game;
-
-  let winner = trick.winner(contract.order);
-  if (!winner) {
-    return false;
-  }
+Brain.prototype.determineParty = function(game, player) {
+  let { contract: { owner, partner }, players } = game;
 
   let declarer = new Set();
-  let { owner, partner } = contract;
+  let defender = new Set();
 
-  declarer.add(owner);
+  if (player.cards.contains(partner)) {
+    partner = player;
+  }
 
-  if (players.includes(partner)) {
-    declarer.add(partner);
-  } else if (player.cards.contains(partner)) {
-    declarer.add(partner = player);
+  for (let player of players) {
+    switch(player) {
+    case owner:
+    case partner:
+      declarer.add(player);
+      break;
+    default:
+      defender.add(player);
+    }
   }
 
   if (!partner || declarer.has(partner)) {
-    return declarer.has(winner) == declarer.has(player);
+    return declarer.has(player) ? declarer : defender;
   }
 
-  return winner == player;
+  return new Set([player]);
 };
 
 Brain.prototype.gainExperience = function(game, player) {
@@ -185,10 +187,13 @@ Brain.prototype.gainExperience = function(game, player) {
 };
 
 Brain.prototype.gainReward = function(game, player) {
-  let { trick } = game;
+  let { trick, contract: { order } } = game;
 
-  let won = this.winning(game, player);
+  let party = this.determineParty(game, player);
+
+  let winner = trick.winner(order);
   let points = trick.points() || 1;
+  let won = party.has(winner);
 
   return (won ? +1 : -1) * points;
 };

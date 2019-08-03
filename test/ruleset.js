@@ -102,13 +102,13 @@ describe('Ruleset#forBidding()', () => {
     contract2.assign(new Player());
     auction.bid(contract2);
 
-    let lead = auction.lead();
+    let winner = auction.winner();
     let rules = Ruleset.forBidding({ auction, actor });
 
     let options = Array.from(rules.options(Contract));
     let values = options.map(c => c.value);
     for (let value of values) {
-      Assert.ok(value >= lead.value);
+      Assert.ok(value >= winner.value);
     }
   });
 
@@ -124,13 +124,13 @@ describe('Ruleset#forBidding()', () => {
     contract2.assign(actor);
     auction.bid(contract2);
 
-    let lead = auction.lead();
+    let winner = auction.winner();
     let rules = Ruleset.forBidding({ auction, actor });
 
     let options = Array.from(rules.options(Contract));
     let values = options.map(c => c.value);
     for (let value of values) {
-      Assert.ok(value > lead.value);
+      Assert.ok(value > winner.value);
     }
   });
 

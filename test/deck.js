@@ -30,6 +30,14 @@ describe('Deck', () => {
     });
   });
 
+  describe('#fill()', () => {
+    it('should add all available cards', () => {
+      let deck = new Deck();
+      deck.fill();
+      Assert.equal(deck.size(), 32);
+    });
+  });
+
   describe('#shuffle()', () => {
     it('should shuffle cards according to random', () => {
       let random = () => 0.5;

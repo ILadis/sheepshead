@@ -33,15 +33,16 @@ Ruleset.prototype.options = function(iterator) {
 }
 
 Ruleset.forJoining = function(game) {
-  return new Ruleset(nextIndex, nonEmptyName);
+  return new Ruleset(preserveIndex, nonEmptyName);
 
-  function nextIndex(player, next) {
+  function preserveIndex(player, next) {
     let { players } = game;
     let index = players.length + 1;
 
     if (player.index !== index) {
       return false;
     }
+
     return next();
   }
 
@@ -65,21 +66,22 @@ Ruleset.forBidding = function(game) {
     if (!contract) {
       return true;
     }
+
     return next();
   }
 
   function enforceValue(contract, next) {
     let { auction, actor } = game;
-    let lead = auction.lead();
+    let winner = auction.winner();
     let minimum = auction.blind();
 
     if (auction.includes(actor)) {
-      minimum = lead.value;
+      minimum = winner.value;
     }
 
     for (let bidder of auction.bidders()) {
       if (bidder == actor) break;
-      else if (bidder == lead.owner) {
+      else if (bidder == winner.owner) {
         minimum++;
       }
     }
@@ -122,44 +124,56 @@ Ruleset.forPlaying = function(game) {
     if (!actor.cards.contains(card)) {
       return false;
     }
+
     if (actor.cards.size() == 1) {
       return true;
     }
+
     return next();
   }
 
-  function enforceTrump(card, next) {
-    let { actor, contract: { order }, trick } = game;
-    let lead = trick.lead() || card;
+  function forcedToFollow(deck) {
+    let { actor, trick } = game;
+    let lead = trick.lead();
 
-    if (order.trumps.contains(lead)) {
-      for (let trump of order.trumps) {
-        if (actor.cards.contains(trump)) {
-          return order.trumps.contains(card);
+    if (deck.contains(lead)) {
+      for (let card of deck) {
+        if (actor.cards.contains(card)) {
+          return true;
         }
       }
     }
 
+    return false;
+  }
+
+  function enforceTrump(card, next) {
+    let { contract: { order } } = game;
+
+    if (forcedToFollow(order.trumps)) {
+      return order.trumps.contains(card);
+    }
+
     return next();
   }
 
-  function isPartnerCalled(card) {
+  function partnerCalled(card) {
     let { contract: { partner, order }, trick } = game;
     let lead = trick.lead() || card;
 
-    if (!partner) {
-      return false;
+    if (partner && lead.suit == partner.suit) {
+      return !order.trumps.contains(lead);
     }
 
-    return lead.suit == partner.suit && !order.trumps.contains(lead);
+    return false;
   }
 
   function enforcePartner(card, next) {
     let { actor, contract: { partner } } = game;
-    let called = isPartnerCalled(card);
+    let called = partnerCalled(card);
 
-    if (partner) {
-      if (called && actor.cards.contains(partner)) {
+    if (actor.cards.contains(partner)) {
+      if (called) {
         return card == partner;
       }
 
@@ -172,12 +186,10 @@ Ruleset.forPlaying = function(game) {
   }
 
   function enforceDominant(card, next) {
-    let { actor, contract: { order } } = game;
+    let { contract: { order } } = game;
 
-    for (let dominant of order.dominants) {
-      if (actor.cards.contains(dominant)) {
-        return order.dominants.contains(card);
-      }
+    if (forcedToFollow(order.dominants)) {
+      return order.dominants.contains(card);
     }
 
     return next();

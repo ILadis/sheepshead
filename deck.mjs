@@ -1,7 +1,18 @@
 
+import { Card, Suit, Rank } from './card.mjs';
+
 export function Deck() {
   this.cards = new Array();
 }
+
+Deck.prototype.fill = function() {
+  this.clear();
+  for (let suit of Suit) {
+    for (let rank of Rank) {
+      this.add(Card[suit][rank]);
+    }
+  }
+};
 
 Deck.prototype.shuffle = function(rand = Math.random) {
   let index = this.cards.length;
@@ -55,7 +66,10 @@ Deck.prototype.clear = function() {
   }
 };
 
-Deck.prototype[Symbol.iterator] = function() {
-  return this.cards.values();
+Deck.prototype[Symbol.iterator] = function*() {
+  let iterator = this.cards.values();
+  for (let card of iterator) {
+    yield card;
+  }
 };
 

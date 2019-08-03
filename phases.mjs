@@ -1,5 +1,4 @@
 
-import { Card, Suit, Rank } from './card.mjs';
 import { Deck } from './deck.mjs';
 import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
@@ -38,12 +37,7 @@ export async function dealing({ players, head }) {
   this.sequence = sequence;
 
   let deck = new Deck();
-  for (let suit of Suit) {
-    for (let rank of Rank) {
-      deck.add(Card[suit][rank]);
-    }
-  }
-
+  deck.fill();
   deck.shuffle();
 
   do {
@@ -80,19 +74,19 @@ export async function attendance({ sequence }) {
     }
   }
 
-  let lead = auction.lead();
-  return lead ? bidding : proceed;
+  let winner = auction.winner();
+  return winner ? bidding : proceed;
 }
 
 export async function bidding({ auction }) {
   let rules = Ruleset.forBidding(this);
 
-  let lead = auction.lead();
+  let winner = auction.winner();
   while (!auction.settled()) {
-    this.onbidded(lead);
+    this.onbidded(winner);
 
     for (let player of auction.bidders()) {
-      if (player == lead.owner) {
+      if (player == winner.owner) {
         continue;
       }
 
@@ -112,15 +106,15 @@ export async function bidding({ auction }) {
       if (contract) {
         contract.assign(player);
         auction.bid(contract);
-        lead = contract;
+        winner = contract;
       } else {
         auction.concede(player);
       }
     }
   }
 
-  this.contract = lead;
-  this.onsettled(lead);
+  this.contract = winner;
+  this.onsettled(winner);
 
   return playing;
 }

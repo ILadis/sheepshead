@@ -21,23 +21,25 @@ Auction.prototype.bidders = function() {
   return { [Symbol.iterator]: next };
 };
 
-Auction.prototype.lead = function() {
-  let lead, highest = 0;
-  for (let contract of this.bids.values()) {
-    if (contract.value > highest) {
-      lead = contract;
-      highest = contract.value;
-    }
-  }
-
-  return lead;
-};
-
 Auction.prototype.blind = function() {
   return this.bids.size;
 };
 
 Auction.prototype.settled = function() {
   return this.bids.size <= 1;
+};
+
+Auction.prototype.winner = function() {
+  let winner, highest = 0;
+
+  let iterator = this.bids.values();
+  for (let contract of iterator) {
+    if (contract.value > highest) {
+      winner = contract;
+      highest = contract.value;
+    }
+  }
+
+  return winner;
 };
 

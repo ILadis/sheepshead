@@ -19,14 +19,15 @@ export async function joining() {
     } while (!rules.valid(player));
 
     players.push(player);
-
     this.onjoined(player);
   }
 
-  let scores = new Scoreboard(players);
-  this.scores = scores;
-
   let next = Player.next(players);
+
+  let scores = new Scoreboard();
+  scores.add(...players);
+
+  this.scores = scores;
   this.head = next;
 
   return dealing;

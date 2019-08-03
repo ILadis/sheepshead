@@ -1,16 +1,18 @@
 
-export function Scoreboard(players, tariff = 5) {
+export function Scoreboard(tariff = 5) {
   this.tariff = tariff;
   this.scores = new Map();
   this.totals = new Map();
   this.claims = new Map();
+}
 
+Scoreboard.prototype.add = function(...players) {
   for (let player of players) {
     this.scores.set(player, 0);
     this.totals.set(player, 0);
     this.claims.set(player, new Set());
   }
-}
+};
 
 Scoreboard.prototype.scoreOf = function(player) {
   return this.scores.get(player);

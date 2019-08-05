@@ -136,12 +136,11 @@ Result.prototype.matadors = function(trumps) {
   let iterator = this.tricks.values();
 
   for (let trick of iterator) {
-    for (let card of trick.cards()) {
+    for (let { player, card } of trick) {
       if (!trumps.contains(card)) {
         continue;
       }
 
-      let player = trick.origin(card);
       if (!this.players.has(player)) {
         continue;
       }

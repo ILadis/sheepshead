@@ -12,15 +12,6 @@ Trick.prototype.cards = function() {
   return { [Symbol.iterator]: next };
 };
 
-Trick.prototype.origin = function(card) {
-  let iterator = this.plays.entries();
-  for (let [player, c] of iterator) {
-    if (card == c) {
-      return player;
-    }
-  }
-};
-
 Trick.prototype.points = function() {
   let points = 0;
   for (let card of this.plays.values()) {
@@ -52,5 +43,12 @@ Trick.prototype.winner = function(order) {
   }
 
   return winner;
+};
+
+Trick.prototype[Symbol.iterator] = function*() {
+  let iterator = this.plays.entries();
+  for (let [player, card] of iterator) {
+    yield { player, card };
+  }
 };
 

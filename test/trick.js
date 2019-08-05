@@ -20,17 +20,23 @@ describe('Trick', () => {
   let player3 = new Player('Player 3');
   trick.add(player3, card3);
 
-  describe('#origin()', () => {
-    it('should return player of card', () => {
-      var player = trick.origin(card1);
-      Assert.equal(player, player1);
-      var player = trick.origin(card3);
-      Assert.equal(player, player3);
-    });
+  it('should be iterable', () => {
+    Assert.ok(trick[Symbol.iterator]);
+  });
 
-    it('should return undefined for unknown card', () => {
-      let player = trick.origin(Card[Suit.heart][Rank.eight]);
-      Assert.equal(player, undefined);
+  describe('#iterator', () => {
+    it('should yield played cards in order', () => {
+      let it = trick[Symbol.iterator]();
+      Assert.deepEqual(it.next().value, {
+        player: player1, card: card1
+      });
+      Assert.deepEqual(it.next().value, {
+        player: player2, card: card2
+      });
+      Assert.deepEqual(it.next().value, {
+        player: player3, card: card3
+      });
+      Assert.ok(it.next().done);
     });
   });
 

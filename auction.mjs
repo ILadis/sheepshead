@@ -16,9 +16,11 @@ Auction.prototype.concede = function(player) {
   this.bids.delete(player);
 };
 
-Auction.prototype.bidders = function() {
-  let next = () => this.bids.keys();
-  return { [Symbol.iterator]: next };
+Auction.prototype.bidders = function*() {
+  let iterator = this.bids.keys();
+  for (let player of iterator) {
+    yield player;
+  }
 };
 
 Auction.prototype.blind = function() {

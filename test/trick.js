@@ -10,15 +10,15 @@ describe('Trick', () => {
 
   let card1 = Card[Suit.leaf][Rank.ace];
   let player1 = new Player('Player 1');
-  trick.add(player1, card1);
+  trick.play(player1, card1);
 
   let card2 = Card[Suit.leaf][Rank.sergeant];
   let player2 = new Player('Player 2');
-  trick.add(player2, card2);
+  trick.play(player2, card2);
 
   let card3 = Card[Suit.leaf][Rank.seven];
   let player3 = new Player('Player 3');
-  trick.add(player3, card3);
+  trick.play(player3, card3);
 
   it('should be iterable', () => {
     Assert.ok(trick[Symbol.iterator]);
@@ -84,7 +84,7 @@ describe('Trick', () => {
 
     it('should return false when cards are added', () => {
       let trick = new Trick();
-      trick.add(new Player('Player 1'), Card[Suit.leaf][Rank.ace]);
+      trick.play(player1, card1);
       Assert.ok(!trick.empty());
     });
   });

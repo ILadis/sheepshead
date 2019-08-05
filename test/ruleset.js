@@ -189,7 +189,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.solo.leaf;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(
@@ -215,7 +215,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.normal.leaf;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(
@@ -239,7 +239,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.normal.leaf;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(
@@ -261,7 +261,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.normal.leaf;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(
@@ -302,7 +302,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.geier.default;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(
@@ -324,7 +324,7 @@ describe('Ruleset#forPlaying()', () => {
     let contract = Contract.normal.leaf;
     contract.order.dominate(lead);
     let trick = new Trick();
-    trick.add(new Player('Player'), lead);
+    trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
     actor.cards.add(

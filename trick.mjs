@@ -7,18 +7,20 @@ Trick.prototype.includes = function(player) {
   return this.plays.has(player);
 };
 
-Trick.prototype.add = function(player, card) {
+Trick.prototype.play = function(player, card) {
   this.plays.set(player, card);
 };
 
-Trick.prototype.cards = function() {
-  let next = () => this.plays.values();
-  return { [Symbol.iterator]: next };
+Trick.prototype.cards = function*() {
+  let iterator = this.plays.values();
+  for (let card of iterator) {
+    yield card;
+  }
 };
 
 Trick.prototype.points = function() {
-  let points = 0;
-  for (let card of this.plays.values()) {
+  let iterator = this.plays.values(), points = 0;
+  for (let card of iterator) {
     points += card.points();
   }
   return points;
@@ -26,7 +28,8 @@ Trick.prototype.points = function() {
 
 Trick.prototype.lead = function() {
   let iterator = this.plays.values();
-  return iterator.next().value;
+  let card = iterator.next().value;
+  return card;
 };
 
 Trick.prototype.empty = function() {

@@ -143,7 +143,7 @@ export async function playing({ contract, sequence }) {
       order.dominate(card);
     }
 
-    trick.add(player, card);
+    trick.play(player, card);
     this.onplayed(player, card, trick);
 
     if (contract.partner == card) {

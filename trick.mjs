@@ -3,6 +3,10 @@ export function Trick() {
   this.plays = new Map();
 };
 
+Trick.prototype.includes = function(player) {
+  return this.plays.has(player);
+};
+
 Trick.prototype.add = function(player, card) {
   this.plays.set(player, card);
 };

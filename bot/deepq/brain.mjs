@@ -5,7 +5,7 @@ import { Tensor, Builder, Indices } from './model.mjs';
 
 export function Brain(network) {
   this.memory = new Memory(1000);
-  this.policy = network ? DeepQ.from(network) : new DeepQ(102, 32, 32, 32, 32);
+  this.policy = network ? DeepQ.from(network) : new DeepQ(103, 32, 32, 32, 32);
   this.target = this.policy.clone();
 }
 
@@ -113,6 +113,12 @@ Brain.prototype.observe = function(game, player) {
   let cards = this.countCards(game);
   let party = this.determineParty(game, player);
 
+  for (let partner of party) {
+    if (partner != player && !trick.includes(partner)) {
+      var chance = true;
+    }
+  }
+
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
@@ -121,7 +127,8 @@ Brain.prototype.observe = function(game, player) {
     .cards(trick.cards())
     .suits(lead)
     .flag(order.trumps.contains(lead))
-    .flag(party.has(winner));
+    .flag(party.has(winner))
+    .flag(chance);
 
   return tensor.states;
 };

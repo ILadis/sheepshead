@@ -1,6 +1,6 @@
 
 import { DeepQ } from './network.mjs';
-import { Memory, Experience } from './memory.mjs';
+import { Memory } from './memory.mjs';
 import { Tensor, Builder, Indices } from './model.mjs';
 
 export function Brain(network) {
@@ -15,8 +15,7 @@ Brain.prototype.onbid = function() {
 
 Brain.prototype.onturn = function(game, actor) {
   if (actor.brain == this) {
-    let exp = this.gainExperience(game, actor);
-    this.memory.save(exp);
+    this.gainExperience(game, actor);
   }
 };
 
@@ -40,8 +39,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
 Brain.prototype.oncompleted = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      let reward = this.gainReward(game, player);
-      this.reward = reward;
+      this.gainReward(game, player);
       break;
     }
   }
@@ -50,8 +48,7 @@ Brain.prototype.oncompleted = function(game) {
 Brain.prototype.onfinished = function(game) {
   for (let player of game.players) {
     if (player.brain == this) {
-      let exp = this.gainExperience(game, player);
-      this.memory.save(exp);
+      this.gainExperience(game, player);
       break;
     }
   }
@@ -189,7 +186,8 @@ Brain.prototype.gainExperience = function(game, player) {
     this.state = null;
     this.action = null;
 
-    return new Experience({ state, action, reward, next });
+    let exp =  { state, action, reward, next };
+    this.memory.save(exp);
   }
 };
 
@@ -202,7 +200,8 @@ Brain.prototype.gainReward = function(game, player) {
   let points = trick.points() || 1;
   let won = party.has(winner);
 
-  return (won ? +1 : -1) * points;
+  let reward = (won ? +1 : -1) * points;
+  this.reward = reward;
 };
 
 Brain.prototype.evolve = function() {

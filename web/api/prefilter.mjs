@@ -85,7 +85,13 @@ PreFilter.requiresActor = function() {
 
 PreFilter.requiresEntity = function(parser) {
   return new PreFilter(async (request, response, next) => {
-    let body = await request.body;
+    try {
+      var body = await request.body;
+    } catch {
+      response.writeHead(413);
+      return response.end();
+    }
+
     if (body.length <= 0) {
       response.writeHead(400);
       return response.end();

@@ -1,18 +1,38 @@
 
-export function Payload() {
+export function Payload(limit = 4096) {
+  this.limit = limit;
 }
 
 Payload.prototype.consume = function(request) {
   let chunks = new Array();
-  let promise = new Promise((resolve) => {
-    request.on('data', (chunk) => {
-      chunks.push(chunk);
-    }).on('end', () => {
-      resolve(Buffer.concat(chunks));
-    });
+
+  let promise = new Promise((resolve, reject) => {
+    request.on('data', this.buffer(chunks, reject));
+    request.on('end', this.concat(chunks, resolve));
   });
 
   return promise;
+};
+
+Payload.prototype.buffer = function(chunks, reject) {
+  let length = 0;
+
+  return (chunk) => {
+    length += chunk.length;
+    if (length > this.limit) {
+      return reject();
+    }
+
+    chunks.size = length;
+    chunks.push(chunk);
+  };
+};
+
+Payload.prototype.concat = function(chunks, resolve) {
+  return () => {
+    let body = Buffer.concat(chunks, chunks.size);
+    return resolve(body);
+  };
 };
 
 Payload.prototype.handle = function(request, response, next) {

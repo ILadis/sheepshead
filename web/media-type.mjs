@@ -1,7 +1,7 @@
 
 import Path from 'path';
 
-export function MediaType (type, subtype) {
+export function MediaType(type, subtype) {
   this.type = type;
   this.subtype = subtype;
 }

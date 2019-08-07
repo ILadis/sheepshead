@@ -67,6 +67,9 @@ body {
   padding-top: 41pt;
   background-color: #dbdbd3;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 
@@ -215,6 +218,23 @@ body {
   margin-right: -18pt;
 }
 
+.chat {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #f2f2f2;
+  border-width: 1pt;
+  border-color: #dadbdb;
+  border-left-style: solid;
+}
+
+.chat .textfield {
+  position: absolute;
+  bottom: 0;
+  border-style: none;
+  border-top-style: solid;
+}
+
 .toast {
   position: absolute;
   width: 100%;
@@ -323,11 +343,13 @@ body {
 }
 
 .textfield {
+  width: 100%;
   padding: 12pt 24pt 10pt;
   background: #e9ebeb;
   border-width: 1pt;
   border-color: #dadbdb;
   border-bottom-style: solid;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
 }
@@ -425,16 +447,15 @@ body {
 
 @media (min-width: 580pt) {
   .shell main > section {
-    top: 50%;
-    left: 50%;
-    max-width: 580pt;
-    max-height: 500pt;
     width: 90%;
+    max-width: 580pt;
     height: 90%;
-    border-radius: 3pt;
+    max-height: 500pt;
     box-shadow: 0 1pt 3pt 1pt #bfbfbf;
-    transform: translateX(-50%) translateY(-50%);
   }
+
+  .shell main > section:first-child { border-radius: 3pt 0 0 3pt; }
+  .shell main > section:last-child { border-radius: 0 3pt 3pt 0; }
 
   .fab {
     position: absolute;

@@ -29,7 +29,7 @@ body {
   background-color: #3b833b;
   border-bottom-style: solid;
   border-color: #a5c3a5;
-  border-width: 1pt;
+  border-width: 1px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -75,11 +75,19 @@ body {
 
 .shell main > section {
   position: relative;
-  width: 100%;
-  height: 100%;
+  height: 90%;
+  max-height: 500pt;
   background-color: #f7f9fa;
+  box-shadow: 0 1px 3pt 1px #bfbfbf;
   overflow: hidden;
 }
+
+.shell main > section:first-child { border-radius: 3pt 0 0 3pt; }
+.shell main > section:last-child { border-radius: 0 3pt 3pt 0; }
+
+.shell main > section.lobby { width: 90%; max-width: 820pt; }
+.shell main > section.game { width: 62%; max-width: 580pt; }
+.shell main > section.drawer { width: 28%; max-width: 240pt; }
 
 .card {
   width: 42pt;
@@ -222,15 +230,53 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
+  padding-bottom: 45pt;
   background-color: #f2f2f2;
-  border-width: 1pt;
+  border-width: 1px;
   border-color: #dadbdb;
   border-left-style: solid;
+  box-sizing: border-box;
+}
+
+.chat ul {
+  height: 100%;
+  padding: 12pt 0 0;
+  list-style: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.chat ul li {
+  margin: 0 19pt 11pt;
+  text-align: center;
+}
+
+.chat ul li.you {
+  text-align: left;
+  margin: 0 29pt 11pt 8pt;
+}
+
+.chat ul li.other {
+  text-align: right;
+  margin: 0 8pt 11pt 29pt;
+}
+
+.chat ul li h6 {
+  font-size: 7pt;
+}
+
+.chat ul li span {
+  padding: 5pt 9pt;
+  border-radius: 4pt;
+  background-color: #fff;
+  box-shadow: 0 1px 1px 0 #bfbfbf;
+  display: inline-block;
 }
 
 .chat .textfield {
   position: absolute;
   bottom: 0;
+  height: 45pt;
   border-style: none;
   border-top-style: solid;
 }
@@ -250,11 +296,11 @@ body {
   max-width: 80%;
   color: #3c3c3c;
   border-style: solid;
-  border-width: 1pt;
+  border-width: 1px;
   border-color: #a8a8a8;
   border-radius: 2pt;
   background-color: #fff;
-  box-shadow: 0 2pt 6pt 1pt #bfbfbf;
+  box-shadow: 0 2pt 6pt 1px #bfbfbf;
   display: inline-block;
 }
 
@@ -265,11 +311,11 @@ body {
   top: 50%;
   left: 50%;
   border-style: solid;
-  border-width: 1pt;
+  border-width: 1px;
   border-color: #a8a8a8;
   border-radius: 2pt;
   background-color: #fff;
-  box-shadow: 0 2pt 6pt 1pt #bfbfbf;
+  box-shadow: 0 2pt 6pt 1px #bfbfbf;
   transform: translateX(-50%) translateY(-50%);
   opacity: 0;
   transition: opacity 0.3s;
@@ -346,7 +392,7 @@ body {
   width: 100%;
   padding: 12pt 24pt 10pt;
   background: #e9ebeb;
-  border-width: 1pt;
+  border-width: 1px;
   border-color: #dadbdb;
   border-bottom-style: solid;
   box-sizing: border-box;
@@ -386,7 +432,7 @@ body {
 
 .list ul li {
   padding: 10pt 16pt;
-  border-width: 1pt;
+  border-width: 1px;
   border-color: #f2f2f2;
   border-bottom-style: solid;
   cursor: pointer;
@@ -410,7 +456,7 @@ body {
 }
 
 .fab button {
-  position: relative;
+  position: absolute;
   width: 100%;
   height: 100%;
   color: #fff;
@@ -423,7 +469,7 @@ body {
   border-radius: 50%;
   outline: none;
   cursor: pointer;
-  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  box-shadow: 0 4pt 6pt 1px #bfbfbf;
   z-index: 2;
 }
 
@@ -445,20 +491,19 @@ body {
   opacity: 1;
 }
 
-@media (min-width: 580pt) {
+@media (max-width: 580pt) {
   .shell main > section {
-    width: 90%;
-    max-width: 580pt;
-    height: 90%;
-    max-height: 500pt;
-    box-shadow: 0 1pt 3pt 1pt #bfbfbf;
+    height: 100%;
+    max-height: unset;
+    border-radius: none;
   }
 
-  .shell main > section:first-child { border-radius: 3pt 0 0 3pt; }
-  .shell main > section:last-child { border-radius: 0 3pt 3pt 0; }
+  .shell main > section.lobby,
+  .shell main > section.game { width: 100%; }
+  .shell main > section.drawer { display : none; }
 
   .fab {
-    position: absolute;
+    position: fixed;
   }
 }
 

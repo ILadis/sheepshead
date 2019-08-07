@@ -14,7 +14,7 @@ let index = new Resource(['GET'], '/');
 index['GET'] = Resource.serveRedirect('index.html');
 
 let server = new HttpServer();
-server.register(new Handlers.Payload());
+server.register(new Handlers.Payload(512e3));
 server.register(new Handlers.Authentication());
 server.register(new Handlers.Registry());
 server.registerAll(Api);

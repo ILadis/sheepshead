@@ -20,6 +20,7 @@ Payload.prototype.buffer = function(chunks, reject) {
   return (chunk) => {
     length += chunk.length;
     if (length > this.limit) {
+      chunks.length = 0;
       return reject();
     }
 

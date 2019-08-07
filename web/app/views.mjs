@@ -34,20 +34,24 @@ Shell.prototype.setRefreshable = function(enable) {
   }
 };
 
-Shell.prototype.setContents = function(views) {
+Shell.prototype.setContents = function(...views) {
   let sections = this.node.querySelectorAll('main > section');
   for (let i = 0; i < sections.length; i++) {
     sections[i].remove();
   }
 
-  let section = document.createElement('section');
-  for (let name in views) {
-    let view = views[name];
-    section.appendChild(view.node);
-  }
-
   let main = this.node.querySelector('main');
-  main.appendChild(section);
+  for (let [name, childs] of views) {
+    let section = document.createElement('section');
+    section.className = name;
+
+    for (let name in childs) {
+      let view = childs[name];
+      section.appendChild(view.node);
+    }
+
+    main.appendChild(section);
+  }
 };
 
 Shell.prototype.onRefreshClicked = function() {
@@ -148,6 +152,45 @@ Trick.prototype.addCard = function(card, position) {
   hr.style.animationName = `slidein-${position}`;
 
   this.node.appendChild(hr);
+};
+
+export const Chat = function() {
+  this.node = importNode(Chat.template);
+}
+
+Chat.template = html`
+<div class="chat">
+  <ul></ul>
+  <div class="textfield">
+    <input type="text">
+  </div>
+</div>
+`;
+
+Chat.prototype.addMessage = function(message, author, self) {
+  let ul = this.node.querySelector('ul');
+
+  let span = document.createElement('span');
+  span.textContent = message;
+
+  if (author) {
+    let h6 = document.createElement('h6');
+    h6.textContent = author;
+    span.appendChild(h6);
+  }
+
+  let li = document.createElement('li');
+  switch (self) {
+  case true:
+    li.className = 'you';
+    break;
+  case false:
+    li.className = 'other';
+    break;
+  }
+
+  li.appendChild(span);
+  ul.appendChild(li);
 };
 
 export const Toast = function() {

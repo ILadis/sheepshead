@@ -11,10 +11,16 @@ Presenter.prototype.stringFor = function(name, ...args) {
   return this.strings.get(name, ...args);
 };
 
-Presenter.prototype.showView = function(title, views) {
+Presenter.prototype.showView = function(title, ...views) {
   this.shell.setTitle(title);
-  this.shell.setContents(views);
-  this.views = views;
+  this.shell.setContents(...views);
+
+  this.views = Object.create(null);
+  for (let [name, childs] of views) {
+    for (let name in childs) {
+      this.views[name] = childs[name];
+    }
+  }
 };
 
 Presenter.prototype.showToast = function(text, duration) {
@@ -22,14 +28,22 @@ Presenter.prototype.showToast = function(text, duration) {
   toast.makeText(text, duration);
 };
 
+Presenter.prototype.addChatMessage = function(message, player, self) {
+  let chat = this.views.chat;
+  let name = player ? player.name : undefined;
+  chat.addMessage(message, name, self);
+}
+
 Presenter.prototype.showLobby = function() {
   let title = this.stringFor('lobby-title');
-  this.showView(title, {
-    name: new View.Textfield(),
-    list: new View.List(),
-    fab: new View.Button(),
-    toast: new View.Toast()
-  });
+  this.showView(title,
+    ['lobby', {
+      name: new View.Textfield(),
+      list: new View.List(),
+      fab: new View.Button(),
+      toast: new View.Toast()
+    }]
+  );
   this.shell.setRefreshable(true);
   this.shell.onRefreshClicked = () => this.refreshGames();
   this.refreshGames(true);
@@ -104,15 +118,20 @@ Presenter.prototype.joinGame = async function(game) {
 
 Presenter.prototype.showGame = function() {
   let title = this.stringFor('game-title');
-  this.showView(title, {
-    trick: new View.Trick(),
-    bottom: new View.Hand(),
-    left: new View.Hand(),
-    right: new View.Hand(),
-    top: new View.Hand(),
-    dialog: new View.Dialog(),
-    toast: new View.Toast()
-  });
+  this.showView(title,
+    ['game', {
+      trick: new View.Trick(),
+      bottom: new View.Hand(),
+      left: new View.Hand(),
+      right: new View.Hand(),
+      top: new View.Hand(),
+      dialog: new View.Dialog(),
+      toast: new View.Toast()
+    }],
+    ['drawer', {
+      chat: new View.Chat()
+    }]
+  );
   this.shell.setRefreshable(false);
   this.listenEvents();
 };
@@ -231,10 +250,14 @@ Presenter.prototype.onBidded = function(contract) {
 
 Presenter.prototype.onSettled = async function(contract) {
   let player = contract.owner;
+  let message = this.stringFor('settled-toast',
+    player.name, contract.name, contract.variant);
+
   if (!this.isSelf(player)) {
-    this.showToast(this.stringFor('settled-toast',
-      player.name, contract.name, contract.variant));
+    this.showToast(message);
   }
+
+  this.addChatMessage(message);
 
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);

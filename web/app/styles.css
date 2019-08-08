@@ -251,7 +251,7 @@ body {
   text-align: center;
 }
 
-.chat ul li.you {
+.chat ul li.self {
   text-align: left;
   margin: 0 29pt 11pt 8pt;
 }

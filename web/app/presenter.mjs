@@ -11,14 +11,22 @@ Presenter.prototype.stringFor = function(name, ...args) {
   return this.strings.get(name, ...args);
 };
 
-Presenter.prototype.showView = function(title, ...views) {
-  this.shell.setTitle(title);
-  this.shell.setContents(...views);
+Presenter.prototype.showView = function(title, ...sections) {
+  let shell = this.shell;
+
+  shell.setTitle(title);
+  shell.clearSections();
 
   this.views = Object.create(null);
-  for (let [name, childs] of views) {
-    for (let name in childs) {
-      this.views[name] = childs[name];
+
+  for (let [name, views] of sections) {
+    let section = shell.newSection(name);
+
+    for (let name in views) {
+      let view = views[name];
+      section.addView(view);
+
+      this.views[name] = view;
     }
   }
 };

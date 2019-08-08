@@ -34,24 +34,25 @@ Shell.prototype.setRefreshable = function(enable) {
   }
 };
 
-Shell.prototype.setContents = function(...views) {
+Shell.prototype.clearSections = function() {
   let sections = this.node.querySelectorAll('main > section');
   for (let i = 0; i < sections.length; i++) {
     sections[i].remove();
   }
+};
+
+Shell.prototype.newSection = function(name) {
+  let section = document.createElement('section');
+  section.className = name;
 
   let main = this.node.querySelector('main');
-  for (let [name, childs] of views) {
-    let section = document.createElement('section');
-    section.className = name;
+  main.appendChild(section);
 
-    for (let name in childs) {
-      let view = childs[name];
-      section.appendChild(view.node);
-    }
+  let addView = (view) => {
+    section.appendChild(view.node);
+  };
 
-    main.appendChild(section);
-  }
+  return { addView };
 };
 
 Shell.prototype.onRefreshClicked = function() {

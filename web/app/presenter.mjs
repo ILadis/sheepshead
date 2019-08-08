@@ -80,7 +80,7 @@ Presenter.prototype.changePlayerName = function(name) {
   let label = this.stringFor('player-name-input');
 
   if (!name || !name.length) {
-    name = fallback;
+    name = this.playerName || fallback;
   }
 
   let view = this.views.name;

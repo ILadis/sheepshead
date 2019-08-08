@@ -24,8 +24,7 @@ Presenter.prototype.showView = function(title, ...views) {
 };
 
 Presenter.prototype.showToast = function(text, duration) {
-  let toast = this.views.toast;
-  toast.makeText(text, duration);
+  this.views.toast.makeText(text, duration);
 };
 
 Presenter.prototype.addChatMessage = function(message, player, self) {
@@ -80,7 +79,7 @@ Presenter.prototype.changePlayerName = function(name) {
   let label = this.stringFor('player-name-input');
 
   if (!name || !name.length) {
-    name = this.playerName || fallback;
+    name = fallback;
   }
 
   let view = this.views.name;
@@ -155,13 +154,14 @@ Presenter.prototype.onJoined = function(player) {
 };
 
 Presenter.prototype.onDealt = async function() {
+  this.views.trick.clearCards();
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);
 };
 
 Presenter.prototype.onTurn = function({ player, phase }) {
-  let dialog = this.views.dialog;
-  dialog.dismiss();
+  this.phase = phase;
+  this.views.dialog.dismiss();
 
   player.actor = true;
   this.refreshPlayers(player);
@@ -207,24 +207,26 @@ Presenter.prototype.playCard = function(card) {
 };
 
 Presenter.prototype.listContracts = async function(phase) {
-  let dialog = this.views.dialog;
   let contracts = await this.client.fetchContracts();
 
-  let options = dialog.withOptions();
+  if (this.phase === phase) {
+    let dialog = this.views.dialog;
+    let options = dialog.withOptions();
 
-  let concede = this.stringFor('concede-label');
-  options.addItem(concede);
-  for (let contract of contracts) {
-    let { name, variant } = contract;
-    let label = this.stringFor('contract-label', name, variant);
-    options.addItem(label, contract);
+    let concede = this.stringFor('concede-label');
+    options.addItem(concede);
+    for (let contract of contracts) {
+      let { name, variant } = contract;
+      let label = this.stringFor('contract-label', name, variant);
+      options.addItem(label, contract);
+    }
+
+    options.onItemSelected = (contract) => this.bidContract(contract);
+
+    let title = this.stringFor('contract-title', phase);
+    dialog.setTitle(title);
+    dialog.show();
   }
-
-  options.onItemSelected = (contract) => this.bidContract(contract);
-
-  let title = this.stringFor('contract-title', phase);
-  dialog.setTitle(title);
-  dialog.show();
 };
 
 Presenter.prototype.bidContract = function(contract) {
@@ -235,16 +237,19 @@ Presenter.prototype.bidContract = function(contract) {
 };
 
 Presenter.prototype.onContested = function(player) {
+  let message = this.stringFor('contested-toast', player.name);
   if (!this.isSelf(player)) {
-    this.showToast(this.stringFor('contested-toast', player.name));
+    this.showToast(message);
   }
 };
 
 Presenter.prototype.onBidded = function(contract) {
   let player = contract.owner;
+  let message = this.stringFor('bidded-toast',
+    player.name, contract.name, contract.variant);
+
   if (!this.isSelf(player)) {
-    this.showToast(this.stringFor('bidded-toast',
-      player.name, contract.name, contract.variant));
+    this.showToast(message);
   }
 };
 
@@ -270,46 +275,52 @@ Presenter.prototype.onPlayed = function({ player, card }) {
 };
 
 Presenter.prototype.onCompleted = function({ winner, points }) {
-  let message = this.stringFor('trick-completed-toast', winner.name, points);
+  let message = this.stringFor('trick-completed-toast',
+    winner.name, points);
   this.showToast(message);
 };
 
 Presenter.prototype.onFinished = function({ winner }) {
-  let { players, points, score } = winner;
-  let names = players.map(p => p.name);
-  let message = this.stringFor('finished-toast', names, points, score);
+  let names = winner.players.map(p => p.name);
+  let message = this.stringFor('finished-toast',
+    names, winner.points, winner.score);
+
+  this.phase = null;
   this.showToast(message, 5000);
+
   setTimeout(() => this.listStandings(), 2000);
 };
 
 Presenter.prototype.listStandings = async function() {
-  let { dialog, trick } = this.views;
   let players = await this.client.fetchScores();
+  
+  if (this.phase === null) {
+    let dialog = this.views.dialog;
 
-  let labels = [
-    this.stringFor('standings-player'),
-    this.stringFor('standings-score'),
-    this.stringFor('standings-total'),
-  ];
+    let labels = [
+      this.stringFor('standings-player'),
+      this.stringFor('standings-score'),
+      this.stringFor('standings-total'),
+    ];
 
-  let table = dialog.withTable();
-  table.addRow('№', ...labels);
+    let table = dialog.withTable();
+    table.addRow('№', ...labels);
 
-  let position = 0;
-  for (let player of players) {
-    table.addRow(++position, player.name, player.score, player.total);
+    let position = 0;
+    for (let player of players) {
+      table.addRow(++position, player.name, player.score, player.total);
+    }
+
+    let title = this.stringFor('standings-title');
+    dialog.setTitle(title);
+
+    let label = this.stringFor('leave-game-action');
+    dialog.addAction(label, () => {
+      this.client.leaveGame().then(() => this.showLobby());
+    });
+
+    dialog.show();
   }
-
-  let title = this.stringFor('standings-title');
-  dialog.setTitle(title);
-
-  let label = this.stringFor('leave-game-action');
-  dialog.addAction(label, () => {
-    this.client.leaveGame().then(() => this.showLobby());
-  });
-
-  dialog.show();
-  trick.clearCards();
 };
 
 Presenter.prototype.isSelf = function(other) {

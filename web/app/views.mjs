@@ -161,15 +161,14 @@ export const Chat = function() {
 Chat.template = html`
 <div class="chat">
   <ul></ul>
-  <div class="textfield">
+  <section>
     <input type="text">
-  </div>
+    <button></button>
+  </section>
 </div>
 `;
 
 Chat.prototype.addMessage = function(message, author, self) {
-  let ul = this.node.querySelector('ul');
-
   let span = document.createElement('span');
   span.textContent = message;
 
@@ -180,17 +179,30 @@ Chat.prototype.addMessage = function(message, author, self) {
   }
 
   let li = document.createElement('li');
+  li.appendChild(span);
+
   switch (self) {
   case true:
-    li.className = 'you';
+    li.className = 'self';
     break;
   case false:
     li.className = 'other';
     break;
   }
 
-  li.appendChild(span);
+  let ul = this.node.querySelector('ul');
   ul.appendChild(li);
+};
+
+Chat.prototype.setComposePlaceholder = function(placeholder) {
+  let input = this.node.querySelector('input');
+  input.placeholder = placeholder;
+
+  let button = this.node.querySelector('button');
+  button.onclick = () => this.onMessageSubmitted(input.value);
+};
+
+Chat.prototype.onMessageSubmitted = function(message) {
 };
 
 export const Toast = function() {
@@ -431,5 +443,4 @@ function importNode(template) {
   let node = document.importNode(template, true);
   return node.firstElementChild;
 }
-
 

@@ -542,20 +542,25 @@ body {
   opacity: 1;
 }
 
-@media (max-width: 580pt) {
+@media (max-width: 680pt) {
   .shell main > section {
     height: 100%;
     max-height: unset;
     border-radius: none;
   }
 
-  .shell main > section.lobby,
-  .shell main > section.game { width: 100%; }
-  .shell main > section.drawer { display : none; }
+  .shell main > section.lobby { width: 100%; }
+  .shell main > section.game { width: 70%; }
+  .shell main > section.drawer { width: 30%; }
 
   .fab {
     position: fixed;
   }
+}
+
+@media (max-width: 550pt) {
+  .shell main > section.game { width: 100%; }
+  .shell main > section.drawer { display : none; }
 }
 
 @media (max-width: 330pt) {

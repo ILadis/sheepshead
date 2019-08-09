@@ -248,35 +248,30 @@ body {
 
 .chat ul li {
   margin: 0 19pt 11pt;
-  text-align: center;
-  overflow-anchor: none;
-}
-
-.chat ul li.anchor {
-  overflow-anchor: auto;
-  height: 1px;
-}
-
-.chat ul li.self {
-  text-align: left;
-  margin: 0 29pt 11pt 8pt;
-}
-
-.chat ul li.other {
-  text-align: right;
-  margin: 0 8pt 11pt 29pt;
-}
-
-.chat ul li h6 {
-  font-size: 7pt;
-}
-
-.chat ul li span {
   padding: 5pt 9pt;
+  text-align: center;
+  word-break: break-word;
   border-radius: 4pt;
   background-color: #fff;
   box-shadow: 0 1px 1px 0 #bfbfbf;
-  display: inline-block;
+  overflow-anchor: none;
+  clear: both;
+}
+
+.chat ul li h6 {
+  padding-top: 3pt;
+  font-size: 7pt;
+}
+
+.chat ul li.self { margin: 0 29pt 11pt 8pt; text-align: left; float: left; }
+.chat ul li.other { margin: 0 8pt 11pt 29pt; text-align: left; float: right; }
+
+.chat ul li.anchor {
+  clear: both;
+  margin: 0;
+  overflow-anchor: auto;
+  height: 1px;
+  visibility: hidden;
 }
 
 .chat form {

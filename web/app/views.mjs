@@ -185,14 +185,14 @@ Chat.prototype.addMessage = function(message, player, self) {
   let span = document.createElement('span');
   span.textContent = message;
 
+  let li = document.createElement('li');
+  li.appendChild(span);
+
   if (player) {
     let h6 = document.createElement('h6');
     h6.textContent = player.name;
-    span.appendChild(h6);
+    li.appendChild(h6);
   }
-
-  let li = document.createElement('li');
-  li.appendChild(span);
 
   switch (self) {
   case true:

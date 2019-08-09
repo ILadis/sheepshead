@@ -169,13 +169,13 @@ Chat.template = html`
 </div>
 `;
 
-Chat.prototype.addMessage = function(message, author, self) {
+Chat.prototype.addMessage = function(message, player, self) {
   let span = document.createElement('span');
   span.textContent = message;
 
-  if (author) {
+  if (player) {
     let h6 = document.createElement('h6');
-    h6.textContent = author;
+    h6.textContent = player.name;
     span.appendChild(h6);
   }
 
@@ -195,12 +195,17 @@ Chat.prototype.addMessage = function(message, author, self) {
   ul.appendChild(li);
 };
 
-Chat.prototype.setComposePlaceholder = function(placeholder) {
+Chat.prototype.setTypingsPlaceholder = function(placeholder) {
   let input = this.node.querySelector('input');
   input.placeholder = placeholder;
 
   let button = this.node.querySelector('button');
   button.onclick = () => this.onMessageSubmitted(input.value);
+};
+
+Chat.prototype.clearTypings = function() {
+  let input = this.node.querySelector('input');
+  input.value = '';
 };
 
 Chat.prototype.onMessageSubmitted = function(message) {

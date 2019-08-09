@@ -125,6 +125,31 @@ Resources.events['GET'] = PreFilter.chain(
   });
 });
 
+Resources.chat = new Resource(
+  ['POST'], '/api/games/(?<id>\\d+)/chat');
+
+Resources.chat['POST'] = PreFilter.chain(
+  PreFilter.requiresGame(),
+  PreFilter.requiresPlayer(),
+  PreFilter.requiresEntity(JSON)
+).then((request, response) => {
+  var { game, player, registry, entity } = request;
+
+  let message = String(entity.message || '');
+  if (!message.length) {
+    response.writeHead(422);
+    return response.end();
+  }
+
+  let events = registry.lookup(game).events;
+  var entity = new Entities.Chat(player, message);
+
+  events.publish('chat', entity);
+
+  response.writeHead(200);
+  return response.end();
+});
+
 Resources.bots = new Resource(
   ['POST'], '/api/games/(?<id>\\d+)/bots');
 

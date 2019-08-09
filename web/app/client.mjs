@@ -191,6 +191,28 @@ Client.prototype.playCard = async function(card) {
   return true;
 };
 
+Client.prototype.sendChatMessage = async function(message) {
+  let id = this.id;
+  let token = this.token;
+  let json = JSON.stringify({ message });
+
+  let request = new Request(`api/games/${id}/chat`, {
+    method: 'POST',
+    body: json,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw response;
+  }
+
+  return true;
+};
+
 Client.prototype.listenEvents = function() {
   let id = this.id;
   let query = '?offset=1';
@@ -217,7 +239,8 @@ Client.prototype.listenEvents = function() {
     'settled',
     'played',
     'completed',
-    'finished'
+    'finished',
+    'chat'
   ]) {
     stream['on' + event] = (...args) => { };
     source.addEventListener(event, handler);

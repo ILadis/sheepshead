@@ -99,3 +99,14 @@ Card.prototype.toJSON = function() {
   return { suit, rank };
 };
 
+export function Chat(player, message) {
+  this.player = player;
+  this.message = message;
+}
+
+Chat.prototype.toJSON = function() {
+  let player = new Player(this.player);
+  let message = this.message;
+  return { player, message };
+};
+

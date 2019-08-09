@@ -35,11 +35,9 @@ Presenter.prototype.showToast = function(text, duration) {
   this.views.toast.makeText(text, duration);
 };
 
-Presenter.prototype.addChatMessage = function(message, player, self) {
-  let chat = this.views.chat;
-  let name = player ? player.name : undefined;
-  chat.addMessage(message, name, self);
-}
+Presenter.prototype.showChatMessage = function(message, player, self) {
+  this.views.chat.addMessage(message, player, self);
+};
 
 Presenter.prototype.showLobby = function() {
   let title = this.stringFor('lobby-title');
@@ -141,6 +139,7 @@ Presenter.prototype.showGame = function() {
   );
   this.shell.setRefreshable(false);
   this.listenEvents();
+  this.setupChat();
 };
 
 Presenter.prototype.listenEvents = function() {
@@ -154,11 +153,27 @@ Presenter.prototype.listenEvents = function() {
   stream.onplayed = (play) => this.onPlayed(play);
   stream.oncompleted = (result) => this.onCompleted(result);
   stream.onfinished = (result) => this.onFinished(result);
+  stream.onchat = (chat) => this.onChatMessage(chat);
+};
+
+Presenter.prototype.setupChat = function() {
+  let chat = this.views.chat;
+  chat.setTypingsPlaceholder('');
+  chat.onMessageSubmitted = (message) => {
+    chat.clearTypings();
+    this.client.sendChatMessage(message);
+  };
+};
+
+Presenter.prototype.onChatMessage = function({ player, message }) {
+  let self = this.isSelf(player);
+  this.showChatMessage(message, player, self);
 };
 
 Presenter.prototype.onJoined = function(player) {
   let message = this.stringFor('joined-game-toast', player.name);
   this.showToast(message);
+  this.showChatMessage(message);
 };
 
 Presenter.prototype.onDealt = async function() {

@@ -264,6 +264,8 @@ Presenter.prototype.bidContract = function(contract) {
 
 Presenter.prototype.onContested = function(player) {
   let message = this.stringFor('contested-toast', player.name);
+
+  this.showChatMessage(message);
   if (!this.isSelf(player)) {
     this.showToast(message);
   }
@@ -274,6 +276,7 @@ Presenter.prototype.onBidded = function(contract) {
   let message = this.stringFor('bidded-toast',
     player.name, contract.name, contract.variant);
 
+  this.showChatMessage(message);
   if (!this.isSelf(player)) {
     this.showToast(message);
   }
@@ -284,11 +287,10 @@ Presenter.prototype.onSettled = async function(contract) {
   let message = this.stringFor('settled-toast',
     player.name, contract.name, contract.variant);
 
+  this.showChatMessage(message);
   if (!this.isSelf(player)) {
     this.showToast(message);
   }
-
-  this.showChatMessage(message);
 
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);

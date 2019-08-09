@@ -175,7 +175,7 @@ Chat.template = html`
 <div class="chat">
   <ul><li class="anchor"></ul>
   <form>
-    <input type="text">
+    <input type="text" autocorrect="off" autocapitalize="sentences">
     <button type="submit"></button>
   </form>
 </div>

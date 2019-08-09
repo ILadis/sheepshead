@@ -80,7 +80,9 @@ export const de = {
   'standings-title': () => 'Punktestand',
   'standings-player': () => 'Spieler',
   'standings-score': () => 'Punkte',
-  'standings-total': () => 'Total'
+  'standings-total': () => 'Total',
+
+  'chat-typings-placeholder': () => 'Schreibe eine Nachricht'
 };
 
 export const en = {
@@ -153,6 +155,8 @@ export const en = {
   'standings-title': () => 'Current standings',
   'standings-player': () => 'Player',
   'standings-score': () => 'Score',
-  'standings-total': () => 'Total'
+  'standings-total': () => 'Total',
+
+  'chat-typings-placeholder': () => 'Type a message'
 };
 

@@ -158,7 +158,10 @@ Presenter.prototype.listenEvents = function() {
 
 Presenter.prototype.setupChat = function() {
   let chat = this.views.chat;
-  chat.setTypingsPlaceholder('');
+
+  let placeholder = this.stringFor('chat-typings-placeholder');
+  chat.setTypingsPlaceholder(placeholder);
+
   chat.onMessageSubmitted = (message) => {
     chat.clearTypings();
     this.client.sendChatMessage(message);

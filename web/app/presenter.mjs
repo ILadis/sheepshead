@@ -285,7 +285,7 @@ Presenter.prototype.onSettled = async function(contract) {
     this.showToast(message);
   }
 
-  this.addChatMessage(message);
+  this.showChatMessage(message);
 
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);

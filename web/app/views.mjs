@@ -161,7 +161,7 @@ export const Chat = function() {
 
 Chat.template = html`
 <div class="chat">
-  <ul></ul>
+  <ul><li class="anchor"></ul>
   <section>
     <input type="text">
     <button></button>
@@ -191,8 +191,8 @@ Chat.prototype.addMessage = function(message, player, self) {
     break;
   }
 
-  let ul = this.node.querySelector('ul');
-  ul.appendChild(li);
+  let ul = this.node.querySelector('ul > li.anchor');
+  ul.parentNode.insertBefore(li, ul);
 };
 
 Chat.prototype.setTypingsPlaceholder = function(placeholder) {

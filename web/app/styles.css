@@ -249,6 +249,12 @@ body {
 .chat ul li {
   margin: 0 19pt 11pt;
   text-align: center;
+  overflow-anchor: none;
+}
+
+.chat ul li.anchor {
+  overflow-anchor: auto;
+  height: 1px;
 }
 
 .chat ul li.self {

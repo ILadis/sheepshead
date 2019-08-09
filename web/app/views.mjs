@@ -156,16 +156,28 @@ Trick.prototype.addCard = function(card, position) {
 };
 
 export const Chat = function() {
-  this.node = importNode(Chat.template);
+  let node = importNode(Chat.template);
+
+  let input = node.querySelector('input');
+  let button = node.querySelector('button');
+  button.onclick = () => this.onMessageSubmitted(input.value);
+
+  let form = node.querySelector('form');
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    this.onMessageSubmitted(input.value);
+  };
+
+  this.node = node;
 }
 
 Chat.template = html`
 <div class="chat">
   <ul><li class="anchor"></ul>
-  <section>
+  <form>
     <input type="text">
-    <button></button>
-  </section>
+    <button type="submit"></button>
+  </form>
 </div>
 `;
 
@@ -198,9 +210,6 @@ Chat.prototype.addMessage = function(message, player, self) {
 Chat.prototype.setTypingsPlaceholder = function(placeholder) {
   let input = this.node.querySelector('input');
   input.placeholder = placeholder;
-
-  let button = this.node.querySelector('button');
-  button.onclick = () => this.onMessageSubmitted(input.value);
 };
 
 Chat.prototype.clearTypings = function() {
@@ -401,7 +410,12 @@ List.prototype.onItemClicked = function(item) {
 };
 
 export const Textfield = function() {
-  this.node = importNode(Textfield.template);
+  let node = importNode(Textfield.template);
+
+  let input = node.querySelector('input');
+  input.onchange = () => this.onValueChange(input.value);
+
+  this.node = node;
 }
 
 Textfield.template = html`
@@ -418,17 +432,18 @@ Textfield.prototype.setLabel = function(label) {
 Textfield.prototype.setValue = function(value) {
   let input = this.node.querySelector('input');
   input.value = value;
-  input.onchange = () => this.onValueChange(input.value);
 };
 
 Textfield.prototype.onValueChanged = function(value) {
 };
 
 export const Button = function() {
-  this.node = importNode(Button.template);
+  let node = importNode(Button.template);
 
-  let button = this.node.querySelector('button');
+  let button = node.querySelector('button');
   button.onclick = () => this.onClicked();
+
+  this.node = node;
 }
 
 Button.template = html`

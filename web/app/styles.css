@@ -279,7 +279,7 @@ body {
   display: inline-block;
 }
 
-.chat section {
+.chat form {
   position: absolute;
   bottom: 0;
   padding: 0 24pt;
@@ -294,7 +294,7 @@ body {
   align-items: center;
 }
 
-.chat section input {
+.chat form input {
   padding: 5pt 10pt;
   margin-right: 5pt;
   min-width: 0;
@@ -305,7 +305,7 @@ body {
   flex-grow: 1;
 }
 
-.chat section button {
+.chat form button {
   position: relative;
   min-width: 20pt;
   height: 20pt;
@@ -320,7 +320,7 @@ body {
   z-index: 2;
 }
 
-.chat section button:after {
+.chat form button:after {
   content: ' ';
   position: absolute;
   top: -12%; left: -12%;
@@ -334,7 +334,7 @@ body {
   z-index: 1;
 }
 
-.chat section button:hover:after {
+.chat form button:hover:after {
   opacity: 1;
 }
 

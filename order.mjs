@@ -9,7 +9,7 @@ export function Order() {
 
 Order.prototype.dominate = function(card) {
   this.dominants.clear();
-  if (!this.trumps.contains(card)) {
+  if (card && !this.trumps.contains(card)) {
     let suit = card.suit;
     for (let rank of Rank) {
       let dominant = Card[suit][rank];

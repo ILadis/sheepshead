@@ -127,7 +127,7 @@ export async function playing({ contract, sequence }) {
   this.trick = trick;
 
   let order = contract.order;
-  order.dominants.clear();
+  order.dominate();
 
   for (let player of sequence) {
     this.actor = player;

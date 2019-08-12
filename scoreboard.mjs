@@ -6,7 +6,7 @@ export function Scoreboard(tariff = 5) {
   this.claims = new Map();
 }
 
-Scoreboard.prototype.add = function(...players) {
+Scoreboard.prototype.addAll = function(players) {
   for (let player of players) {
     this.scores.set(player, 0);
     this.totals.set(player, 0);

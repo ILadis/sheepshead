@@ -25,7 +25,7 @@ export async function joining() {
   let next = Player.next(players);
 
   let scores = new Scoreboard();
-  scores.add(...players);
+  scores.addAll(players);
 
   this.scores = scores;
   this.head = next;
@@ -44,7 +44,7 @@ export async function dealing({ players, head }) {
   do {
     for (let player of sequence) {
       let cards = deck.draw();
-      player.cards.add(...cards);
+      player.cards.addAll(cards);
     }
   } while (!deck.empty());
 

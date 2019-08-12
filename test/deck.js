@@ -12,7 +12,7 @@ describe('Deck', () => {
 
   beforeEach(() => {
     deck.clear();
-    deck.add(card1, card2, card3, card4);
+    deck.addAll([card1, card2, card3, card4]);
   });
 
   it('should be iterable', () => {
@@ -82,7 +82,7 @@ describe('Deck', () => {
 
     it('should return false when deck is missing card', () => {
       let card = Card[Suit.bell][Rank.seven];
-      deck.add(card1, card2);
+      deck.addAll([card1, card2]);
       Assert.equal(deck.contains(card), false);
     });
   });

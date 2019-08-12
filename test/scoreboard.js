@@ -18,7 +18,7 @@ describe('Scoreboard', () => {
   describe('#result()', () => {
     it('should return results/scores for winner/loser', () => {
       let board = new Scoreboard();
-      board.add(player1, player2, player3);
+      board.addAll([player1, player2, player3]);
 
       var trick = new Trick();
       trick.play(player1, Card[Suit.leaf][Rank.king]);
@@ -45,7 +45,7 @@ describe('Scoreboard', () => {
   describe('#award()', () => {
     it('should add winning result scores to board', () => {
       let board = new Scoreboard();
-      board.add(player1, player2, player3);
+      board.addAll([player1, player2, player3]);
 
       let winner = new Result();
       winner.score = 12;

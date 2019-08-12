@@ -26,12 +26,31 @@ Deck.prototype.shuffle = function(rand = Math.random) {
 };
 
 Deck.prototype.sort = function(comparator) {
-  this.cards.sort(comparator);
+  let length = this.cards.length - 1;
+  do {
+    var swapped = false;
+
+    for (let i = 0; i < length; i++) {
+      let card = this.cards[i];
+      let other = this.cards[i + 1];
+
+      if (comparator(card, other) > 0) {
+        this.cards[i] = other;
+        this.cards[i + 1] = card;
+
+        swapped = true;
+      }
+    }
+  } while (swapped);
 };
 
-Deck.prototype.add = function(...cards) {
+Deck.prototype.add = function(card) {
+  this.cards.push(card);
+};
+
+Deck.prototype.addAll = function(cards) {
   for (let card of cards) {
-    this.cards.push(card);
+    this.add(card);
   }
 };
 
@@ -39,12 +58,16 @@ Deck.prototype.draw = function(count = 4) {
   return this.cards.splice(0, count);
 };
 
-Deck.prototype.remove = function(...cards) {
+Deck.prototype.remove = function(card) {
+  let index = this.cards.indexOf(card);
+  if (index != -1) {
+    this.cards.splice(index, 1);
+  }
+};
+
+Deck.prototype.removeAll = function(cards) {
   for (let card of cards) {
-    let index = this.cards.indexOf(card);
-    if (index != -1) {
-      this.cards.splice(index, 1);
-    }
+    this.remove(card);
   }
 };
 

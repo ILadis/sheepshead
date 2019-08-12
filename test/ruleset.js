@@ -137,11 +137,11 @@ describe('Ruleset#forBidding()', () => {
   it('should disallow ownership of partner card', () => {
     let auction = new Auction();
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace]
-    );
+    ]);
 
     let rules = Ruleset.forBidding({ auction, actor });
 
@@ -151,11 +151,11 @@ describe('Ruleset#forBidding()', () => {
   it('should force ownership of non trump partner suit', () => {
     let auction = new Auction();
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.bell][Rank.seven],
       Card[Suit.leaf][Rank.officer]
-    );
+    ]);
 
     let rules = Ruleset.forBidding({ auction, actor });
 
@@ -168,10 +168,10 @@ describe('Ruleset#forPlaying()', () => {
   it('should enforce ownership of card', () => {
     let trick = new Trick();
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick });
     for (let card of [
@@ -192,12 +192,12 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace],
       Card[Suit.acorn][Rank.sergeant]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));
@@ -218,12 +218,12 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace],
       Card[Suit.acorn][Rank.sergeant]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));
@@ -242,10 +242,10 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));
@@ -264,10 +264,10 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));
@@ -282,10 +282,10 @@ describe('Ruleset#forPlaying()', () => {
     let trick = new Trick();
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
 
@@ -305,10 +305,10 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.leaf][Rank.ace],
       Card[Suit.acorn][Rank.sergeant]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));
@@ -327,12 +327,12 @@ describe('Ruleset#forPlaying()', () => {
     trick.play(new Player('Player'), lead);
 
     let actor = new Player('Actor');
-    actor.cards.add(
+    actor.cards.addAll([
       Card[Suit.heart][Rank.king],
       Card[Suit.leaf][Rank.seven],
       Card[Suit.leaf][Rank.ace],
       Card[Suit.acorn][Rank.sergeant]
-    );
+    ]);
 
     let rules = Ruleset.forPlaying({ actor, trick, contract });
     let options = Array.from(rules.options(actor.cards));

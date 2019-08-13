@@ -23,7 +23,8 @@ Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
     let state = this.observe(game, actor);
 
-    if (this.strat.wantExplore()) {
+    let explore = this.strat.wantExplore();
+    if (explore) {
       var card = this.actRandomly(actor, rules);
     } else {
       var card = this.actGreedy(state, rules);
@@ -56,7 +57,6 @@ Brain.prototype.onfinished = function(game) {
   let experiences = this.memory.sample(100);
   if (experiences) {
     this.optimize(experiences);
-    this.evolve();
   }
 };
 
@@ -189,18 +189,15 @@ Brain.prototype.gainReward = function(game, player) {
   this.reward = reward;
 };
 
-Brain.prototype.evolve = function() {
-  let evols = this.evols || 0;
+Brain.prototype.optimize = function(experiences) {
+  let steps = this.iterations || 0;
+  let evolve = ++steps % 10 == 0;
 
-  let evolve = evols % 10 == 0;
+  this.iterations = steps;
   if (evolve) {
     this.target = this.policy.clone();
   }
 
-  this.evols = evols + 1;
-};
-
-Brain.prototype.optimize = function(experiences) {
   for (let exp of experiences) {
     let { state, action, reward, next } = exp;
 

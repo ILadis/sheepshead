@@ -43,6 +43,9 @@ export const de = {
       solo: 'ein'
     }) + ` ${de['contract-label'](contract, variant)}`,
 
+  'matched-toast': (owner, partner) => ''
+    + `${owner} spielt mit ${partner}`,
+
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} gewinnt +1 Auge`,
     other: `${player} gewinnt +${points} Augen`
@@ -119,6 +122,9 @@ export const en = {
   'settled-toast': (player, contract, variant) => ''
     + `${player} is playing a `
     + `${en['contract-label'](contract, variant)}`,
+
+  'matched-toast': (owner, partner) => ''
+    + `${owner} is playing with ${partner}`,
 
   'trick-completed-toast': (player, points) => points.case({
     one: `${player} wins +1 point`,

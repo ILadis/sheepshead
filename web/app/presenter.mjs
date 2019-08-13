@@ -151,6 +151,7 @@ Presenter.prototype.listenEvents = function() {
   stream.onbidded = (contract) => this.onBidded(contract);
   stream.onsettled = (contract) => this.onSettled(contract);
   stream.onplayed = (play) => this.onPlayed(play);
+  stream.onmatched = (match) => this.onMatched(match);
   stream.oncompleted = (result) => this.onCompleted(result);
   stream.onfinished = (result) => this.onFinished(result);
   stream.onchat = (chat) => this.onChatMessage(chat);
@@ -300,6 +301,12 @@ Presenter.prototype.onPlayed = function({ player, card }) {
   let position = this.positionOf(player);
   this.views.trick.addCard(card, position);
   this.refreshPlayers(player);
+};
+
+Presenter.prototype.onMatched = function({ owner, partner }) {
+  let message = this.stringFor('matched-toast',
+    owner.name, partner.name);
+  this.showChatMessage(message);
 };
 
 Presenter.prototype.onCompleted = function({ winner, points }) {

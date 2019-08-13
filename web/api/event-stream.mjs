@@ -34,10 +34,13 @@ EventStream.prototype.attach = function(game) {
     let play = new Entities.Play(args[0], args[1]);
     this.publish('played', play);
   };
+  game.onmatched = (...args) => {
+    let match = new Entities.Match(args[0]);
+    this.publish('matched', match);
+  };
   game.oncompleted = (...args) => {
-    let points = args[0].points();
-    let winner = new Entities.Player(args[1]);
-    this.publish('completed', { winner, points });
+    let completion = new Entities.Completion(args[0], args[1]);
+    this.publish('completed', completion);
   };
   game.onfinished = (...args) => {
     let winner = new Entities.Result(args[0]);

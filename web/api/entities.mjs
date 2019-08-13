@@ -25,6 +25,17 @@ Contract.prototype.toJSON = function() {
   return { name, variant, owner };
 };
 
+export function Turn(player, phase) {
+  this.player = player;
+  this.phase = phase;
+}
+
+Turn.prototype.toJSON = function() {
+  let player = new Player(this.player);
+  let phase = this.phase.name;
+  return { player, phase };
+};
+
 export function Play(player, card) {
   this.player = player;
   this.card = card;
@@ -36,15 +47,25 @@ Play.prototype.toJSON = function() {
   return { player, card };
 };
 
-export function Turn(player, phase) {
-  this.player = player;
-  this.phase = phase;
+export function Match(contract) {
+  this.contract = contract;
 }
 
-Turn.prototype.toJSON = function() {
-  let player = new Player(this.player);
-  let phase = this.phase.name;
-  return { player, phase };
+Match.prototype.toJSON = function() {
+  let owner = new Player(this.contract.owner);
+  let partner = new Player(this.contract.partner);
+  return { owner, partner };
+};
+
+export function Completion(trick, winner) {
+  this.trick = trick;
+  this.winner = winner;
+}
+
+Completion.prototype.toJSON = function() {
+  let points = this.trick.points();
+  let winner = new Player(this.winner);
+  return { points, winner };
 };
 
 export function Result(result) {

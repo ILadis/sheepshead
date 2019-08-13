@@ -78,11 +78,11 @@ Indices.prototype.size = function() {
 Indices.cards = new Indices((values) => {
   for (let suit of Suit) {
     for (let rank of Rank) {
-        var index = ++index || 0;
-        var card = Card[suit][rank];
+      var index = ++index || 0;
+      var card = Card[suit][rank];
 
-        values.set(index, card);
-        values.set(card, index);
+      values.set(index, card);
+      values.set(card, index);
     }
   }
 });

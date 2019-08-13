@@ -1,11 +1,11 @@
 
-import { DeepQ } from './network.mjs';
-import { Memory } from './memory.mjs';
 import { Tensor, Builder, Indices } from './model.mjs';
+import { Network, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 
 export function Brain(network) {
-  this.memory = new Memory(1000);
-  this.policy = network ? DeepQ.from(network) : new DeepQ(103, 32, 32, 32, 32);
+  this.memory = new ReplayMemory(1000);
+  this.strat = new GreedyStrategy(1, 0.1, 0.000021);
+  this.policy = network ? Network.from(network) : new Network(103, 32, 32, 32, 32);
   this.target = this.policy.clone();
 }
 
@@ -23,7 +23,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
     let state = this.observe(game, actor);
 
-    if (this.wantExplore()) {
+    if (this.strat.wantExplore()) {
       var card = this.actRandomly(actor, rules);
     } else {
       var card = this.actGreedy(state, rules);
@@ -58,21 +58,6 @@ Brain.prototype.onfinished = function(game) {
     this.optimize(experiences);
     this.evolve();
   }
-};
-
-Brain.prototype.wantExplore = function() {
-  let expls = this.expls || 0;
-
-  let end = 0.1;
-  let start = 1;
-  let decay = 0.000021;
-
-  let explore = end + (start - end) * Math.exp(-1 * expls * decay);
-  let rand = Math.random();
-
-  this.expls = expls + 1;
-
-  return explore > rand;
 };
 
 Brain.prototype.actRandomly = function(player, rules) {

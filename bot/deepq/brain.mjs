@@ -5,7 +5,7 @@ import { Network, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 export function Brain(network) {
   this.memory = new ReplayMemory(1000);
   this.strat = new GreedyStrategy(1, 0.1, 0.000021);
-  this.policy = network ? Network.from(network) : new Network(103, 32, 32, 32, 32);
+  this.policy = network ? Network.from(network) : new Network(135, 32, 32, 32, 32);
   this.target = this.policy.clone();
 }
 
@@ -86,46 +86,34 @@ Brain.prototype.actGreedy = function(state, rules) {
   return card;
 };
 
-Brain.prototype.observe = function(game, player) {
-  let { trick, contract: { order } } = game;
+Brain.prototype.observe = function(game, actor) {
+  let { players, trick, contract: { order } } = game;
 
   let lead = trick.lead();
   let winner = trick.winner(order);
 
-  let cards = this.countCards(game);
-  let party = this.determineParty(game, player);
+  let party = this.determineParty(game, actor);
+  let chance = this.partnerYetToPlay(party, actor, trick);
 
-  for (let partner of party) {
-    if (partner != player && !trick.includes(partner)) {
-      var chance = true;
-    }
-  }
+  let opponents = this.opponentCards(party, players, trick);
+  let remaining = this.remainingCards(players);
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
-  builder.cards(player.cards)
-    .cards(cards)
-    .cards(trick.cards())
+  builder.cards(actor.cards);
+
+  builder.cards(trick.cards())
     .suits(lead)
-    .flag(order.trumps.contains(lead))
-    .flag(party.has(winner))
+    .flag(order.trumps.contains(lead));
+
+  builder.flag(party.has(winner))
     .flag(chance);
 
+  builder.cards(opponents)
+    .cards(remaining);
+
   return tensor.states;
-};
-
-Brain.prototype.countCards = function(game) {
-  let { players } = game;
-
-  let cards = new Set();
-  for (let player of players) {
-    for (let card of player.cards) {
-      cards.add(card);
-    }
-  }
-
-  return cards;
 };
 
 Brain.prototype.determineParty = function(game, player) {
@@ -134,12 +122,12 @@ Brain.prototype.determineParty = function(game, player) {
   let declarer = new Set();
   let defender = new Set();
 
-  if (player.cards.contains(partner)) {
-    partner = player;
-  }
-
   for (let player of players) {
-    switch(player) {
+    if (player.cards.contains(partner)) {
+      partner = player;
+    }
+
+    switch (player) {
     case owner:
     case partner:
       declarer.add(player);
@@ -154,6 +142,40 @@ Brain.prototype.determineParty = function(game, player) {
   }
 
   return new Set([player]);
+};
+
+Brain.prototype.partnerYetToPlay = function(party, actor, trick) {
+  for (let partner of party) {
+    if (partner != actor && !trick.includes(partner)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+Brain.prototype.opponentCards = function(party, players, trick) {
+  let cards = new Set();
+  for (let player of players) {
+    if (!party.has(player) && !trick.includes(player)) {
+      for (let card of player.cards) {
+        cards.add(card);
+      }
+    }
+  }
+
+  return cards;
+};
+
+Brain.prototype.remainingCards = function(players) {
+  let cards = new Set();
+  for (let player of players) {
+    for (let card of player.cards) {
+      cards.add(card);
+    }
+  }
+
+  return cards;
 };
 
 Brain.prototype.gainExperience = function(game, player) {

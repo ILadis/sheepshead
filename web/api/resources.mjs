@@ -6,6 +6,7 @@ import { Token } from './token.mjs';
 import { PreFilter } from './prefilter.mjs';
 import { EventStream } from './event-stream.mjs';
 import { DeferredInput } from './deferred-input.mjs';
+import { Chat, Command } from './chat.mjs';
 import * as Entities from './entities.mjs';
 
 import { Game } from '../../game.mjs';
@@ -142,9 +143,14 @@ Resources.chat['POST'] = PreFilter.chain(
   }
 
   let events = registry.lookup(game).events;
-  var entity = new Entities.Chat(player, message);
 
-  events.publish('chat', entity);
+  let chat = new Chat((message, player) => {
+    let entity = new Entities.Chat(message, player);
+    events.publish('chat', entity);
+  });
+
+  chat.register(new Command.Hello(game));
+  chat.send(message, player);
 
   response.writeHead(200);
   return response.end();

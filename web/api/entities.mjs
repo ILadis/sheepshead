@@ -120,14 +120,15 @@ Card.prototype.toJSON = function() {
   return { suit, rank };
 };
 
-export function Chat(player, message) {
-  this.player = player;
+export function Chat(message, player) {
   this.message = message;
+  this.player = player;
 }
 
 Chat.prototype.toJSON = function() {
-  let player = new Player(this.player);
   let message = this.message;
-  return { player, message };
+  let player = this.player;
+  player =  player ? new Player(player) : undefined;
+  return { message, player };
 };
 

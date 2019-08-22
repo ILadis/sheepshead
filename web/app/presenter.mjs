@@ -328,7 +328,7 @@ Presenter.prototype.onFinished = function({ winner }) {
 
 Presenter.prototype.listStandings = async function() {
   let players = await this.client.fetchScores();
-  
+
   if (this.phase === null) {
     let dialog = this.views.dialog;
 
@@ -359,7 +359,7 @@ Presenter.prototype.listStandings = async function() {
 };
 
 Presenter.prototype.isSelf = function(other) {
-  return this.self.index == other.index;
+  return other && this.self.index == other.index;
 };
 
 Presenter.prototype.positionOf = function(other) {

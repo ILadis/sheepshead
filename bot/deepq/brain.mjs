@@ -116,7 +116,7 @@ Brain.prototype.observe = function(game, actor) {
   return tensor.states;
 };
 
-Brain.prototype.determineParty = function(game, player) {
+Brain.prototype.determineParty = function(game, actor) {
   let { contract: { owner, partner }, players } = game;
 
   let declarer = new Set();
@@ -137,11 +137,7 @@ Brain.prototype.determineParty = function(game, player) {
     }
   }
 
-  if (!partner || declarer.has(partner)) {
-    return declarer.has(player) ? declarer : defender;
-  }
-
-  return new Set([player]);
+  return declarer.has(actor) ? declarer : defender;
 };
 
 Brain.prototype.partnerYetToPlay = function(party, actor, trick) {

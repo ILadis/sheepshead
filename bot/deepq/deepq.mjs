@@ -32,7 +32,6 @@ function clone() {
   return Network.from(this.serialize());
 }
 
-
 export function ReplayMemory(capacity) {
   this.experiences = new Array(capacity);
   this.size = 0;

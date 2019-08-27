@@ -5,7 +5,7 @@ import { Network, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 export function Brain(network) {
   this.memory = new ReplayMemory(1000);
   this.strat = new GreedyStrategy(1, 0.1, 0.000021);
-  this.policy = network ? Network.from(network) : new Network(135, 32, 32, 32, 32);
+  this.policy = network ? Network.from(network) : new Network(134, 32, 32, 32, 32);
   this.target = this.policy.clone();
 }
 
@@ -87,31 +87,27 @@ Brain.prototype.actGreedy = function(state, rules) {
 };
 
 Brain.prototype.observe = function(game, actor) {
-  let { players, trick, contract: { order } } = game;
+  let { trick, contract: { order } } = game;
 
   let lead = trick.lead();
   let winner = trick.winner(order);
 
   let party = this.determineParty(game, actor);
-  let chance = this.partnerYetToPlay(party, actor, trick);
 
-  let opponents = this.opponentCards(party, players, trick);
-  let remaining = this.remainingCards(players);
+  let partner = this.yetToBePlayed(game, actor, p => party.has(p));
+  let opponents = this.yetToBePlayed(game, actor, p => !party.has(p));
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
-  builder.cards(actor.cards);
+  builder.cards(actor.cards)
+    .cards(partner)
+    .cards(opponents);
 
   builder.cards(trick.cards())
     .suits(lead)
-    .flag(order.trumps.contains(lead));
-
-  builder.flag(party.has(winner))
-    .flag(chance);
-
-  builder.cards(opponents)
-    .cards(remaining);
+    .flag(order.trumps.contains(lead))
+    .flag(party.has(winner));
 
   return tensor.states;
 };
@@ -140,34 +136,15 @@ Brain.prototype.determineParty = function(game, actor) {
   return declarer.has(actor) ? declarer : defender;
 };
 
-Brain.prototype.partnerYetToPlay = function(party, actor, trick) {
-  for (let partner of party) {
-    if (partner != actor && !trick.includes(partner)) {
-      return true;
-    }
-  }
+Brain.prototype.yetToBePlayed = function(game, actor, filter) {
+  let { players, trick } = game;
 
-  return false;
-};
-
-Brain.prototype.opponentCards = function(party, players, trick) {
   let cards = new Set();
   for (let player of players) {
-    if (!party.has(player) && !trick.includes(player)) {
+    if (player != actor && !trick.includes(player) && filter(player)) {
       for (let card of player.cards) {
         cards.add(card);
       }
-    }
-  }
-
-  return cards;
-};
-
-Brain.prototype.remainingCards = function(players) {
-  let cards = new Set();
-  for (let player of players) {
-    for (let card of player.cards) {
-      cards.add(card);
     }
   }
 

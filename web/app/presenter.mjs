@@ -7,10 +7,6 @@ export function Presenter(shell, client, strings) {
   this.strings = strings;
 }
 
-Presenter.prototype.stringFor = function(name, ...args) {
-  return this.strings.get(name, ...args);
-};
-
 Presenter.prototype.showView = function(title, ...sections) {
   let shell = this.shell;
 
@@ -31,14 +27,6 @@ Presenter.prototype.showView = function(title, ...sections) {
   }
 };
 
-Presenter.prototype.showToast = function(text, duration) {
-  this.views.toast.makeText(text, duration);
-};
-
-Presenter.prototype.showChatMessage = function(message, player, self) {
-  this.views.chat.addMessage(message, player, self);
-};
-
 Presenter.prototype.showLobby = function() {
   let title = this.stringFor('lobby-title');
   this.showView(title,
@@ -50,7 +38,7 @@ Presenter.prototype.showLobby = function() {
     }]
   );
   this.shell.setRefreshable(true);
-  this.shell.onRefreshClicked = () => this.refreshGames();
+  this.shell.refreshClicked = () => this.refreshGames();
   this.refreshGames(true);
   this.changePlayerName();
 };
@@ -76,8 +64,8 @@ Presenter.prototype.refreshGames = async function(initial) {
   var hint = this.stringFor('no-games-hint');
   list.setHint(hint);
 
-  fab.onClicked = () => this.createGame();
-  list.onItemClicked = (game) => this.joinGame(game);
+  fab.clicked = () => this.createGame();
+  list.itemClicked = (game) => this.joinGame(game);
 };
 
 Presenter.prototype.changePlayerName = function(name) {
@@ -93,7 +81,7 @@ Presenter.prototype.changePlayerName = function(name) {
     view.setLabel(label);
     view.setValue(name);
 
-    view.onValueChange = (name) => this.playerName = name;
+    view.valueChange = (name) => this.playerName = name;
   }
 
   this.playerName = name;
@@ -144,17 +132,17 @@ Presenter.prototype.showGame = function() {
 
 Presenter.prototype.listenEvents = function() {
   let stream = this.client.listenEvents();
-  stream.onjoined = (player) => this.onJoined(player);
-  stream.ondealt = () => this.onDealt();
-  stream.onturn = (turn) => this.onTurn(turn);
-  stream.oncontested = (player) => this.onContested(player);
-  stream.onbidded = (contract) => this.onBidded(contract);
-  stream.onsettled = (contract) => this.onSettled(contract);
-  stream.onplayed = (play) => this.onPlayed(play);
-  stream.onmatched = (match) => this.onMatched(match);
-  stream.oncompleted = (result) => this.onCompleted(result);
-  stream.onfinished = (result) => this.onFinished(result);
-  stream.onchat = (chat) => this.onChatMessage(chat);
+  stream.onchat = (chat) => this.chatMessageReceived(chat);
+  stream.onjoined = (player) => this.playerJoined(player);
+  stream.ondealt = () => this.cardsDealt();
+  stream.onturn = (turn) => this.playerTurn(turn);
+  stream.oncontested = (player) => this.auctionContested(player);
+  stream.onbidded = (contract) => this.contractBidded(contract);
+  stream.onsettled = (contract) => this.contractSettled(contract);
+  stream.onplayed = (play) => this.cardPlayed(play);
+  stream.onmatched = (match) => this.partiesMatched(match);
+  stream.oncompleted = (result) => this.trickCompleted(result);
+  stream.onfinished = (result) => this.gameFinished(result);
 };
 
 Presenter.prototype.setupChat = function() {
@@ -163,30 +151,29 @@ Presenter.prototype.setupChat = function() {
   let placeholder = this.stringFor('chat-typings-placeholder');
   chat.setTypingsPlaceholder(placeholder);
 
-  chat.onMessageSubmitted = (message) => {
+  chat.messageSubmitted = (message) => {
     chat.clearTypings();
     this.client.sendChatMessage(message);
   };
 };
 
-Presenter.prototype.onChatMessage = function({ player, message }) {
-  let self = this.isSelf(player);
-  this.showChatMessage(message, player, self);
+Presenter.prototype.chatMessageReceived = function({ message, player }) {
+  this.showChatMessage(message, player);
 };
 
-Presenter.prototype.onJoined = function(player) {
+Presenter.prototype.playerJoined = function(player) {
   let message = this.stringFor('joined-game-toast', player.name);
   this.showToast(message);
   this.showChatMessage(message);
 };
 
-Presenter.prototype.onDealt = async function() {
+Presenter.prototype.cardsDealt = async function() {
   this.views.trick.clearCards();
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);
 };
 
-Presenter.prototype.onTurn = function({ player, phase }) {
+Presenter.prototype.playerTurn = function({ player, phase }) {
   this.phase = phase;
   this.views.dialog.dismiss();
 
@@ -208,7 +195,9 @@ Presenter.prototype.refreshPlayers = function(...players) {
     hand.setActor(false);
   }
 
-  bottom.onCardClicked = (card) => this.playCard(card);
+  bottom.cardClicked = (card) => {
+    this.client.playCard(card);
+  };
 
   let hands = this.views;
   for (let player of players) {
@@ -229,10 +218,6 @@ Presenter.prototype.refreshPlayers = function(...players) {
   }
 };
 
-Presenter.prototype.playCard = function(card) {
-  this.client.playCard(card);
-};
-
 Presenter.prototype.listContracts = async function(phase) {
   let contracts = await this.client.fetchContracts();
 
@@ -248,7 +233,7 @@ Presenter.prototype.listContracts = async function(phase) {
       options.addItem(label, contract);
     }
 
-    options.onItemSelected = (contract) => this.bidContract(contract);
+    options.itemSelected = (contract) => this.bidContract(contract, phase);
 
     let title = this.stringFor('contract-title', phase);
     dialog.setTitle(title);
@@ -256,14 +241,16 @@ Presenter.prototype.listContracts = async function(phase) {
   }
 };
 
-Presenter.prototype.bidContract = function(contract) {
-  let dialog = this.views.dialog;
-  this.client.bidContract(contract).then(() => {
+Presenter.prototype.bidContract = async function(contract, phase) {
+  await this.client.bidContract(contract);
+
+  if (this.phase === phase) {
+    let dialog = this.views.dialog;
     dialog.dismiss();
-  });
+  }
 };
 
-Presenter.prototype.onContested = function(player) {
+Presenter.prototype.auctionContested = function(player) {
   let message = this.stringFor('contested-toast', player.name);
 
   this.showChatMessage(message);
@@ -272,7 +259,7 @@ Presenter.prototype.onContested = function(player) {
   }
 };
 
-Presenter.prototype.onBidded = function(contract) {
+Presenter.prototype.contractBidded = function(contract) {
   let player = contract.owner;
   let message = this.stringFor('bidded-toast',
     player.name, contract.name, contract.variant);
@@ -283,7 +270,7 @@ Presenter.prototype.onBidded = function(contract) {
   }
 };
 
-Presenter.prototype.onSettled = async function(contract) {
+Presenter.prototype.contractSettled = async function(contract) {
   let player = contract.owner;
   let message = this.stringFor('settled-toast',
     player.name, contract.name, contract.variant);
@@ -297,25 +284,25 @@ Presenter.prototype.onSettled = async function(contract) {
   this.refreshPlayers(...players);
 };
 
-Presenter.prototype.onPlayed = function({ player, card }) {
+Presenter.prototype.cardPlayed = function({ player, card }) {
   let position = this.positionOf(player);
   this.views.trick.addCard(card, position);
   this.refreshPlayers(player);
 };
 
-Presenter.prototype.onMatched = function({ owner, partner }) {
+Presenter.prototype.partiesMatched = function({ owner, partner }) {
   let message = this.stringFor('matched-toast',
     owner.name, partner.name);
   this.showChatMessage(message);
 };
 
-Presenter.prototype.onCompleted = function({ winner, points }) {
+Presenter.prototype.trickCompleted = function({ winner, points }) {
   let message = this.stringFor('trick-completed-toast',
     winner.name, points);
   this.showToast(message);
 };
 
-Presenter.prototype.onFinished = function({ winner }) {
+Presenter.prototype.gameFinished = function({ winner }) {
   let names = winner.players.map(p => p.name);
   let message = this.stringFor('finished-toast',
     names, winner.points, winner.score);
@@ -358,6 +345,21 @@ Presenter.prototype.listStandings = async function() {
   }
 };
 
+Presenter.prototype.showToast = function(text, duration) {
+  let toast = this.views.toast;
+  if (toast) {
+    toast.makeText(text, duration);
+  }
+};
+
+Presenter.prototype.showChatMessage = function(message, player) {
+  let chat = this.views.chat;
+  if (chat) {
+    var self = this.isSelf(player);
+    chat.addMessage(message, player, self);
+  }
+};
+
 Presenter.prototype.isSelf = function(other) {
   return other && this.self.index == other.index;
 };
@@ -369,5 +371,9 @@ Presenter.prototype.positionOf = function(other) {
       return position;
     }
   }
+};
+
+Presenter.prototype.stringFor = function(name, ...args) {
+  return this.strings.get(name, ...args);
 };
 

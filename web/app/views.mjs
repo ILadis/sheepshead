@@ -28,7 +28,7 @@ Shell.prototype.setRefreshable = function(enable) {
   if (enable && !button) {
     button = document.createElement('button');
     button.className = 'refresh';
-    button.onclick = () => this.onRefreshClicked();
+    button.onclick = () => this.refreshClicked();
 
     header.appendChild(button);
   }
@@ -55,7 +55,7 @@ Shell.prototype.newSection = function(name) {
   return { addView };
 };
 
-Shell.prototype.onRefreshClicked = function() {
+Shell.prototype.refreshClicked = function() {
 };
 
 export const Hand = function() {
@@ -111,7 +111,7 @@ Hand.prototype.setCards = function(cards) {
   for (let card of cards) {
     let button = document.createElement('button');
     button.className = 'card';
-    button.onclick = () => this.onCardClicked(card);
+    button.onclick = () => this.cardClicked(card);
 
     if (card) {
       button.classList.add(card.suit);
@@ -122,7 +122,7 @@ Hand.prototype.setCards = function(cards) {
   }
 };
 
-Hand.prototype.onCardClicked = function(card) {
+Hand.prototype.cardClicked = function(card) {
 };
 
 export const Trick = function() {
@@ -160,12 +160,12 @@ export const Chat = function() {
 
   let input = node.querySelector('input');
   let button = node.querySelector('button');
-  button.onclick = () => this.onMessageSubmitted(input.value);
+  button.onclick = () => this.messageSubmitted(input.value);
 
   let form = node.querySelector('form');
   form.onsubmit = (event) => {
     event.preventDefault();
-    this.onMessageSubmitted(input.value);
+    this.messageSubmitted(input.value);
   };
 
   this.node = node;
@@ -217,7 +217,7 @@ Chat.prototype.clearTypings = function() {
   input.value = '';
 };
 
-Chat.prototype.onMessageSubmitted = function(message) {
+Chat.prototype.messageSubmitted = function(message) {
 };
 
 export const Toast = function() {
@@ -311,7 +311,7 @@ Dialog.prototype.withOptions = function() {
   let addItem = function(label, item) {
     let li = document.createElement('li');
     li.textContent = label;
-    li.onclick = () => this.onItemSelected(item);
+    li.onclick = () => this.itemSelected(item);
 
     ul.appendChild(li);
   };
@@ -396,7 +396,7 @@ List.prototype.clearItems = function() {
 List.prototype.addItem = function(label, item) {
   let li = document.createElement('li');
   li.textContent = label;
-  li.onclick = () => this.onItemClicked(item);
+  li.onclick = () => this.itemClicked(item);
 
   let ul = this.node.querySelector('ul');
   ul.style.visibility = 'visible';
@@ -406,14 +406,14 @@ List.prototype.addItem = function(label, item) {
   span.style.display = 'none';
 };
 
-List.prototype.onItemClicked = function(item) {
+List.prototype.itemClicked = function(item) {
 };
 
 export const Textfield = function() {
   let node = importNode(Textfield.template);
 
   let input = node.querySelector('input');
-  input.onchange = () => this.onValueChange(input.value);
+  input.onchange = () => this.valueChange(input.value);
 
   this.node = node;
 }
@@ -434,14 +434,14 @@ Textfield.prototype.setValue = function(value) {
   input.value = value;
 };
 
-Textfield.prototype.onValueChanged = function(value) {
+Textfield.prototype.valueChanged = function(value) {
 };
 
 export const Button = function() {
   let node = importNode(Button.template);
 
   let button = node.querySelector('button');
-  button.onclick = () => this.onClicked();
+  button.onclick = () => this.clicked();
 
   this.node = node;
 }
@@ -451,7 +451,7 @@ Button.template = html`
   <button></button>
 </div>`;
 
-Button.prototype.onClicked = function() {
+Button.prototype.clicked = function() {
 };
 
 function html(source) {

@@ -175,6 +175,7 @@ Chat.template = html`
 <div class="chat">
   <ul><li class="anchor"></ul>
   <form>
+    <ul></ul>
     <input type="text" autocorrect="off" autocapitalize="sentences">
     <button type="submit"></button>
   </form>
@@ -208,12 +209,29 @@ Chat.prototype.addMessage = function(message, player, self) {
 };
 
 Chat.prototype.setTypingsPlaceholder = function(placeholder) {
-  let input = this.node.querySelector('input');
+  let input = this.node.querySelector('form > input');
   input.placeholder = placeholder;
 };
 
+Chat.prototype.addEmojis = function(from, to, label) {
+  let ul = this.node.querySelector('form > ul');
+
+  for (let code = from; code < to; code++) {
+    let emoji = String.fromCodePoint(code);
+
+    let input = document.createElement('input');
+    input.type = 'button';
+    input.value = emoji;
+
+    let li = document.createElement('li');
+    li.appendChild(input);
+
+    ul.appendChild(li);
+  }
+};
+
 Chat.prototype.clearTypings = function() {
-  let input = this.node.querySelector('input');
+  let input = this.node.querySelector('form > input');
   input.value = '';
 };
 

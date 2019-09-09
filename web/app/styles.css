@@ -230,23 +230,25 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  padding-bottom: 45pt;
-  background-color: #f2f2f2;
   border-width: 1px;
   border-color: #dadbdb;
   border-left-style: solid;
+  background-color: #f2f2f2;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-.chat ul {
+.chat > ul {
   height: 100%;
   padding: 12pt 0 0;
   list-style: none;
   box-sizing: border-box;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-.chat ul li {
+.chat > ul li {
   margin: 0 24pt 11pt;
   padding: 5pt 9pt;
   text-align: center;
@@ -258,15 +260,15 @@ body {
   clear: both;
 }
 
-.chat ul li h6 {
+.chat > ul li h6 {
   padding-top: 3pt;
   font-size: 7pt;
 }
 
-.chat ul li.self { margin: 0 29pt 11pt 8pt; text-align: left; float: left; }
-.chat ul li.other { margin: 0 8pt 11pt 29pt; text-align: left; float: right; }
+.chat > ul li.self { margin: 0 29pt 11pt 8pt; text-align: left; float: left; }
+.chat > ul li.other { margin: 0 8pt 11pt 29pt; text-align: left; float: right; }
 
-.chat ul li.anchor {
+.chat > ul li.anchor {
   clear: both;
   margin: 0;
   overflow-anchor: auto;
@@ -275,21 +277,43 @@ body {
 }
 
 .chat form {
-  position: absolute;
-  bottom: 0;
-  padding: 0 24pt;
-  height: 45pt;
+  padding: 0 0 10pt 12pt;
   width: 100%;
+  border-top: solid 1px #dadbdb;
   background: #e9ebeb;
-  border-width: 1px;
-  border-color: #dadbdb;
-  border-top-style: solid;
   box-sizing: border-box;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-.chat form input {
+.chat form > ul {
+  width: 100%;
+  max-height: 100pt;
+  padding-top: 5pt;
+  margin-bottom: 5pt;
+  flex-grow: 1;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+  display: block;
+}
+
+.chat form > ul li {
+  display: inline-block;
+}
+
+.chat form > ul li > input {
+  padding: 3pt;
+  font-size: 16pt;
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chat form > input {
   padding: 5pt 10pt;
   margin-right: 5pt;
   min-width: 0;
@@ -300,10 +324,11 @@ body {
   flex-grow: 1;
 }
 
-.chat form button {
+.chat form > button {
   position: relative;
   min-width: 20pt;
   height: 20pt;
+  margin-right: 12pt;
   background-color: transparent;
   background-image: url('send.svg');
   background-size: 20pt;
@@ -315,7 +340,7 @@ body {
   z-index: 2;
 }
 
-.chat form button:after {
+.chat form > button:after {
   content: ' ';
   position: absolute;
   top: -12%; left: -12%;

@@ -151,7 +151,7 @@ Presenter.prototype.setupChat = function() {
   let placeholder = this.stringFor('chat-typings-placeholder');
   chat.setTypingsPlaceholder(placeholder);
 
-  chat.addEmojis(0x1F601, 0x1F64F);
+  chat.addEmojis([0x1F601, 0x1F64F]);
 
   chat.messageSubmitted = (message) => {
     chat.clearTypings();

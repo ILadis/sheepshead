@@ -158,9 +158,10 @@ Trick.prototype.addCard = function(card, position) {
 export const Chat = function() {
   let node = importNode(Chat.template);
 
-  let input = node.querySelector('input');
-  let button = node.querySelector('button');
-  button.onclick = () => this.messageSubmitted(input.value);
+  let input = node.querySelector('form > input');
+
+  let button = node.querySelector('form > button[type=button]');
+  button.onclick = () => this.toggleEmojis();
 
   let form = node.querySelector('form');
   form.onsubmit = (event) => {
@@ -169,6 +170,7 @@ export const Chat = function() {
   };
 
   this.node = node;
+  this.toggleEmojis();
 }
 
 Chat.template = html`
@@ -176,6 +178,7 @@ Chat.template = html`
   <ul><li class="anchor"></ul>
   <form>
     <ul></ul>
+    <button type="button"></button>
     <input type="text" autocorrect="off" autocapitalize="sentences">
     <button type="submit"></button>
   </form>
@@ -213,18 +216,36 @@ Chat.prototype.setTypingsPlaceholder = function(placeholder) {
   input.placeholder = placeholder;
 };
 
-Chat.prototype.addEmojis = function(from, to, label) {
+Chat.prototype.toggleEmojis = function() {
   let ul = this.node.querySelector('form > ul');
 
+  if (ul.className == 'close') {
+    ul.className = 'open';
+  } else {
+    ul.className = 'close';
+  }
+};
+
+Chat.prototype.addEmojis = function(range) {
+  let ul = this.node.querySelector('form > ul');
+  let input = this.node.querySelector('form > input');
+
+  let [from, to] = range;
   for (let code = from; code < to; code++) {
     let emoji = String.fromCodePoint(code);
 
-    let input = document.createElement('input');
-    input.type = 'button';
-    input.value = emoji;
+    let button = document.createElement('input');
+    button.type = 'button';
+    button.value = emoji;
+    button.onclick = () => {
+      input.focus();
+      let start = input.selectionStart;
+      input.setRangeText(emoji);
+      input.selectionStart = input.selectionEnd = start + emoji.length;
+    };
 
     let li = document.createElement('li');
-    li.appendChild(input);
+    li.appendChild(button);
 
     ul.appendChild(li);
   }

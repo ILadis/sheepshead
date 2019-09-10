@@ -16,6 +16,7 @@ for (let path of [
   filepath`./back.svg`,
   filepath`./create.svg`,
   filepath`./refresh.svg`,
+  filepath`./emoji.svg`,
   filepath`./send.svg`,
   filepath`./app.mjs`,
   filepath`./presenter.mjs`,

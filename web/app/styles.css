@@ -289,7 +289,7 @@ body {
 
 .chat form > ul {
   width: 100%;
-  max-height: 100pt;
+  height: 0;
   padding-top: 5pt;
   margin-bottom: 5pt;
   flex-grow: 1;
@@ -298,7 +298,11 @@ body {
   scrollbar-width: thin;
   box-sizing: border-box;
   display: block;
+  transition: height 0.3s ease-out;
 }
+
+.chat form > ul.open { height: 100pt; }
+.chat form > ul.close { height: 0; }
 
 .chat form > ul li {
   display: inline-block;
@@ -315,8 +319,8 @@ body {
 
 .chat form > input {
   padding: 5pt 10pt;
-  margin-right: 5pt;
-  min-width: 0;
+  margin: 0 5pt;
+  width: 0;
   border: none;
   border-radius: 16pt;
   outline: none;
@@ -326,13 +330,11 @@ body {
 
 .chat form > button {
   position: relative;
-  min-width: 20pt;
+  width: 20pt;
   height: 20pt;
-  margin-right: 12pt;
   background-color: transparent;
-  background-image: url('send.svg');
   background-size: 20pt;
-  background-position: 1px center;
+  background-position: center;
   background-repeat: no-repeat;
   border: none;
   outline: none;
@@ -347,7 +349,6 @@ body {
   width: 124%;
   height: 124%;
   border-radius: 50%;
-  background: rgba(59, 131, 59, 0.2);
   opacity: 0;
   transition: opacity 0.4s;
   display: block;
@@ -357,6 +358,15 @@ body {
 .chat form button:hover:after {
   opacity: 1;
 }
+
+.chat form > button[type=submit]:after { background: rgba(59, 131, 59, 0.2); }
+.chat form > button[type=submit] {
+  margin-right: 12pt;
+  background-image: url('send.svg');
+}
+
+.chat form > button:after { background: rgba(0, 0, 0, 0.1); }
+.chat form > button { background-image: url('emoji.svg'); }
 
 .toast {
   position: absolute;

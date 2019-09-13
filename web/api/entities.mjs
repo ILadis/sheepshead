@@ -76,8 +76,7 @@ Result.prototype.toJSON = function() {
   let players = Array.from(this.result.players);
   players = players.map(p => new Player(p));
   let points = this.result.points();
-  let score = this.result.score;
-  return { players, points, score };
+  return { players, points };
 };
 
 export function Player(player, actor, token) {
@@ -96,17 +95,15 @@ Player.prototype.toJSON = function() {
   return { token, actor, index, name, cards };
 };
 
-export function Score(player, score, total) {
+export function Score(player) {
   this.player = player;
-  this.score = score;
-  this.total = total;
 }
 
 Score.prototype.toJSON = function() {
   let name = this.player.name;
   let index = this.player.index;
-  let score = this.score;
-  let total = this.total;
+  let score = this.player.score;
+  let total = this.player.wins;
   return { index, name, score, total };
 };
 

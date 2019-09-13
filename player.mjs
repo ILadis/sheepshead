@@ -5,6 +5,9 @@ export function Player(name, index) {
   this.name = name;
   this.index = index;
   this.cards = new Deck();
+  this.tricks = new Set();
+  this.wins = 0;
+  this.score = 0;
 }
 
 Player.sequence = function(group, from) {

@@ -269,15 +269,12 @@ Resources.scores = new Resource(
 Resources.scores['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  var { game: { players, scores } } = request;
-
-  let score = (p) => scores.scoreOf(p);
-  let total = (p) => scores.totalOf(p);
+  var { game: { players } } = request;
 
   var players = Array.from(players);
-  players.sort((p1, p2) => score(p2) - score(p1));
+  players.sort((p1, p2) => p2.score - p1.score);
 
-  let entity = players.map(p => new Entities.Score(p, score(p), total(p)));
+  let entity = players.map(p => new Entities.Score(p));
   let json = JSON.stringify(entity);
 
   response.setHeader('Content-Type', MediaType.json);

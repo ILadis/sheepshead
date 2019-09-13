@@ -28,7 +28,7 @@ Auction.prototype.blind = function() {
 };
 
 Auction.prototype.settled = function() {
-  return this.bids.size <= 1;
+  return this.bids.size == 1;
 };
 
 Auction.prototype.winner = function() {

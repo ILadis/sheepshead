@@ -4,8 +4,8 @@ import { Trick } from './trick.mjs';
 import { Player } from './player.mjs';
 import { Contract } from './contract.mjs';
 import { Auction } from './auction.mjs';
-import { Scoreboard } from './scoreboard.mjs';
 import { Ruleset } from './ruleset.mjs';
+import { Result } from './result.mjs';
 
 export async function joining() {
   let rules = Ruleset.forJoining(this);
@@ -23,11 +23,6 @@ export async function joining() {
   }
 
   let next = Player.next(players);
-
-  let scores = new Scoreboard();
-  scores.addAll(players);
-
-  this.scores = scores;
   this.head = next;
 
   return dealing;
@@ -120,7 +115,7 @@ export async function bidding({ auction }) {
   return playing;
 }
 
-export async function playing({ contract, sequence }) {
+export async function playing({ contract, sequence, players }) {
   let rules = Ruleset.forPlaying(this);
 
   let trick = new Trick();
@@ -152,31 +147,44 @@ export async function playing({ contract, sequence }) {
     }
   }
 
-  return award;
-}
-
-export async function award({ contract, trick, scores, players }) {
-  let order = contract.order;
-
   let winner = trick.winner(order);
-  scores.claim(winner, trick);
+  winner.tricks.add(trick);
 
   this.oncompleted(trick, winner);
 
-  let sequence = Player.sequence(players, winner);
+  var sequence = Player.sequence(players, winner);
   this.sequence = sequence;
 
-  if (!winner.cards.empty()) {
-    return playing;
+  return winner.cards.empty() ? aftermath : playing;
+}
+
+export async function aftermath({ contract, players }) {
+  let declarer = new Result();
+  let defender = new Result();
+
+  for (let player of players) {
+    switch (player) {
+    case contract.owner:
+    case contract.partner:
+      declarer.add(player);
+      break;
+    default:
+      defender.add(player);
+    }
   }
 
-  let result = scores.result(contract);
-  if (result) {
-    scores.award(result);
+  let result = Result.compare(declarer, defender);
+  let multiplier = Result.multiplier(result, contract);
+  let score = 5 * multiplier;
 
-    let { winner, loser } = result;
-    this.onfinished(winner, loser);
+  let { winner, loser } = result;
+
+  for (let player of winner.players) {
+    player.wins++;
+    player.score += score;
   }
+
+  this.onfinished(winner, loser);
 
   return proceed;
 }
@@ -185,6 +193,7 @@ export async function proceed({ players, head }) {
   this.actor = null;
   for (let player of players) {
     player.cards.clear();
+    player.tricks.clear();
   }
 
   let proceed = await this.onproceed();

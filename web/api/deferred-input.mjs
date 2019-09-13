@@ -15,9 +15,10 @@ DeferredInput.prototype.attach = function(game) {
   };
 
   game.onproceed = () => {
+    let timeout = game.auction.settled() ? 12000 : 200;
     return new Promise((resolve, reject) => {
       this.promise = { resolve, reject };
-      this.timer = setTimeout(() => resolve(true), 12000);
+      this.timer = setTimeout(() => resolve(true), timeout);
     });
   };
 };

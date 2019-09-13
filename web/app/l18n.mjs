@@ -51,11 +51,11 @@ export const de = {
     other: `${player} gewinnt +${points} Augen`
   }),
 
-  'finished-toast': (players, points, score) => ''
+  'finished-toast': (players, points) => ''
     + players.format('join', ' und ') + ' ' + players.case({
       one: `hat`,
       other: `haben`
-    }) + ` mit ${points} Augen gewonnen und +${score} Punkte erzielt`,
+    }) + ` mit ${points} Augen gewonnen`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Was möchtest du spielen?',
@@ -132,8 +132,7 @@ export const en = {
   }),
 
   'finished-toast': (players, points, score) => ''
-    + players.format('join', ' and ') + ` won with ${points} `
-    + `points and scored +${score}`,
+    + players.format('join', ' and ') + ` won with ${points}`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Choose what to play!',

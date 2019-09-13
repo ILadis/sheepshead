@@ -1,66 +1,10 @@
 
 import Assert from 'assert';
-import { Scoreboard, Result } from '../scoreboard.mjs';
+import { Result } from '../result.mjs';
 import { Contract } from '../contract.mjs';
 import { Player } from '../player.mjs';
 import { Trick } from '../trick.mjs';
 import { Card, Suit, Rank } from '../card.mjs';
-
-describe('Scoreboard', () => {
-  let player1 = new Player();
-  let player2 = new Player();
-  let player3 = new Player();
-
-  let contract = Contract.normal.leaf;
-  contract.partner = player3;
-  contract.assign(player1);
-
-  describe('#result()', () => {
-    it('should return results/scores for winner/loser', () => {
-      let board = new Scoreboard();
-      board.addAll([player1, player2, player3]);
-
-      var trick = new Trick();
-      trick.play(player1, Card[Suit.leaf][Rank.king]);
-      board.claim(player1, trick);
-
-      var trick = new Trick();
-      trick.play(player2, Card[Suit.heart][Rank.ace]);
-      trick.play(player1, Card[Suit.leaf][Rank.ten]);
-      board.claim(player2, trick);
-
-      var trick = new Trick();
-      trick.play(player3, Card[Suit.bell][Rank.ace]);
-      trick.play(player2, Card[Suit.acorn][Rank.ten]);
-      board.claim(player3, trick);
-
-      let { winner } = board.result(contract);
-      Assert.equal(winner.score, 10);
-
-      let players = Array.from(winner.players);
-      Assert.deepEqual(players, [player1, player3]);
-    });
-  });
-
-  describe('#award()', () => {
-    it('should add winning result scores to board', () => {
-      let board = new Scoreboard();
-      board.addAll([player1, player2, player3]);
-
-      let winner = new Result();
-      winner.score = 12;
-      winner.add(player1, []);
-      winner.add(player2, []);
-
-      let loser = new Result();
-      board.award({ winner, loser });
-
-      Assert.equal(board.scoreOf(player1), 12);
-      Assert.equal(board.scoreOf(player2), 12);
-      Assert.equal(board.scoreOf(player3), 0);
-    });
-  });
-});
 
 describe('Result', () => {
   it('should have iterable players property', () => {
@@ -78,8 +22,8 @@ describe('Result', () => {
       let result = new Result();
       let player1 = new Player();
       let player2 = new Player();
-      result.add(player1, []);
-      result.add(player2, []);
+      result.add(player1);
+      result.add(player2);
       let players = Array.from(result.players);
       Assert.deepEqual(players, [player1, player2]);
     });
@@ -92,11 +36,13 @@ describe('Result', () => {
 
       let trick1 = new Trick();
       trick1.play(player, Card[Suit.leaf][Rank.ace]);
+      player.tricks.add(trick1);
 
       let trick2 = new Trick();
       trick2.play(player, Card[Suit.leaf][Rank.king]);
+      player.tricks.add(trick2);
 
-      result.add(player, [trick1, trick2]);
+      result.add(player);
       Assert.equal(result.points(), 15);
     });
   });
@@ -110,15 +56,18 @@ describe('Result', () => {
       let trick1 = new Trick();
       trick1.play(player2, Card[Suit.leaf][Rank.officer]);
       trick1.play(player1, Card[Suit.heart][Rank.officer]);
+      player1.tricks.add(trick1);
 
       let trick2 = new Trick();
       trick2.play(player2, Card[Suit.acorn][Rank.officer]);
+      player2.tricks.add(trick2);
 
       let trick3 = new Trick();
       trick3.play(player2, Card[Suit.acorn][Rank.sergeant]);
+      player2.tricks.add(trick3);
 
-      result.add(player1, [trick1]);
-      result.add(player2, [trick2, trick3]);
+      result.add(player1);
+      result.add(player2);
 
       let contract = Contract.normal.leaf;
       let trumps = contract.order.trumps;
@@ -133,13 +82,15 @@ describe('Result', () => {
     let player1 = new Player();
     let trick1 = new Trick();
     trick1.play(player1, Card[Suit.leaf][Rank.ace]);
-    result1.add(player1, [trick1]);
+    player1.tricks.add(trick1);
+    result1.add(player1);
 
     let result2 = new Result();
     let player2 = new Player();
     let trick2 = new Trick();
     trick2.play(player2, Card[Suit.leaf][Rank.king]);
-    result2.add(player2, [trick2]);
+    player2.tricks.add(trick2);
+    result2.add(player2);
 
     it('should return result with higher points as winner', () => {
       let { winner } = Result.compare(result1, result2);

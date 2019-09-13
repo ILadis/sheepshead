@@ -307,7 +307,7 @@ Presenter.prototype.trickCompleted = function({ winner, points }) {
 Presenter.prototype.gameFinished = function({ winner }) {
   let names = winner.players.map(p => p.name);
   let message = this.stringFor('finished-toast',
-    names, winner.points, winner.score);
+    names, winner.points);
 
   this.phase = null;
   this.showToast(message, 5000);

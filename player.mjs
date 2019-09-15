@@ -1,11 +1,12 @@
 
 import { Deck } from './deck.mjs';
+import { Result } from './result.mjs';
 
 export function Player(name, index) {
   this.name = name;
   this.index = index;
   this.cards = new Deck();
-  this.tricks = new Set();
+  this.result = new Result(this);
   this.wins = 0;
   this.score = 0;
 }

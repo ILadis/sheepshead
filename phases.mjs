@@ -148,7 +148,7 @@ export async function playing({ contract, sequence, players }) {
   }
 
   let winner = trick.winner(order);
-  winner.tricks.add(trick);
+  winner.result.claim(trick);
 
   this.oncompleted(trick, winner);
 
@@ -166,10 +166,10 @@ export async function aftermath({ contract, players }) {
     switch (player) {
     case contract.owner:
     case contract.partner:
-      declarer.add(player);
+      declarer.merge(player.result);
       break;
     default:
-      defender.add(player);
+      defender.merge(player.result);
     }
   }
 
@@ -193,7 +193,6 @@ export async function proceed({ players, head }) {
   this.actor = null;
   for (let player of players) {
     player.cards.clear();
-    player.tricks.clear();
   }
 
   let proceed = await this.onproceed();

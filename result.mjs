@@ -1,30 +1,40 @@
 
-export function Result() {
-  this.players = new Set();
+export function Result(...players) {
+  this.players = new Set(players);
   this.tricks = new Set();
 }
 
-Result.prototype.add = function(player) {
-  this.players.add(player);
-  for (let trick of player.tricks) {
+Result.prototype.claim = function(trick) {
+  this.tricks.add(trick);
+};
+
+Result.prototype.merge = function(other) {
+  var iterator = other.players.values();
+  for (let player of iterator) {
+    this.players.add(player);
+  }
+
+  var iterator = other.tricks.values();
+  for (let trick of iterator) {
     this.tricks.add(trick);
   }
+
+  other.tricks.clear();
 };
 
 Result.prototype.points = function() {
-  let points = 0;
-
-  for (let trick of this.tricks) {
+  let iterator = this.tricks.values(), points = 0;
+  for (let trick of iterator) {
     points += trick.points();
   }
-
   return points;
 };
 
 Result.prototype.matadors = function(trumps) {
   let cards = new Set();
 
-  for (let trick of this.tricks) {
+  let iterator = this.tricks.values();
+  for (let trick of iterator) {
     for (let { player, card } of trick) {
       if (!trumps.contains(card)) {
         continue;

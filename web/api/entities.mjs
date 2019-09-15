@@ -112,8 +112,8 @@ export function Card(card) {
 }
 
 Card.prototype.toJSON = function() {
-  let suit = this.card.suit.description.toLowerCase();
-  let rank = this.card.rank.description.toLowerCase();
+  let suit = this.card.suit.description;
+  let rank = this.card.rank.description;
   return { suit, rank };
 };
 

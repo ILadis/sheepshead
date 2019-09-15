@@ -4,14 +4,16 @@ import { Deck } from '../deck.mjs';
 import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Deck', () => {
-  const deck = new Deck(),
+  let deck = new Deck(),
     card1 = Card[Suit.leaf][Rank.ace],
     card2 = Card[Suit.leaf][Rank.sergeant],
     card3 = Card[Suit.leaf][Rank.seven],
-    card4 = Card[Suit.leaf][Rank.king];
+    card4 = Card[Suit.leaf][Rank.king],
+    card5 = Card[Suit.leaf][Rank.eight],
+    card6 = Card[Suit.leaf][Rank.seven];
 
   beforeEach(() => {
-    deck.clear();
+    deck = new Deck();
     deck.addAll([card1, card2, card3, card4]);
   });
 
@@ -56,6 +58,22 @@ describe('Deck', () => {
     });
   });
 
+  describe('#add()', () => {
+    it('should add given card', () => {
+      deck.add(card5);
+      let cards = Array.from(deck);
+      Assert.deepEqual(cards, [card1, card2, card3, card4, card5]);
+    });
+  });
+
+  describe('#addAll()', () => {
+    it('should add given cards', () => {
+      deck.addAll([card5, card6]);
+      let cards = Array.from(deck);
+      Assert.deepEqual(cards, [card1, card2, card3, card4, card5, card6]);
+    });
+  });
+
   describe('#draw()', () => {
     it('should remove and return topmost cards', () => {
       let drawn = deck.draw(3);
@@ -74,6 +92,14 @@ describe('Deck', () => {
     });
   });
 
+  describe('#removeAll()', () => {
+    it('should remove given cards', () => {
+      deck.removeAll([card2, card4]);
+      let cards = Array.from(deck);
+      Assert.deepEqual(cards, [card1, card3]);
+    });
+  });
+
   describe('#contains()', () => {
     it('should return true when deck has card', () => {
       let card = Card[Suit.leaf][Rank.ace];
@@ -82,8 +108,13 @@ describe('Deck', () => {
 
     it('should return false when deck is missing card', () => {
       let card = Card[Suit.bell][Rank.seven];
-      deck.addAll([card1, card2]);
       Assert.equal(deck.contains(card), false);
+    });
+  });
+
+  describe('#size()', () => {
+    it('should return number of cards in deck', () => {
+      Assert.equal(deck.size(), 4);
     });
   });
 

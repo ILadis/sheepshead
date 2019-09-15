@@ -6,26 +6,27 @@ import { Contract } from '../contract.mjs';
 import { Card, Suit, Rank } from '../card.mjs';
 
 describe('Trick', () => {
-  let trick = new Trick();
+  let trick = new Trick(),
+    card1 = Card[Suit.leaf][Rank.ace],
+    card2 = Card[Suit.leaf][Rank.sergeant],
+    card3 = Card[Suit.leaf][Rank.seven],
+    player1 = new Player('Player 1'),
+    player2 = new Player('Player 2'),
+    player3 = new Player('Player 3');
 
-  let card1 = Card[Suit.leaf][Rank.ace];
-  let player1 = new Player('Player 1');
-  trick.play(player1, card1);
-
-  let card2 = Card[Suit.leaf][Rank.sergeant];
-  let player2 = new Player('Player 2');
-  trick.play(player2, card2);
-
-  let card3 = Card[Suit.leaf][Rank.seven];
-  let player3 = new Player('Player 3');
-  trick.play(player3, card3);
+  beforeEach(() => {
+    trick = new Trick();
+    trick.play(player1, card1);
+    trick.play(player2, card2);
+    trick.play(player3, card3);
+  });
 
   it('should be iterable', () => {
     Assert.ok(trick[Symbol.iterator]);
   });
 
   describe('#iterator', () => {
-    it('should yield played cards in order', () => {
+    it('should yield player and cards in play order', () => {
       let it = trick[Symbol.iterator]();
       Assert.deepEqual(it.next().value, {
         player: player1, card: card1
@@ -40,13 +41,24 @@ describe('Trick', () => {
     });
   });
 
+  describe('#includes()', () => {
+    it('should return true if player has played card', () => {
+      Assert.ok(trick.includes(player2));
+    });
+
+    it('should return false if player has not played card', () => {
+      let trick = new Trick();
+      Assert.ok(!trick.includes(player2));
+    });
+  });
+
   describe('#cards()', () => {
     it('should be iterable', () => {
       let cards = trick.cards();
       Assert.ok(cards[Symbol.iterator]);
     });
 
-    it('should yield played cards', () => {
+    it('should yield cards in play order', () => {
       let cards = trick.cards();
       let it = cards[Symbol.iterator]();
       Assert.equal(it.next().value, card1);

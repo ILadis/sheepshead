@@ -12,68 +12,21 @@ describe('Card', () => {
   });
 
   describe('#points()', () => {
-    it('should return 11 for any ace', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.ace];
-        let points = card.points();
-        Assert.equal(points, 11);
-      }
-    });
-
-    it('should return 10 for any ten', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.ten];
-        let points = card.points();
-        Assert.equal(points, 10);
-      }
-    });
-
-    it('should return 4 for any king', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.king];
-        let points = card.points();
-        Assert.equal(points, 4);
-      }
-    });
-
-    it('should return 3 for any officer', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.officer];
-        let points = card.points();
-        Assert.equal(points, 3);
-      }
-    });
-
-    it('should return 2 for any sergeant', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.sergeant];
-        let points = card.points();
-        Assert.equal(points, 2);
-      }
-    });
-
-    it('should return 0 for any nine', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.nine];
-        let points = card.points();
-        Assert.equal(points, 0);
-      }
-    });
-
-    it('should return 0 for any eight', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.eight];
-        let points = card.points();
-        Assert.equal(points, 0);
-      }
-    });
-
-    it('should return 0 for any seven', () => {
-      for (let suit of Suit) {
-        let card = Card[suit][Rank.seven];
-        let points = card.points();
-        Assert.equal(points, 0);
-      }
+    [ [Rank.ace, 11],
+      [Rank.ten, 10],
+      [Rank.king, 4],
+      [Rank.officer, 3],
+      [Rank.sergeant, 2],
+      [Rank.nine, 0],
+      [Rank.eight, 0],
+      [Rank.seven, 0],
+    ].forEach(([rank, points]) => {
+      it(`should return ${points} for any ${rank.description}`, () => {
+        for (let suit of Suit) {
+          let card = Card[suit][rank];
+          Assert.equal(card.points(), points);
+        }
+      });
     });
   });
 });

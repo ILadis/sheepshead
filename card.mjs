@@ -22,10 +22,10 @@ Card.prototype.points = function() {
 };
 
 export const Suit = {
-  bell: Symbol('Bell'),
-  heart: Symbol('Heart'),
-  leaf: Symbol('Leaf'),
-  acorn: Symbol('Acorn')
+  bell: Symbol('bell'),
+  heart: Symbol('heart'),
+  leaf: Symbol('leaf'),
+  acorn: Symbol('acorn')
 };
 
 Suit[Symbol.iterator] = function*() {
@@ -36,14 +36,14 @@ Suit[Symbol.iterator] = function*() {
 };
 
 export const Rank = {
-  seven: Symbol('Seven'),
-  eight: Symbol('Eight'),
-  nine: Symbol('Nine'),
-  sergeant: Symbol('Sergeant'),
-  officer: Symbol('Officer'),
-  king: Symbol('King'),
-  ten: Symbol('Ten'),
-  ace: Symbol('Ace')
+  seven: Symbol('seven'),
+  eight: Symbol('eight'),
+  nine: Symbol('nine'),
+  sergeant: Symbol('sergeant'),
+  officer: Symbol('officer'),
+  king: Symbol('king'),
+  ten: Symbol('ten'),
+  ace: Symbol('ace')
 };
 
 Rank[Symbol.iterator] = function*() {

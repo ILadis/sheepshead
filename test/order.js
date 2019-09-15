@@ -98,24 +98,15 @@ describe('Order', () => {
       order.promote([Suit.heart], [Rank.sergeant]);
       order.dominate(Card[Suit.leaf][Rank.seven]);
 
-      it('should return 0 for acorn ace', () => {
-        let card = Card[Suit.acorn][Rank.ace];
-        Assert.equal(order.valueOf(card), 0);
-      });
-
-      it('should return 2 for dominant leaf eight', () => {
-        let card = Card[Suit.leaf][Rank.eight];
-        Assert.equal(order.valueOf(card), 2);
-      });
-
-      it('should return 4 for dominant leaf officer', () => {
-        let card = Card[Suit.leaf][Rank.officer];
-        Assert.equal(order.valueOf(card), 4);
-      });
-
-      it('should return 15 for trump bell sergeant', () => {
-        let card = Card[Suit.bell][Rank.sergeant];
-        Assert.equal(order.valueOf(card), 15);
+      [ [Suit.acorn, Rank.ace, 0],
+        [Suit.leaf, Rank.eight, 2],
+        [Suit.leaf, Rank.officer, 4],
+        [Suit.bell, Rank.sergeant, 15],
+      ].forEach(([suit, rank, value]) => {
+        it(`should return ${value} for ${suit.description} ${rank.description}`, () => {
+          let card = Card[suit][rank];
+          Assert.equal(order.valueOf(card), value);
+        });
       });
     });
 
@@ -123,24 +114,15 @@ describe('Order', () => {
       let order = new Order();
       order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
 
-      it('should return 1 for trump heart seven', () => {
-        let card = Card[Suit.heart][Rank.seven];
-        Assert.equal(order.valueOf(card), 1);
-      });
-
-      it('should return 4 for trump heart king', () => {
-        let card = Card[Suit.heart][Rank.king];
-        Assert.equal(order.valueOf(card), 4);
-      });
-
-      it('should return 9 for trump leaf sergeant', () => {
-        let card = Card[Suit.leaf][Rank.sergeant];
-        Assert.equal(order.valueOf(card), 9);
-      });
-
-      it('should return 11 for trump bell officer', () => {
-        let card = Card[Suit.bell][Rank.officer];
-        Assert.equal(order.valueOf(card), 11);
+      [ [Suit.heart, Rank.seven, 1],
+        [Suit.heart, Rank.king, 4],
+        [Suit.leaf, Rank.sergeant, 9],
+        [Suit.bell, Rank.officer, 11],
+      ].forEach(([suit, rank, value]) => {
+        it(`should return ${value} for ${suit.description} ${rank.description}`, () => {
+          let card = Card[suit][rank];
+          Assert.equal(order.valueOf(card), value);
+        });
       });
     });
   });
@@ -150,49 +132,20 @@ describe('Order', () => {
       let order = new Order();
       order.promote([Suit.heart], [Rank.sergeant, Rank.officer]);
 
-      it('should return 1 for bell seven', () => {
-        let card = Card[Suit.bell][Rank.seven];
-        Assert.equal(order.orderOf(card), 1);
-      });
-
-      it('should return 5 for bell ten', () => {
-        let card = Card[Suit.bell][Rank.ten];
-        Assert.equal(order.orderOf(card), 5);
-      });
-
-      it('should return 8 for leaf eight', () => {
-        let card = Card[Suit.leaf][Rank.eight];
-        Assert.equal(order.orderOf(card), 8);
-      });
-
-      it('should return 16 for acorn king', () => {
-        let card = Card[Suit.acorn][Rank.king];
-        Assert.equal(order.orderOf(card), 16);
-      });
-
-      it('should return 18 for acorn ace', () => {
-        let card = Card[Suit.acorn][Rank.ace];
-        Assert.equal(order.orderOf(card), 18);
-      });
-
-      it('should return 24 for heart ace', () => {
-        let card = Card[Suit.heart][Rank.ace];
-        Assert.equal(order.orderOf(card), 24);
-      });
-
-      it('should return 25 for bell sergeant', () => {
-        let card = Card[Suit.bell][Rank.sergeant];
-        Assert.equal(order.orderOf(card), 25);
-      });
-
-      it('should return 29 for bell officer', () => {
-        let card = Card[Suit.bell][Rank.officer];
-        Assert.equal(order.orderOf(card), 29);
-      });
-
-      it('should return 32 for acorn officer', () => {
-        let card = Card[Suit.acorn][Rank.officer];
-        Assert.equal(order.orderOf(card), 32);
+      [ [Suit.bell, Rank.seven, 1],
+        [Suit.bell, Rank.ten, 5],
+        [Suit.leaf, Rank.eight, 8],
+        [Suit.acorn, Rank.king, 16],
+        [Suit.acorn, Rank.ace, 18],
+        [Suit.heart, Rank.ace, 24],
+        [Suit.bell, Rank.sergeant, 25],
+        [Suit.bell, Rank.officer, 29],
+        [Suit.acorn, Rank.officer, 32],
+      ].forEach(([suit, rank, value]) => {
+        it(`should return ${value} for ${suit.description} ${rank.description}`, () => {
+          let card = Card[suit][rank];
+          Assert.equal(order.orderOf(card), value);
+        });
       });
     });
   });

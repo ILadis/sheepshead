@@ -4,7 +4,7 @@ import { Player } from '../player.mjs';
 import { Deck } from '../deck.mjs';
 
 describe('Player', () => {
-  const player1 = new Player(),
+  let player1 = new Player(),
     player2 = new Player(),
     player3 = new Player(),
     players = new Array(player1, player2, player3);

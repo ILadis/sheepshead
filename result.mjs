@@ -8,18 +8,16 @@ Result.prototype.claim = function(trick) {
   this.tricks.add(trick);
 };
 
-Result.prototype.merge = function(other) {
-  var iterator = other.players.values();
-  for (let player of iterator) {
-    this.players.add(player);
-  }
+Result.prototype.add = function(player) {
+  let result = player.result;
+  this.players.add(player);
 
-  var iterator = other.tricks.values();
+  let iterator = result.tricks.values();
   for (let trick of iterator) {
     this.tricks.add(trick);
   }
 
-  other.tricks.clear();
+  result.tricks.clear();
 };
 
 Result.prototype.points = function() {

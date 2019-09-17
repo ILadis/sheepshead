@@ -6,7 +6,7 @@ export function Player(name, index) {
   this.name = name;
   this.index = index;
   this.cards = new Deck();
-  this.result = new Result(this);
+  this.result = new Result();
   this.wins = 0;
   this.score = 0;
 }

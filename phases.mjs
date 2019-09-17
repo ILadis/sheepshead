@@ -166,10 +166,10 @@ export async function aftermath({ contract, players }) {
     switch (player) {
     case contract.owner:
     case contract.partner:
-      declarer.merge(player.result);
+      declarer.add(player);
       break;
     default:
-      defender.merge(player.result);
+      defender.add(player);
     }
   }
 

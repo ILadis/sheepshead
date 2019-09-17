@@ -49,20 +49,15 @@ describe('Result', () => {
     });
   });
 
-  describe('#points()', () => {
-    it('should return result points', () => {
-      Assert.equal(result.points(), 6);
-    });
-  });
-
-  describe('#merge()', () => {
-    it('should merge other result tricks and players', () => {
-      let other = new Result(player3);
+  describe('#add()', () => {
+    it('should add player and claimed tricks', () => {
+      let other = player3.result;
       other.claim(trick3);
-      result.merge(other);
+      result.add(player3);
       let players = Array.from(result.players);
       Assert.deepEqual(players, [player1, player2, player3]);
       Assert.equal(result.points(), 17);
+      Assert.equal(other.points(), 0);
     });
   });
 

@@ -102,7 +102,7 @@ describe('Trick', () => {
   });
 
   describe('#winner()', () => {
-    it('should return player with highest card ', () => {
+    it('should return player with highest card', () => {
       let contract = Contract.normal.leaf;
       let order = contract.order;
       let winner = trick.winner(order);

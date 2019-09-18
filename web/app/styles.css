@@ -47,16 +47,23 @@ body {
 .shell header button {
   width: 23pt;
   height: 23pt;
+  margin-left: 11pt;
   border: none;
   outline: none;
   cursor: pointer;
   background-size: contain;
   background-color: transparent;
+  background-repeat: no-repeat;
   flex-shrink: 0;
 }
 
 .shell header button.refresh {
   background-image: url(refresh.svg);
+}
+
+.shell header button.github {
+  background-image: url(github.svg);
+  background-size: 20pt;
 }
 
 .shell main {
@@ -587,7 +594,7 @@ body {
   .shell main > section {
     height: 100%;
     max-height: unset;
-    border-radius: none;
+    border-radius: unset;
   }
 
   .shell main > section.lobby { width: 100%; }

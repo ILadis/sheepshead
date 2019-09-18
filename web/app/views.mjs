@@ -17,21 +17,25 @@ Shell.prototype.setTitle = function(title) {
   document.title = title;
 };
 
-Shell.prototype.setRefreshable = function(enable) {
+Shell.prototype.clearActions = function() {
+  let buttons = this.node.querySelectorAll('header > button');
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].remove();
+  }
+};
+
+Shell.prototype.newAction = function(kind) {
   let header = this.node.querySelector('header');
 
-  let button = header.querySelector('button.refresh');
-  if (!enable && button) {
-    header.removeChild(button);
-  }
+  let button = document.createElement('button');
+  button.className = kind;
+  header.appendChild(button);
 
-  if (enable && !button) {
-    button = document.createElement('button');
-    button.className = 'refresh';
-    button.onclick = () => this.refreshClicked();
-
-    header.appendChild(button);
-  }
+  return {
+    set clicked(callback) {
+      button.onclick = () => callback();
+    }
+  };
 };
 
 Shell.prototype.clearSections = function() {
@@ -48,11 +52,11 @@ Shell.prototype.newSection = function(name) {
   let main = this.node.querySelector('main');
   main.appendChild(section);
 
-  let addView = (view) => {
-    section.appendChild(view.node);
+  return {
+    addView: function(view) {
+      section.appendChild(view.node);
+    }
   };
-
-  return { addView };
 };
 
 Shell.prototype.refreshClicked = function() {
@@ -354,35 +358,34 @@ Dialog.prototype.withOptions = function() {
   let ul = document.createElement('ul');
   this.withContent(ul);
 
-  let onItemSelected = (item) => { };
-  let addItem = function(label, item) {
-    let li = document.createElement('li');
-    li.textContent = label;
-    li.onclick = () => this.itemSelected(item);
-
-    ul.appendChild(li);
+  return {
+    addItem: function(label, item) {
+      let li = document.createElement('li');
+      li.textContent = label;
+      li.onclick = () => this.itemSelected(item);
+      ul.appendChild(li);
+    },
+    itemSelected: function(item) { }
   };
-
-  return { addItem, onItemSelected };
 };
 
 Dialog.prototype.withTable = function() {
   let table = document.createElement('table');
   this.withContent(table);
 
-  let hasCols = false;
-  let addRow = (...contents) => {
-    let tr = document.createElement('tr');
-    for (let content of contents) {
-      let td = document.createElement(hasCols ? 'td' : 'th');
-      td.textContent = content;
-      tr.appendChild(td);
+  return {
+    hasCols: false,
+    addRow: function(...contents) {
+      let tr = document.createElement('tr');
+      for (let content of contents) {
+        let td = document.createElement(this.hasCols ? 'td' : 'th');
+        td.textContent = content;
+        tr.appendChild(td);
+      }
+      this.hasCols = true;
+      table.appendChild(tr);
     }
-    hasCols = true;
-    table.appendChild(tr);
   };
-
-  return { addRow };
 };
 
 Dialog.prototype.addAction = function(label, callback) {

@@ -37,8 +37,12 @@ Presenter.prototype.showLobby = function() {
       toast: new View.Toast()
     }]
   );
-  this.shell.setRefreshable(true);
-  this.shell.refreshClicked = () => this.refreshGames();
+  let refresh = this.shell.newAction('refresh');
+  refresh.clicked = () => this.refreshGames();
+
+  let github = this.shell.newAction('github');
+  github.clicked = () => this.redirectTo('https://github.com/ILadis/sheepshead');
+
   this.refreshGames(true);
   this.changePlayerName();
 };
@@ -73,7 +77,7 @@ Presenter.prototype.changePlayerName = function(name) {
   let label = this.stringFor('player-name-input');
 
   if (!name || !name.length) {
-    name = fallback;
+    name = this.playerName || fallback;
   }
 
   let view = this.views.name;
@@ -125,7 +129,7 @@ Presenter.prototype.showGame = function() {
       chat: new View.Chat()
     }]
   );
-  this.shell.setRefreshable(false);
+  this.shell.clearActions();
   this.listenEvents();
   this.setupChat();
 };
@@ -377,6 +381,10 @@ Presenter.prototype.positionOf = function(other) {
       return position;
     }
   }
+};
+
+Presenter.prototype.redirectTo = function(url) {
+  window.location.href = url;
 };
 
 Presenter.prototype.stringFor = function(name, ...args) {

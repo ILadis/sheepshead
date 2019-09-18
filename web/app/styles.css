@@ -307,6 +307,12 @@ body {
   display: inline-block;
 }
 
+.chat form > ul li.label {
+  padding: 6pt 0 2pt;
+  color: #959595;
+  display: block;
+}
+
 .chat form > ul li > input {
   padding: 3pt;
   font-size: 16pt;

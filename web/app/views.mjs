@@ -226,28 +226,36 @@ Chat.prototype.toggleEmojis = function() {
   }
 };
 
-Chat.prototype.addEmojis = function(range) {
+Chat.prototype.addEmojis = function(ranges, label) {
   let ul = this.node.querySelector('form > ul');
   let input = this.node.querySelector('form > input');
 
-  let [from, to] = range;
-  for (let code = from; code < to; code++) {
-    let emoji = String.fromCodePoint(code);
+  let li = document.createElement('li');
+  li.textContent = label;
+  li.className = 'label';
+  ul.appendChild(li);
 
-    let button = document.createElement('input');
-    button.type = 'button';
-    button.value = emoji;
-    button.onclick = () => {
-      input.focus();
-      let start = input.selectionStart;
-      input.setRangeText(emoji);
-      input.selectionStart = input.selectionEnd = start + emoji.length;
-    };
+  for (let i = 0; i < ranges.length;) {
+    let from = ranges[i++], to = ranges[i++];
 
-    let li = document.createElement('li');
-    li.appendChild(button);
+    for (let code = from; code < to; code++) {
+      let emoji = String.fromCodePoint(code);
 
-    ul.appendChild(li);
+      let button = document.createElement('input');
+      button.type = 'button';
+      button.value = emoji;
+      button.onclick = () => {
+        input.focus();
+        let start = input.selectionStart;
+        input.setRangeText(emoji);
+        input.selectionStart = input.selectionEnd = start + emoji.length;
+      };
+
+      let li = document.createElement('li');
+      li.appendChild(button);
+
+      ul.appendChild(li);
+    }
   }
 };
 

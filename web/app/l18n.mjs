@@ -85,7 +85,9 @@ export const de = {
   'standings-score': () => 'Punkte',
   'standings-total': () => 'Total',
 
-  'chat-typings-placeholder': () => 'Schreibe eine Nachricht'
+  'chat-typings-placeholder': () => 'Schreibe eine Nachricht',
+  'chat-emoji-smileys-label': () => 'Smileys',
+  'chat-emoji-symbols-label': () => 'Symbole'
 };
 
 export const en = {
@@ -162,6 +164,8 @@ export const en = {
   'standings-score': () => 'Score',
   'standings-total': () => 'Total',
 
-  'chat-typings-placeholder': () => 'Type a message'
+  'chat-typings-placeholder': () => 'Type a message',
+  'chat-emoji-smileys-label': () => 'Smileys',
+  'chat-emoji-symbols-label': () => 'Symbols'
 };
 

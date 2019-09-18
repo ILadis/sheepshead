@@ -151,7 +151,11 @@ Presenter.prototype.setupChat = function() {
   let placeholder = this.stringFor('chat-typings-placeholder');
   chat.setTypingsPlaceholder(placeholder);
 
-  chat.addEmojis([0x1F601, 0x1F64F]);
+  var label = this.stringFor('chat-emoji-smileys-label');
+  chat.addEmojis([0x1F601, 0x1F64F, 0x1F600, 0x1F636], label);
+
+  var label = this.stringFor('chat-emoji-symbols-label');
+  chat.addEmojis([0x1F493, 0x1F52E], 'Symbole');
 
   chat.messageSubmitted = (message) => {
     chat.clearTypings();

@@ -142,7 +142,7 @@ Resources.chat['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  let events = registry.lookup(game).events;
+  let { events, input } = registry.lookup(game);
 
   let chat = new Chat((message, player) => {
     let entity = new Entities.Chat(message, player);
@@ -150,6 +150,7 @@ Resources.chat['POST'] = PreFilter.chain(
   });
 
   chat.register(new Command.Hello(game));
+  chat.register(new Command.AddBot(game, input));
   chat.send(message, player);
 
   response.writeHead(200);

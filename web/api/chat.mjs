@@ -8,25 +8,28 @@ Chat.prototype.register = function(command) {
   this.commands.push(command);
 };
 
-Chat.prototype.send = function(message, player) {
+Chat.prototype.send = async function(message, player) {
   var message = Emojifier.apply(message);
 
   let iterator = this.commands.values();
-  for (let command of iterator) {
+  for (var command of iterator) {
     let args = command.matches(message);
 
     if (args !== false) {
-      var response = command.execute(player, args);
+      var response = await command.execute(player, args);
       break;
     }
+
+    command = null;
+  }
+
+  if (!command) {
+    return this.publish(message, player);
   }
 
   if (response) {
-    message = response;
-    player = undefined;
+    return this.publish(response);
   }
-
-  this.publish(message, player);
 };
 
 export function Emoji(pattern, code) {
@@ -82,6 +85,25 @@ Command.Hello = function(game) {
     if (player) {
       return `Hello ${player.name}!`;
     }
+  });
+};
+
+Command.AddBot = function(game, input) {
+  return new Command('addbot', async () => {
+    let [index, rules] = input.args;
+
+    let { Bot } = await import('../../bot/bot.mjs');
+    let { Brainless } = await import('../../bot/brainless.mjs');
+
+    let brain = new Brainless();
+    let bot = new Bot(index, brain);
+
+    if (game.phase.name != 'joining' || !rules.valid(bot)) {
+      return false;
+    }
+
+    bot.attach(game);
+    input.resolve(bot);
   });
 };
 

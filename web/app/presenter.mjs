@@ -391,7 +391,7 @@ Presenter.prototype.showToast = function(text, duration) {
 Presenter.prototype.showChatMessage = function(message, player) {
   let chat = this.views.chat;
   if (chat) {
-    var self = this.isSelf(player);
+    let self = this.isSelf(player);
     chat.addMessage(message, player, self);
   }
 };

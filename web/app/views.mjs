@@ -201,16 +201,9 @@ Chat.prototype.addMessage = function(message, player, self) {
   if (player) {
     let h6 = document.createElement('h6');
     h6.textContent = player.name;
-    li.appendChild(h6);
-  }
 
-  switch (self) {
-  case true:
-    li.className = 'self';
-    break;
-  case false:
-    li.className = 'other';
-    break;
+    li.className = self ? 'self' : 'other';
+    li.appendChild(h6);
   }
 
   let ul = this.node.querySelector('ul > li.anchor');

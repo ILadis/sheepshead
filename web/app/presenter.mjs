@@ -102,9 +102,15 @@ Presenter.prototype.createGame = async function() {
 };
 
 Presenter.prototype.joinGame = async function(game) {
+  let spectate = game.players.length == 4;
   let name = this.playerName;
 
-  try {
+  if (spectate) {
+    this.client.spectateGame(game);
+    this.showGame();
+  }
+
+  else try {
     this.self = await this.client.joinGame(game, name);
     this.showGame();
   } catch (e) {
@@ -135,7 +141,7 @@ Presenter.prototype.showGame = function() {
 };
 
 Presenter.prototype.listenEvents = function() {
-  let stream = this.client.listenEvents();
+  let stream = this.stream = this.client.listenEvents(true);
   stream.onchat = (chat) => this.chatMessageReceived(chat);
   stream.onjoined = (player) => this.playerJoined(player);
   stream.ondealt = () => this.cardsDealt();
@@ -161,10 +167,16 @@ Presenter.prototype.setupChat = function() {
   var label = this.stringFor('chat-emoji-symbols-label');
   chat.addEmojis([0x1F493, 0x1F52E], label);
 
-  chat.messageSubmitted = (message) => {
+  chat.messageSubmitted = (message) => this.sendChatMessage(message);
+};
+
+Presenter.prototype.sendChatMessage = function(message) {
+  if (!this.isSpectator()) {
+    let chat = this.views.chat;
     chat.clearTypings();
+
     this.client.sendChatMessage(message);
-  };
+  }
 };
 
 Presenter.prototype.chatMessageReceived = function({ message, player }) {
@@ -205,9 +217,7 @@ Presenter.prototype.refreshPlayers = function(...players) {
     hand.setActor(false);
   }
 
-  bottom.cardClicked = (card) => {
-    this.client.playCard(card);
-  };
+  bottom.cardClicked = (card) => this.playCard(card);
 
   let hands = this.views;
   for (let player of players) {
@@ -225,6 +235,12 @@ Presenter.prototype.refreshPlayers = function(...players) {
     } else {
       hand.setCards(cards);
     }
+  }
+};
+
+Presenter.prototype.playCard = function(card) {
+  if (!this.isSpectator()) {
+    this.client.playCard(card);
   }
 };
 
@@ -347,12 +363,22 @@ Presenter.prototype.listStandings = async function() {
     dialog.setTitle(title);
 
     let label = this.stringFor('leave-game-action');
-    dialog.addAction(label, () => {
-      this.client.leaveGame().then(() => this.showLobby());
-    });
+    dialog.addAction(label, () => this.leaveGame());
 
     dialog.show();
   }
+};
+
+Presenter.prototype.leaveGame = async function() {
+  if (!this.isSpectator()) {
+    await this.client.leaveGame();
+  }
+  this.stream.close();
+
+  this.stream = null;
+  this.self = null;
+
+  this.showLobby();
 };
 
 Presenter.prototype.showToast = function(text, duration) {
@@ -370,12 +396,16 @@ Presenter.prototype.showChatMessage = function(message, player) {
   }
 };
 
+Presenter.prototype.isSpectator = function() {
+  return Boolean(!this.self && this.stream);
+};
+
 Presenter.prototype.isSelf = function(other) {
-  return other && this.self.index == other.index;
+  return Boolean(other && this.self && this.self.index == other.index);
 };
 
 Presenter.prototype.positionOf = function(other) {
-  let index = this.self.index;
+  let index = this.self ? this.self.index : 1;
   for (let position of ['left', 'top', 'right', 'bottom']) {
     if ((++index % 4 || 4) === other.index) {
       return position;

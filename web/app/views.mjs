@@ -170,7 +170,9 @@ export const Chat = function() {
   let form = node.querySelector('form');
   form.onsubmit = (event) => {
     event.preventDefault();
-    this.messageSubmitted(input.value);
+    if (input.value.length) {
+      this.messageSubmitted(input.value);
+    }
   };
 
   this.node = node;

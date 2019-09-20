@@ -56,6 +56,13 @@ Client.prototype.joinGame = async function(game, name) {
   return json;
 };
 
+Client.prototype.spectateGame = function(game) {
+  this.id = game.id;
+  this.token = null;
+
+  return true;
+};
+
 Client.prototype.leaveGame = async function() {
   let id = this.id;
   let token = this.token;
@@ -213,9 +220,9 @@ Client.prototype.sendChatMessage = async function(message) {
   return true;
 };
 
-Client.prototype.listenEvents = function() {
+Client.prototype.listenEvents = function(earliest) {
   let id = this.id;
-  let query = '?offset=1';
+  let query = earliest ? '?offset=1' : '';
   let source = new EventSource(`api/games/${id}/events${query}`);
 
   let stream = Object.create(null);
@@ -246,6 +253,8 @@ Client.prototype.listenEvents = function() {
     stream['on' + event] = (...args) => { };
     source.addEventListener(event, handler);
   }
+
+  stream.close = () => source.close();
 
   return stream;
 };

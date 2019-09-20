@@ -83,7 +83,7 @@ export const de = {
   'standings-title': () => 'Punktestand',
   'standings-player': () => 'Spieler',
   'standings-score': () => 'Punkte',
-  'standings-total': () => 'Total',
+  'standings-wins': () => 'Siege',
 
   'chat-typings-placeholder': () => 'Schreibe eine Nachricht',
   'chat-emoji-smileys-label': () => 'Smileys',
@@ -134,7 +134,7 @@ export const en = {
   }),
 
   'finished-toast': (players, points, score) => ''
-    + players.format('join', ' and ') + ` won with ${points}`,
+    + players.format('join', ' and ') + ` won with ${points} points`,
 
   'contract-title': (phase) => phase.case({
     attendance: 'Choose what to play!',
@@ -162,7 +162,7 @@ export const en = {
   'standings-title': () => 'Current standings',
   'standings-player': () => 'Player',
   'standings-score': () => 'Score',
-  'standings-total': () => 'Total',
+  'standings-wins': () => 'Wins',
 
   'chat-typings-placeholder': () => 'Type a message',
   'chat-emoji-smileys-label': () => 'Smileys',

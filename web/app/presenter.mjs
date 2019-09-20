@@ -159,7 +159,7 @@ Presenter.prototype.setupChat = function() {
   chat.addEmojis([0x1F601, 0x1F64F, 0x1F600, 0x1F636], label);
 
   var label = this.stringFor('chat-emoji-symbols-label');
-  chat.addEmojis([0x1F493, 0x1F52E], 'Symbole');
+  chat.addEmojis([0x1F493, 0x1F52E], label);
 
   chat.messageSubmitted = (message) => {
     chat.clearTypings();
@@ -332,7 +332,7 @@ Presenter.prototype.listStandings = async function() {
     let labels = [
       this.stringFor('standings-player'),
       this.stringFor('standings-score'),
-      this.stringFor('standings-total'),
+      this.stringFor('standings-wins'),
     ];
 
     let table = dialog.withTable();
@@ -340,7 +340,7 @@ Presenter.prototype.listStandings = async function() {
 
     let position = 0;
     for (let player of players) {
-      table.addRow(++position, player.name, player.score, player.total);
+      table.addRow(++position, player.name, player.score, player.wins);
     }
 
     let title = this.stringFor('standings-title');

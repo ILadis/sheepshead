@@ -103,8 +103,8 @@ Score.prototype.toJSON = function() {
   let name = this.player.name;
   let index = this.player.index;
   let score = this.player.score;
-  let total = this.player.wins;
-  return { index, name, score, total };
+  let wins = this.player.wins;
+  return { index, name, score, wins };
 };
 
 export function Card(card) {

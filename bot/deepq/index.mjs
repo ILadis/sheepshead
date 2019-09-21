@@ -1,13 +1,17 @@
 
 import File from 'fs';
 import { Trainer } from './trainer.mjs';
+import { GreedyStrategy, ReplayMemory } from './deepq.mjs';
 
 const options = {
   // Function called after each simulation
   callback: every(10e3, save()),
 
   // Number of games to simulate
-  episodes: 10e6
+  episodes: 10e6,
+
+  memory: new ReplayMemory(1000, 100),
+  strat: new GreedyStrategy(1, 0.1, 0.0000004)
 };
 
 Trainer.train(options);
@@ -22,7 +26,7 @@ function save() {
 
     let json = JSON.stringify(network);
 
-    let file = `snapshot-${version}.json`;
+    let file = `snapshot.json`;
     File.writeFileSync(file, json);
 
     version++;

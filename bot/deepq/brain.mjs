@@ -2,9 +2,9 @@
 import { Tensor, Builder, Indices } from './model.mjs';
 import { Network, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 
-export function Brain(network) {
-  this.memory = new ReplayMemory(1000);
-  this.strat = new GreedyStrategy(1, 0.1, 0.000021);
+export function Brain({ network, memory, strat }) {
+  this.memory = memory || new ReplayMemory(1000, 100);
+  this.strat = strat || new GreedyStrategy(1, 0.1, 0.0001);
   this.policy = network ? Network.from(network) : new Network(134, 32, 32, 32, 32);
   this.target = this.policy.clone();
 }
@@ -23,7 +23,7 @@ Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
     let state = this.observe(game, actor);
 
-    let explore = this.strat.wantExplore();
+    let explore = this.wantExplore();
     if (explore) {
       var card = this.actRandomly(actor, rules);
     } else {
@@ -54,7 +54,7 @@ Brain.prototype.onfinished = function(game) {
     }
   }
 
-  let experiences = this.memory.sample(100);
+  let experiences = this.memory.sample();
   if (experiences) {
     this.optimize(experiences);
   }
@@ -151,6 +151,23 @@ Brain.prototype.yetToBePlayed = function(game, actor, filter) {
   return cards;
 };
 
+Brain.prototype.wantExplore = function() {
+  return this.strat.wantExplore();
+};
+
+Brain.prototype.gainReward = function(game, player) {
+  let { trick, contract: { order } } = game;
+
+  let party = this.determineParty(game, player);
+
+  let winner = trick.winner(order);
+  let points = trick.points() || 1;
+  let won = party.has(winner);
+
+  let reward = (won ? +1 : -1) * points;
+  this.reward = reward;
+};
+
 Brain.prototype.gainExperience = function(game, player) {
   let state = this.state;
   let action = this.action;
@@ -171,24 +188,10 @@ Brain.prototype.gainExperience = function(game, player) {
   }
 };
 
-Brain.prototype.gainReward = function(game, player) {
-  let { trick, contract: { order } } = game;
-
-  let party = this.determineParty(game, player);
-
-  let winner = trick.winner(order);
-  let points = trick.points() || 1;
-  let won = party.has(winner);
-
-  let reward = (won ? +1 : -1) * points;
-  this.reward = reward;
-};
-
 Brain.prototype.optimize = function(experiences) {
   let steps = this.iterations || 0;
   let evolve = ++steps % 10 == 0;
 
-  this.iterations = steps;
   if (evolve) {
     this.target = this.policy.clone();
   }
@@ -215,6 +218,8 @@ Brain.prototype.optimize = function(experiences) {
 
     this.policy.propagate(rate, momentum, true, output);
   }
+
+  this.iterations = steps;
 };
 
 Brain.prototype.serialize = function() {

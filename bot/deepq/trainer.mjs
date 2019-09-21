@@ -9,14 +9,16 @@ export const Trainer = Object.create(null);
 Trainer.train = async function(options = {}) {
   let {
     episodes = 1000,
-    callback = () => {}
+    callback = () => {},
+    memory = null,
+    strat = null
   } = options;
 
   let game = new Game();
   let brains = new Array();
 
   game.onjoin = (index) => {
-    let brain = new Brain();
+    let brain = new Brain({ memory, strat });
     brain.onbid = bidder;
 
     brains.push(brain);

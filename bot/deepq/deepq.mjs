@@ -32,27 +32,31 @@ function clone() {
   return Network.from(this.serialize());
 }
 
-export function ReplayMemory(capacity) {
+export function ReplayMemory(capacity, batch) {
   this.experiences = new Array(capacity);
+  this.batch = batch;
   this.size = 0;
 }
 
 ReplayMemory.prototype.save = function(experience) {
   let capacity = this.experiences.length;
-  let size = this.size;
+  if (capacity <=  0) {
+    return false;
+  }
 
-  this.experiences[size % capacity] = experience;
-
+  this.experiences[this.size % capacity] = experience;
   return ++this.size;
 };
 
-ReplayMemory.prototype.sample = function(batch) {
+ReplayMemory.prototype.sample = function() {
   let capacity = this.experiences.length;
-  let size = this.size;
+  if (capacity <= 0) {
+    return false;
+  }
 
-  if (size >= batch) {
-    var batch = new Array(batch);
-    let length = Math.min(size, capacity);
+  if (this.size >= this.batch) {
+    let batch = new Array(this.batch);
+    let length = Math.min(this.size, capacity);
 
     for (let i = 0; i < batch.length; i++) {
       let index = Math.floor(Math.random() * length);

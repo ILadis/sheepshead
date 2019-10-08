@@ -67,7 +67,7 @@ Brain.prototype.actRandomly = function(player, rules) {
 };
 
 Brain.prototype.actGreedy = function(state, rules) {
-  let output = this.policy.activate(state);
+  let output = this.policy.predict(state);
 
   do {
     var highest = -Infinity, index = 0;
@@ -201,7 +201,7 @@ Brain.prototype.optimize = function(experiences) {
 
     let max = 0;
     if (next) {
-      let output = this.target.activate(next);
+      let output = this.target.predict(next);
       max = output.reduce((p, v) => p > v ? p : v);
     }
 

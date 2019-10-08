@@ -21,6 +21,10 @@ Network.from = function(object) {
   return network;
 };
 
+Network.prototype.predict = function(input) {
+  return this.delegate.noTraceActivate(input);
+};
+
 Network.prototype.activate = function(input) {
   return this.delegate.activate(input);
 };

@@ -67,7 +67,7 @@ Brain.prototype.actRandomly = function(player, rules) {
 };
 
 Brain.prototype.actGreedy = function(state, rules) {
-  let output = this.policy.noTraceActivate(state);
+  let output = this.policy.activate(state);
 
   do {
     var highest = -Infinity, index = 0;
@@ -201,22 +201,22 @@ Brain.prototype.optimize = function(experiences) {
 
     let max = 0;
     if (next) {
-      let output = this.target.noTraceActivate(next);
+      let output = this.target.activate(next);
       max = output.reduce((p, v) => p > v ? p : v);
     }
 
     let discount = 0.7;
 
-    let value = reward + discount * max;
+    let value = ((reward+120)/240) + discount * max;
     let index = Indices.cards.indexOf(action);
 
     let rate = 0.001;
     let momentum = 0;
 
-    let output = this.policy.activate(state, true);
+    let output = this.policy.activate(state);
     output[index] = value;
 
-    this.policy.propagate(rate, momentum, true, output);
+    this.policy.propagate(rate, momentum, output);
   }
 
   this.iterations = steps;

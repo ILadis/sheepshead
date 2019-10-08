@@ -1,36 +1,48 @@
 
-import Neataptic from 'neataptic';
+import { default as brain } from 'brain.js';
 
 export function Network(...args) {
-  let network = new Neataptic.architect.Perceptron(...args);
+  if (args.length) {
+    let inputSize = args.shift();
+    let outputSize = args.pop();
 
-  for (let node of network.nodes) {
-    if (node.type == 'output') {
-      node.squash = Neataptic.methods.activation.IDENTITY;
-    }
+    var network = new brain.NeuralNetwork({
+      inputSize: inputSize,
+      hiddenLayers: args,
+      outputSize: outputSize,
+    });
+
+    network.initialize();
   }
 
-  return enhance(network);
+  this.delegate = network;
 }
 
 Network.from = function(object) {
-  let network = Neataptic.Network.fromJSON(object);
-  return enhance(network);
+  let network = new Network();
+  network.delegate = new brain.NeuralNetwork();
+  network.delegate.fromJSON(object);
+  return network;
 };
 
-function enhance(network) {
-  network.clone = clone;
-  network.serialize = serialize;
-  return network;
-}
+Network.prototype.activate = function(input) {
+  return this.delegate.runInput(input);
+};
 
-function serialize() {
-  return this.toJSON();
-}
+Network.prototype.propagate = function(rate, momentum, target) {
+  this.delegate.trainOpts.learningRate = rate;
+  this.delegate.trainOpts.momentum = momentum;
+  this.delegate.calculateDeltas(target);
+  this.delegate.adjustWeights();
+};
 
-function clone() {
+Network.prototype.serialize = function() {
+  return this.delegate.toJSON();
+};
+
+Network.prototype.clone = function() {
   return Network.from(this.serialize());
-}
+};
 
 export function ReplayMemory(capacity, batch) {
   this.experiences = new Array(capacity);
@@ -77,7 +89,7 @@ GreedyStrategy.prototype.wantExplore = function() {
   let steps = this.steps || 0;
 
   let value = Math.random();
-  let decay = Math.exp(-1 * this.steps * this.decay);
+  let decay = Math.exp(-1 * steps * this.decay);
 
   let explore = this.end + (this.start - this.end) * decay;
 

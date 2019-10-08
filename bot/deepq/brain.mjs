@@ -1,12 +1,11 @@
 
 import { Tensor, Builder, Indices } from './model.mjs';
-import { Network, ReplayMemory, GreedyStrategy } from './deepq.mjs';
+import { DeepQNet, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 
 export function Brain({ network, memory, strat }) {
   this.memory = memory || new ReplayMemory(1000, 100);
   this.strat = strat || new GreedyStrategy(1, 0.1, 0.0001);
-  this.policy = network ? Network.from(network) : new Network(134, 32, 32, 32, 32);
-  this.target = this.policy.clone();
+  this.network = network || new DeepQNet(134, 64, 32);
 }
 
 Brain.prototype.onbid = function() {
@@ -21,7 +20,7 @@ Brain.prototype.onturn = function(game, actor) {
 
 Brain.prototype.onplay = function(game, actor, rules) {
   if (actor.brain == this) {
-    let state = this.observe(game, actor);
+    let state = this.observeState(game, actor);
 
     let explore = this.wantExplore();
     if (explore) {
@@ -30,8 +29,10 @@ Brain.prototype.onplay = function(game, actor, rules) {
       var card = this.actGreedy(state, rules);
     }
 
+    let action = Indices.cards.indexOf(card);
+
     this.state = state;
-    this.action = card;
+    this.action = action;
 
     return card;
   }
@@ -53,11 +54,6 @@ Brain.prototype.onfinished = function(game) {
       break;
     }
   }
-
-  let experiences = this.memory.sample();
-  if (experiences) {
-    this.optimize(experiences);
-  }
 };
 
 Brain.prototype.actRandomly = function(player, rules) {
@@ -67,7 +63,7 @@ Brain.prototype.actRandomly = function(player, rules) {
 };
 
 Brain.prototype.actGreedy = function(state, rules) {
-  let output = this.policy.predict(state);
+  let output = this.network.predict(state);
 
   do {
     var highest = -Infinity, index = 0;
@@ -86,7 +82,7 @@ Brain.prototype.actGreedy = function(state, rules) {
   return card;
 };
 
-Brain.prototype.observe = function(game, actor) {
+Brain.prototype.observeState = function(game, actor) {
   let { trick, contract: { order } } = game;
 
   let lead = trick.lead();
@@ -177,7 +173,7 @@ Brain.prototype.gainExperience = function(game, player) {
     let final = game.phase.name != 'playing';
 
     if (!final) {
-      var next = this.observe(game, player);
+      var next = this.observeState(game, player);
     }
 
     this.state = null;
@@ -186,43 +182,5 @@ Brain.prototype.gainExperience = function(game, player) {
     let exp =  { state, action, reward, next };
     this.memory.save(exp);
   }
-};
-
-Brain.prototype.optimize = function(experiences) {
-  let steps = this.iterations || 0;
-  let evolve = ++steps % 10 == 0;
-
-  if (evolve) {
-    this.target = this.policy.clone();
-  }
-
-  for (let exp of experiences) {
-    let { state, action, reward, next } = exp;
-
-    let max = 0;
-    if (next) {
-      let output = this.target.predict(next);
-      max = output.reduce((p, v) => p > v ? p : v);
-    }
-
-    let discount = 0.7;
-
-    let value = reward + discount * max;
-    let index = Indices.cards.indexOf(action);
-
-    let rate = 0.001;
-    let momentum = 0;
-
-    let output = this.policy.activate(state);
-    output[index] = value;
-
-    this.policy.propagate(rate, momentum, output);
-  }
-
-  this.iterations = steps;
-};
-
-Brain.prototype.serialize = function() {
-  return this.policy.serialize();
 };
 

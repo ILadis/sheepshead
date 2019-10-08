@@ -3,17 +3,18 @@ import OS from 'os';
 import Process from 'process';
 import File from 'fs';
 import { Trainer } from './trainer.mjs';
-import { GreedyStrategy, ReplayMemory } from './deepq.mjs';
+import { DeepQNet, GreedyStrategy, ReplayMemory } from './deepq.mjs';
 
 const options = {
   // Function called after each simulation
-  callback: every(10e3, stats(), save()),
+  callback: every(1e3, stats(), save()),
 
   // Number of games to simulate
   episodes: 10e6,
 
   memory: new ReplayMemory(1000, 100),
-  strat: new GreedyStrategy(1, 0.1, 0.0000004)
+  strat: new GreedyStrategy(1, 0.1, 0.0000004),
+  network: new DeepQNet(134, 32, 32, 32, 32)
 };
 
 Trainer.train(options);
@@ -25,8 +26,8 @@ function stats() {
     let span = now.getTime() - last;
 
     Process.stdout.write(''
-      + `Currently at ${steps} steps, last ${count} steps took ${span} ms`
-      + ` [${now}]${OS.EOL}`);
+      + `Currently at ${steps} steps, last ${count} steps `
+      + `took ${span} ms [${now}]${OS.EOL}`);
 
     last = now.getTime();
   };
@@ -34,13 +35,10 @@ function stats() {
 
 function save() {
   let version = 1;
-  return ({ brains }) => {
+  return ({ network }) => {
     let name = `Snapshot Gen #${version}`;
 
-    let network = brains[0].serialize();
-    network.name = name;
-
-    let json = JSON.stringify(network);
+    let json = network.serialize({ name });
 
     let file = `snapshot.json`;
     File.writeFileSync(file, json);
@@ -51,9 +49,9 @@ function save() {
 
 function every(count, ...callbacks) {
   let steps = 1;
-  return (brains) => {
+  return (network) => {
     if (steps++ % count == 0) {
-      let args = { steps, count, brains };
+      let args = { steps, count, network };
       for (let callback of callbacks) {
         callback(args);
       }

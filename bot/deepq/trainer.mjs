@@ -9,16 +9,18 @@ export const Trainer = Object.create(null);
 Trainer.train = async function(options = {}) {
   let {
     episodes = 1000,
+    evolutions = 10,
     callback = () => {},
     memory = null,
-    strat = null
+    strat = null,
+    network = null
   } = options;
 
   let game = new Game();
   let brains = new Array();
 
   game.onjoin = (index) => {
-    let brain = new Brain({ memory, strat });
+    let brain = new Brain({ memory, strat, network });
     brain.onbid = bidder;
 
     brains.push(brain);
@@ -32,7 +34,16 @@ Trainer.train = async function(options = {}) {
   };
 
   game.onproceed = () => {
-    callback(brains);
+    let experiences = memory.sample();
+    if (experiences) {
+      network.optimize(experiences);
+    }
+
+    if (episodes % evolutions == 0) {
+      network.evolve();
+    }
+
+    callback(network);
     return --episodes >= 0;
   };
 

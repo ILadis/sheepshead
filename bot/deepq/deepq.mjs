@@ -1,46 +1,58 @@
 
-import Carrot from '@liquid-carrot/carrot';
+import Neataptic from 'neataptic';
 
-export function Network(...args) {
-  if (args.length) {
-    var network = new Carrot.architect.Perceptron(...args);
-
+export function DeepQNet(...args) {
+  if (args.length > 1) {
+    var network = new Neataptic.architect.Perceptron(...args);
     for (let node of network.nodes) {
       if (node.type == 'output') {
-        node.squash = Carrot.methods.activation.IDENTITY;
+        node.squash = Neataptic.methods.activation.IDENTITY;
       }
     }
+  } else {
+    var network = Neataptic.Network.fromJSON(args[0]);
   }
 
-  this.delegate = network;
+  this.policy = network;
+  this.evolve();
 }
 
-Network.from = function(object) {
-  let network = new Network();
-  network.delegate = Carrot.Network.fromJSON(object);
-  return network;
+DeepQNet.prototype.predict = function(input) {
+  return this.policy.noTraceActivate(input);
 };
 
-Network.prototype.predict = function(input) {
-  return this.delegate.noTraceActivate(input);
+DeepQNet.prototype.optimize = function(experiences) {
+  for (let exp of experiences) {
+    let { state, action, reward, next } = exp;
+
+    let max = 0;
+    if (next) {
+      let output = this.target.noTraceActivate(next);
+      max = output.reduce((p, v) => p > v ? p : v);
+    }
+
+    let discount = 0.7;
+    let value = reward + discount * max;
+
+    let rate = 0.001;
+    let momentum = 0;
+
+    let output = this.policy.activate(state);
+    output[action] = value;
+
+    this.policy.propagate(rate, momentum, true, output);
+  }
 };
 
-Network.prototype.activate = function(input) {
-  return this.delegate.activate(input);
+DeepQNet.prototype.evolve = function() {
+  let json  = this.policy.toJSON();
+  this.target = Neataptic.Network.fromJSON(json);
 };
 
-Network.prototype.propagate = function(rate, momentum, target) {
-  this.delegate.propagate(rate, momentum, true, target);
-};
-
-Network.prototype.serialize = function() {
-  return this.delegate.toJSON();
-};
-
-Network.prototype.clone = function() {
-  let network = new Network();
-  network.delegate = this.delegate.clone();
-  return network;
+DeepQNet.prototype.serialize = function(extra) {
+  let json = this.policy.toJSON();
+  Object.assign(json, extra);
+  return JSON.stringify(json);
 };
 
 export function ReplayMemory(capacity, batch) {

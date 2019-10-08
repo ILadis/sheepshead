@@ -21,14 +21,14 @@ Trainer.train(options);
 function stats() {
   let last = Date.now();
   return ({ steps, count }) => {
-    let now = Date.now();
-    let span = now - last;
+    let now = new Date();
+    let span = now.getTime() - last;
 
     Process.stdout.write(''
       + `Currently at ${steps} steps, last ${count} steps took ${span} ms`
-      + OS.EOL);
+      + ` [${now}]${OS.EOL}`);
 
-    last = now;
+    last = now.getTime();
   };
 }
 

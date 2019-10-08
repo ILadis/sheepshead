@@ -207,7 +207,7 @@ Brain.prototype.optimize = function(experiences) {
 
     let discount = 0.7;
 
-    let value = ((reward+120)/240) + discount * max;
+    let value = reward + discount * max;
     let index = Indices.cards.indexOf(action);
 
     let rate = 0.001;

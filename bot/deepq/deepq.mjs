@@ -1,18 +1,15 @@
 
-import { default as brain } from 'brain.js';
+import Carrot from '@liquid-carrot/carrot';
 
 export function Network(...args) {
   if (args.length) {
-    let inputSize = args.shift();
-    let outputSize = args.pop();
+    var network = new Carrot.architect.Perceptron(...args);
 
-    var network = new brain.NeuralNetwork({
-      inputSize: inputSize,
-      hiddenLayers: args,
-      outputSize: outputSize,
-    });
-
-    network.initialize();
+    for (let node of network.nodes) {
+      if (node.type == 'output') {
+        node.squash = Carrot.methods.activation.IDENTITY;
+      }
+    }
   }
 
   this.delegate = network;
@@ -20,20 +17,16 @@ export function Network(...args) {
 
 Network.from = function(object) {
   let network = new Network();
-  network.delegate = new brain.NeuralNetwork();
-  network.delegate.fromJSON(object);
+  network.delegate = Carrot.Network.fromJSON(object);
   return network;
 };
 
 Network.prototype.activate = function(input) {
-  return this.delegate.runInput(input);
+  return this.delegate.activate(input);
 };
 
 Network.prototype.propagate = function(rate, momentum, target) {
-  this.delegate.trainOpts.learningRate = rate;
-  this.delegate.trainOpts.momentum = momentum;
-  this.delegate.calculateDeltas(target);
-  this.delegate.adjustWeights();
+  this.delegate.propagate(rate, momentum, true, target);
 };
 
 Network.prototype.serialize = function() {
@@ -41,7 +34,9 @@ Network.prototype.serialize = function() {
 };
 
 Network.prototype.clone = function() {
-  return Network.from(this.serialize());
+  let network = new Network();
+  network.delegate = this.delegate.clone();
+  return network;
 };
 
 export function ReplayMemory(capacity, batch) {

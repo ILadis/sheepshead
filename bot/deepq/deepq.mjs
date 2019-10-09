@@ -1,20 +1,24 @@
 
 import Neataptic from 'neataptic';
 
-export function DeepQNet(...args) {
-  if (args.length > 1) {
+function clone(network) {
+  let json  = network.toJSON();
+  return Neataptic.Network.fromJSON(json);
+}
+
+export function DeepQNet(args) {
+  if (!Array.isArray(args)) {
+    var network = Neataptic.Network.fromJSON(args);
+  } else {
     var network = new Neataptic.architect.Perceptron(...args);
     for (let node of network.nodes) {
       if (node.type == 'output') {
         node.squash = Neataptic.methods.activation.IDENTITY;
       }
     }
-  } else {
-    var network = Neataptic.Network.fromJSON(args[0]);
   }
-
   this.policy = network;
-  this.evolve();
+  this.target = clone(network);
 }
 
 DeepQNet.prototype.predict = function(input) {
@@ -45,8 +49,7 @@ DeepQNet.prototype.optimize = function(experiences) {
 };
 
 DeepQNet.prototype.evolve = function() {
-  let json  = this.policy.toJSON();
-  this.target = Neataptic.Network.fromJSON(json);
+  this.target = clone(this.policy);
 };
 
 DeepQNet.prototype.serialize = function(extra) {

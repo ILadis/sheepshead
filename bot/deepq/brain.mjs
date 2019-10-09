@@ -5,7 +5,7 @@ import { DeepQNet, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 export function Brain({ network, memory, strat }) {
   this.memory = memory || new ReplayMemory(1000, 100);
   this.strat = strat || new GreedyStrategy(1, 0.1, 0.0001);
-  this.network = network || new DeepQNet(134, 64, 32);
+  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [134, 64, 32]);
 }
 
 Brain.prototype.onbid = function() {

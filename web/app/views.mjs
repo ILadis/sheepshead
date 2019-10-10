@@ -112,10 +112,13 @@ Hand.prototype.setCards = function(cards) {
     cards = new Array(cards);
   }
 
+  let index = 0, length = cards.length + 1;
+
   for (let card of cards) {
     let button = document.createElement('button');
     button.className = 'card';
     button.onclick = () => this.cardClicked(card);
+    button.style.setProperty('--position', ++index / length);
 
     if (card) {
       button.classList.add(card.suit);

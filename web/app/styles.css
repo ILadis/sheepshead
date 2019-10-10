@@ -192,7 +192,11 @@ body {
   white-space: nowrap;
 }
 .hand .card:first-of-type { margin-left: 0 !important; }
-.hand .card { margin-left: -12pt; }
+.hand .card {
+  --position: 0;
+  margin-left: -12pt;
+  transform: rotateZ(calc(var(--position) * 40deg - 20deg)) translateY(calc((var(--position) - 0.5) * (var(--position) - 0.5) * 100px));
+}
 
 .hand span {
   position: absolute;

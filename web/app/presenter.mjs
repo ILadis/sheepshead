@@ -190,7 +190,6 @@ Presenter.prototype.playerJoined = function(player) {
 };
 
 Presenter.prototype.cardsDealt = async function() {
-  this.views.trick.clearCards();
   let players = await this.client.fetchPlayers();
   this.refreshPlayers(...players);
 };
@@ -326,6 +325,9 @@ Presenter.prototype.trickCompleted = function({ winner, points }) {
   let message = this.stringFor('trick-completed-toast',
     winner.name, points);
   this.showToast(message);
+
+  let position = this.positionOf(winner);
+  setTimeout(() => this.views.trick.tidyCards(position), 1000);
 };
 
 Presenter.prototype.gameFinished = function({ winner }) {

@@ -107,7 +107,7 @@ body {
   border-color: #000;
   border-radius: 8pt;
   background-color: #fcfcfc;
-  box-shadow: 0 0 0 2pt #fcfcfc;
+  box-shadow: 0 0 4pt 1pt #bfbfbf;
   display: inline-block;
 }
 
@@ -162,29 +162,64 @@ body {
   animation: 0.5s forwards;
 }
 
+.trick .card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  animation: 0.8s forwards;
+}
+
 .trick .card.top { transform: translateX(-50%) translateY(-50%) rotateZ(180deg) translateY(60%); }
 .trick .card.bottom { transform: translateX(-50%) translateY(-50%) rotateZ(0deg) translateY(60%); }
-.trick .card.left { transform: translateX(-50%) translateY(-50%)  rotateZ(90deg) translateY(60%); }
+.trick .card.left { transform: translateX(-50%) translateY(-50%) rotateZ(90deg) translateY(60%); }
 .trick .card.right { transform: translateX(-50%) translateY(-50%) rotateZ(270deg) translateY(60%); }
 
 @keyframes slidein-top {
-  from { margin-top: -50%; }
-  to { margin-top: 0; }
+  from { margin-top: -50vh }
+  to { margin: 0; }
 }
 
 @keyframes slidein-bottom {
-  from { margin-top: 50%; }
-  to { margin-top: 0; }
+  from { margin-top: 50vh }
+  to { margin: 0; }
 }
 
 @keyframes slidein-left {
-  from { margin-left: -50%; }
-  to { margin-left: 0; }
+  from { margin-left: -50vh }
+  to { margin: 0; }
 }
 
 @keyframes slidein-right {
-  from { margin-left: 50%; }
-  to { margin-left: 0; }
+  from { margin-left: 50vh }
+  to { margin: 0; }
+}
+
+@keyframes slideout-top {
+  to {
+    margin-top: -50vh;
+    transform: translateX(-50%) rotateZ(90deg);
+  }
+}
+
+@keyframes slideout-bottom {
+  to {
+    margin-top: 50vh;
+    transform: translateX(-50%) rotateZ(90deg);
+  }
+}
+
+@keyframes slideout-left {
+  to {
+    margin-left: -50vh;
+    transform: translateY(-50%) rotateZ(0deg);
+  }
+}
+
+@keyframes slideout-right {
+  to {
+    margin-left: 50vh;
+    transform: translateY(-50%) rotateZ(0deg);
+  }
 }
 
 .hand {

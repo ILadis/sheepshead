@@ -327,7 +327,7 @@ Presenter.prototype.trickCompleted = function({ winner, points }) {
   this.showToast(message);
 
   let position = this.positionOf(winner);
-  setTimeout(() => this.views.trick.tidyCards(position), 1000);
+  setTimeout(() => this.views.trick.clearCards(position), 1000);
 };
 
 Presenter.prototype.gameFinished = function({ winner }) {

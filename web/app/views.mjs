@@ -139,18 +139,28 @@ export const Trick = function() {
 Trick.template = html`
 <div class="trick"></div>`;
 
-Trick.prototype.tidyCards = function(position) {
+Trick.prototype.clearCards = function(position) {
   let hrs = this.node.querySelectorAll('hr');
+  let count = 0;
 
-  for (let i = 0; i < hrs.length && i < 4; i++) {
-    hrs[i].style.animationName = `slideout-${position}`;
-    hrs[i].onanimationend = () => hrs[i].remove();
+  for (let i = 0; i < hrs.length; i++) {
+    let hr = hrs[i];
+    let animated = hr.style.animationName.startsWith('slideout');
+
+    if (animated) {
+      continue;
+    }
+
+    hr.style.animationName = `slideout-${position}`;
+    hr.onanimationend = () => hrs[i].remove();
+
+    if (++count == 4) {
+      break;
+    }
   }
 };
 
 Trick.prototype.addCard = function(card, position) {
-  //this.clearCards();
-
   let hr = document.createElement('hr');
   hr.className = 'card';
   hr.classList.add(card.suit);

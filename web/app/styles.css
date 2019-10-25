@@ -159,13 +159,6 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  animation: 0.5s forwards;
-}
-
-.trick .card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   animation: 0.8s forwards;
 }
 
@@ -175,49 +168,45 @@ body {
 .trick .card.right { transform: translateX(-50%) translateY(-50%) rotateZ(270deg) translateY(60%); }
 
 @keyframes slidein-top {
-  from { margin-top: -50vh }
-  to { margin: 0; }
+  from { top: 0; }
 }
 
 @keyframes slidein-bottom {
-  from { margin-top: 50vh }
-  to { margin: 0; }
+  from { top: 100% }
 }
 
 @keyframes slidein-left {
-  from { margin-left: -50vh }
-  to { margin: 0; }
+  from { left: 0; }
 }
 
 @keyframes slidein-right {
-  from { margin-left: 50vh }
-  to { margin: 0; }
+  from { left: 100%; }
 }
 
 @keyframes slideout-top {
   to {
-    margin-top: -50vh;
+    top: 0;
     transform: translateX(-50%) rotateZ(90deg);
   }
 }
 
 @keyframes slideout-bottom {
   to {
-    margin-top: 50vh;
+    top: 100%;
     transform: translateX(-50%) rotateZ(90deg);
   }
 }
 
 @keyframes slideout-left {
   to {
-    margin-left: -50vh;
+    left: 0;
     transform: translateY(-50%) rotateZ(0deg);
   }
 }
 
 @keyframes slideout-right {
   to {
-    margin-left: 50vh;
+    left: 100%;
     transform: translateY(-50%) rotateZ(0deg);
   }
 }

@@ -138,6 +138,7 @@ Presenter.prototype.showGame = function() {
   this.shell.clearActions();
   this.listenEvents();
   this.setupChat();
+  this.refreshPlayers();
 };
 
 Presenter.prototype.listenEvents = function() {
@@ -190,8 +191,7 @@ Presenter.prototype.playerJoined = function(player) {
 };
 
 Presenter.prototype.cardsDealt = async function() {
-  let players = await this.client.fetchPlayers();
-  this.refreshPlayers(...players);
+  this.refreshPlayers();
 };
 
 Presenter.prototype.playerTurn = function({ player, phase }) {
@@ -210,13 +210,17 @@ Presenter.prototype.playerTurn = function({ player, phase }) {
   }
 };
 
-Presenter.prototype.refreshPlayers = function(...players) {
+Presenter.prototype.refreshPlayers = async function(...players) {
+  if (!players.length) {
+    players = await this.client.fetchPlayers();
+  }
+
   let { left, top, right, bottom } = this.views;
+  bottom.cardClicked = (card) => this.playCard(card);
+
   for (let hand of [left, top, right, bottom]) {
     hand.setActor(false);
   }
-
-  bottom.cardClicked = (card) => this.playCard(card);
 
   let hands = this.views;
   for (let player of players) {

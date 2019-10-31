@@ -108,17 +108,16 @@ Resources.events = new Resource(
 Resources.events['GET'] = PreFilter.chain(
   PreFilter.requiresGame()
 ).then((request, response) => {
-  var { game, registry, url } = request;
+  var { game, registry } = request;
 
   response.setHeader('Cache-Control', 'no-cache');
   response.setHeader('Content-Type', MediaType.event);
   response.writeHead(200);
 
-  let offset = Number(url.query['offset']);
   let events = registry.lookup(game).events;
 
   let callback = (event) => response.write(event);
-  events.subscribe(callback, offset);
+  events.subscribe(callback);
 
   request.on('close', () => {
     events.unsubscribe(callback);
@@ -146,7 +145,7 @@ Resources.chat['POST'] = PreFilter.chain(
 
   let chat = new Chat((message, player) => {
     let entity = new Entities.Chat(message, player);
-    events.publish('chat', entity);
+    events.publish('chat', entity, false);
   });
 
   chat.register(new Command.Hello(game));

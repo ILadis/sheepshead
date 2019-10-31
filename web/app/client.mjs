@@ -220,19 +220,18 @@ Client.prototype.sendChatMessage = async function(message) {
   return true;
 };
 
-Client.prototype.listenEvents = function(earliest) {
+Client.prototype.listenEvents = function() {
   let id = this.id;
-  let query = earliest ? '?offset=1' : '';
-  let source = new EventSource(`api/games/${id}/events${query}`);
+  let source = new EventSource(`api/games/${id}/events`);
 
   let stream = Object.create(null);
-  let offset = 0;
+  let lastId = 0;
 
   let handler = function(event) {
     let id = Number.parseInt(event.lastEventId);
     let data = JSON.parse(event.data);
-    if (id > offset) {
-      offset = id;
+    if (id > lastId) {
+      lastId = id;
       stream['on' + event.type](data);
     }
   };

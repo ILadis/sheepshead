@@ -20,20 +20,23 @@ when(typeof Symbol, (define) => {
 });
 
 when(typeof HTMLElement, (define) => {
-  let event = 'transitionend'
-  let handler = Symbol(event);
+  let events = ['transitionend', 'animationend'];
 
-  define(HTMLElement.prototype, 'ontransitionend', {
-    configurable: true,
-    enumerable: false,
-    set: function(listener) {
-      this.removeEventListener(event, this[handler]);
-      this[handler] = listener;
-      this.addEventListener(event, this[handler]);
-    },
-    get: function() {
-      return this[handler] || null;
-    }
-  });
+  for (let event of events) {
+    let handler = Symbol(event);
+
+    define(HTMLElement.prototype, 'on' + event, {
+      configurable: true,
+      enumerable: false,
+      set: function(listener) {
+        this.removeEventListener(event, this[handler]);
+        this[handler] = listener;
+        this.addEventListener(event, this[handler]);
+      },
+      get: function() {
+        return this[handler] || null;
+      }
+    });
+  }
 });
 

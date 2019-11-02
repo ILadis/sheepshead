@@ -186,28 +186,28 @@ body {
 @keyframes slideout-top {
   to {
     top: 0;
-    transform: translateX(-50%) rotateZ(90deg);
+    transform: rotateZ(0deg) translateX(-50%) translateY(-100%);
   }
 }
 
 @keyframes slideout-bottom {
   to {
     top: 100%;
-    transform: translateX(-50%) rotateZ(90deg);
+    transform: rotateZ(0deg) translateX(-50%) translateY(0);
   }
 }
 
 @keyframes slideout-left {
   to {
     left: 0;
-    transform: translateY(-50%) rotateZ(0deg);
+    transform: rotateZ(0deg) translateX(-100%) translateY(-50%);
   }
 }
 
 @keyframes slideout-right {
   to {
     left: 100%;
-    transform: translateY(-50%) rotateZ(0deg);
+    transform: rotateZ(0deg) translateX(0) translateY(-50%);
   }
 }
 

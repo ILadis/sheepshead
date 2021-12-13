@@ -112,6 +112,7 @@ Resources.events['GET'] = PreFilter.chain(
 
   response.setHeader('Cache-Control', 'no-cache');
   response.setHeader('Content-Type', MediaType.event);
+  response.setHeader('Connection', 'keep-alive');
   response.writeHead(200);
 
   let events = registry.lookup(game).events;
@@ -119,7 +120,7 @@ Resources.events['GET'] = PreFilter.chain(
   let callback = (event) => response.write(event);
   events.subscribe(callback);
 
-  request.on('close', () => {
+  response.on('close', () => {
     events.unsubscribe(callback);
     response.end();
   });

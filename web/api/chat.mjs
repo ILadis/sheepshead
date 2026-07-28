@@ -107,3 +107,22 @@ Command.AddBot = function(game, input) {
   });
 };
 
+Command.AddAi = function(game, input) {
+  return new Command('addai', async () => {
+    let [index, rules] = input.args;
+
+    let { Bot } = await import('../../bot/bot.mjs');
+    let { Brain } = await import('../../bot/openai/brain.mjs');
+
+    let brain = new Brain();
+    let bot = new Bot(index, brain);
+
+    if (game.phase.name != 'joining' || !rules.valid(bot)) {
+      return false;
+    }
+
+    bot.attach(game);
+    input.resolve(bot);
+  });
+};
+

@@ -17,6 +17,7 @@ import * as Phases from '../../phases.mjs';
 
 import { Bot } from '../../bot/bot.mjs';
 import { Brainless } from '../../bot/brainless.mjs';
+import { Brain } from '../../bot/openai/brain.mjs';
 
 const Resources = Object.create(null);
 
@@ -151,6 +152,7 @@ Resources.chat['POST'] = PreFilter.chain(
 
   chat.register(new Command.Hello(game));
   chat.register(new Command.AddBot(game, input));
+  chat.register(new Command.AddAi(game, input));
   chat.send(message, player);
 
   response.writeHead(200);
@@ -224,11 +226,15 @@ Resources.players['POST'] = PreFilter.chain(
     return response.end();
   }
 
-  if (player.name == 'Bot') {
-    let brain = new Brainless();
-
-    player = new Bot(index, brain);
+  switch (player.name) {
+  case 'Bot':
+    player = new Bot(index, new Brainless());
     player.attach(game);
+    break;
+  case 'AI':
+    player = new Bot(index, new Brain());
+    player.attach(game);
+    break;
   }
 
   registry.register(player, token);

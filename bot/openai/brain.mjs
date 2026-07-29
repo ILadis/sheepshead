@@ -1,7 +1,9 @@
 
+import { CopilotCLI } from './client.mjs';
 import { Suit, Rank } from '../../card.mjs';
 
 export function Brain() {
+  this.ai = new CopilotCLI();
   this.prompt = new Array();
   this.round = 0;
 }
@@ -28,7 +30,7 @@ function stringifyCard(card) {
   return suits.get(card.suit) +'-'+ ranks.get(card.rank);
 }
 
-function addQuotations(value) {
+function quote(value) {
   return '"' + value + '"';
 }
 
@@ -41,46 +43,36 @@ Brain.prototype.onplay = async function(game, actor, rules) {
     let cards = Array.from(actor.cards);
     let options = Array.from(rules.options(cards));
 
-    this.prompt.push(`Du bist an der Reihe, deine Handkarten lauten: ${cards.map(stringifyCard).map(addQuotations).join(', ')}.`);
-    this.prompt.push(`Die Spielregeln erlauben die aus folgenden Karten zu wählen: ${options.map(stringifyCard).map(addQuotations).join(', ')}.`);
+    if (options.length <= 1) {
+      console.log('Only one option available, returning without help of AI');
+      return options[0];
+    }
+
+    let length = this.prompt.length;
+
+    this.prompt.push(`Du bist an der Reihe, deine Handkarten lauten: ${cards.map(stringifyCard).map(quote).join(', ')}.`);
+    this.prompt.push(`Die Spielregeln erlauben die aus folgenden Karten zu wählen: ${options.map(stringifyCard).map(quote).join(', ')}.`);
     this.prompt.push('Welche Karte möchtest du spielen.');
     this.prompt.push('Strebe an das Spiel zu gewinnen.');
     this.prompt.push('Antworte nur mit den Namen der Karte die du legen möchtest!');
 
-    let content = this.prompt.join(' ');
-    let prompt = {
-      model: 'openai/gpt-4.1-mini',
-      messages: [
-        { role: 'system', content: '' },
-        { role: 'user', content },
-      ]
-    };
+    let prompt = this.prompt.join(' ');
+    this.prompt.length = length;
 
-    let request = new Request('https://models.github.ai/inference/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ...',
-      },
-      body: JSON.stringify(prompt),
-    });
+    console.log(`AI prompt: ${prompt}`);
 
-    let response = await fetch(request);
-    if (!response.ok) {
-      console.log('AI completion request failed, returned status: ' + request.status);
-      return options[0];
-    }
+    let { result, reasoning } = await this.ai.prompt(prompt).catch(() => false);
 
-    let completion = await response.json();
-    let choice = completion?.choices?.[0]?.message?.content;
+    console.log(`AI reasoning: ${reasoning}`);
+    console.log(`AI response: ${result}`);
 
     for (let option of options) {
-      if (choice === stringifyCard(option)) {
+      if (result === stringifyCard(option)) {
         return option;
       }
     }
 
-    console.log('AI chose invalid option, choice was: ' + choice);
+    console.log('AI chose invalid option!');
     return options[0];
   }
 };
@@ -94,7 +86,7 @@ Brain.prototype.ondealt = function(game, players) {
 
   this.prompt.push(`Du bist Teil einer Schafkopf-Runde.`);
   this.prompt.push(`Dein Name lautet "${self.name}".`);
-  this.prompt.push(`Deine Mitspieler heißen: ${others.map(p => p.name).map(addQuotations).join(', ')}.`);
+  this.prompt.push(`Deine Mitspieler heißen: ${others.map(p => p.name).map(quote).join(', ')}.`);
 };
 
 Brain.prototype.onsettled = function(game, contract) {

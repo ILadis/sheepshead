@@ -1,10 +1,10 @@
 
 export function CopilotCLI() {
-  this.file = 'copilot.exe';
+  this.file = 'copilot';
 }
 
 async function exec(file, args) {
-  const proc = await import('node:child_process');
+  const proc = await import('child_process');
 
   return new Promise((resolve, reject) => proc.execFile(file, args, (error, output) => {
     if (error) {
@@ -15,9 +15,23 @@ async function exec(file, args) {
   }));
 }
 
-CopilotCLI.prototype.prompt = async function(prompt) {
-  let output = await exec(this.file, ['--model', 'claude-sonnet-4.6', '--reasoning-effort', 'medium', '--prompt', prompt, '--output-format', 'json', '--enable-reasoning-summaries']);
-  let events = output.split(/\r?\n/).map(output => output.trim()).filter(output => output.length > 0).map(JSON.parse);
+CopilotCLI.prototype.prompt = async function(prompt, model) {
+  let options = [
+    '--prompt', prompt,
+    '--enable-reasoning-summaries',
+    '--output-format', 'json',
+  ];
+
+  if (model?.length > 0) {
+    options.push('--model', model, '--reasoning-effort', 'medium');
+  }
+
+  let output = await exec(this.file, options);
+
+  let events = output.split(/\r?\n/)
+      .map(output => output.trim())
+      .filter(output => output.length > 0)
+      .map(JSON.parse);
 
   for (let event of events) {
     switch (event.type) {
@@ -38,10 +52,9 @@ export function OpenAIClient(token, endpoint = 'https://models.github.ai/inferen
   this.endpoint = endpoint;
 }
 
-OpenAIClient.prototype.prompt = async function(content) {
+OpenAIClient.prototype.prompt = async function(content, model = 'openai/gpt-4.1-mini') {
   let prompt = {
-    model: 'openai/gpt-4.1-mini',
-    messages: [
+    model, messages: [
       { role: 'system', content: '' },
       { role: 'user', content },
     ]
@@ -60,7 +73,7 @@ OpenAIClient.prototype.prompt = async function(content) {
   if (!response.ok) {
     throw response;
   }
-  
+
   let completion = await response.json();
   let result = completion?.choices?.[0]?.message?.content?.trim();
 

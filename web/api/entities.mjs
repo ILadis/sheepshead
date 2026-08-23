@@ -125,7 +125,7 @@ export function Chat(message, player) {
 Chat.prototype.toJSON = function() {
   let message = this.message;
   let player = this.player;
-  player =  player ? new Player(player) : undefined;
+  player = player ? new Player(player) : undefined;
   return { message, player };
 };
 

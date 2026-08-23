@@ -2,7 +2,7 @@
 import Neataptic from 'neataptic';
 
 function clone(network) {
-  let json  = network.toJSON();
+  let json = network.toJSON();
   return Neataptic.Network.fromJSON(json);
 }
 
@@ -73,7 +73,7 @@ export function ReplayMemory(capacity, batch) {
 
 ReplayMemory.prototype.save = function(experience) {
   let capacity = this.experiences.length;
-  if (capacity <=  0) {
+  if (capacity <= 0) {
     return false;
   }
 

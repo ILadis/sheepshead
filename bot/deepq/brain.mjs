@@ -185,7 +185,7 @@ Brain.prototype.gainExperience = function(game, player) {
     this.state = null;
     this.action = null;
 
-    let exp =  { state, action, reward, next };
+    let exp = { state, action, reward, next };
     this.memory.save(exp);
   }
 };

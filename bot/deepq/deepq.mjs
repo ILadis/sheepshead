@@ -32,10 +32,17 @@ DeepQNet.prototype.optimize = function(experiences) {
     let max = 0;
     if (next) {
       let output = this.target.noTraceActivate(next);
-      max = output.reduce((p, v) => p > v ? p : v);
+      let legal = next.slice(-32);
+
+      max = -Infinity;
+      for (let i = 0; i < output.length; i++) {
+        if (legal[i]) {
+          max = Math.max(max, output[i]);
+        }
+      }
     }
 
-    let discount = 0.7;
+    let discount = 0.9;
     let value = reward + discount * max;
 
     let rate = 0.001;

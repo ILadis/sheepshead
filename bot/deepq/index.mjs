@@ -12,9 +12,9 @@ const options = {
   // Number of games to simulate
   episodes: 10e6,
 
-  memory: new ReplayMemory(1000, 100),
+  memory: new ReplayMemory(100_000, 100),
   strat: new GreedyStrategy(1, 0.1, 0.0000004),
-  network: new DeepQNet([134, 32, 32, 32, 32])
+  network: new DeepQNet([166, 32, 32, 32, 32])
 };
 
 Trainer.train(options);

@@ -44,7 +44,7 @@ Trainer.train = async function(options = {}) {
     }
 
     callback(network);
-    return --episodes >= 0;
+    return --episodes > 0;
   };
 
   await game.run();

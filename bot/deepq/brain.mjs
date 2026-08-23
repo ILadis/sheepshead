@@ -1,11 +1,12 @@
 
 import { Tensor, Builder, Indices } from './model.mjs';
 import { DeepQNet, ReplayMemory, GreedyStrategy } from './deepq.mjs';
+import { Ruleset } from '../../ruleset.mjs';
 
 export function Brain({ network, memory, strat }) {
   this.memory = memory || new ReplayMemory(1000, 100);
   this.strat = strat || new GreedyStrategy(1, 0.1, 0.0001);
-  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [134, 64, 32]);
+  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [166, 64, 32]);
 }
 
 Brain.prototype.onbid = function() {
@@ -66,7 +67,7 @@ Brain.prototype.actGreedy = function(state, rules) {
   let output = this.network.predict(state);
 
   do {
-    var highest = -Infinity, index = 0;
+    let highest = -Infinity, index = 0;
     for (let i = 0; i < output.length; i++) {
       if (output[i] > highest) {
         highest = output[i];
@@ -93,6 +94,9 @@ Brain.prototype.observeState = function(game, actor) {
   let partner = this.yetToBePlayed(game, actor, p => party.has(p));
   let opponents = this.yetToBePlayed(game, actor, p => !party.has(p));
 
+  let rules = Ruleset.forPlaying(game);
+  let legal = rules.options(actor.cards);
+
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
@@ -104,6 +108,8 @@ Brain.prototype.observeState = function(game, actor) {
     .suits(lead)
     .flag(order.trumps.contains(lead))
     .flag(party.has(winner));
+
+  builder.cards(legal);
 
   return tensor.states;
 };
@@ -168,7 +174,7 @@ Brain.prototype.gainExperience = function(game, player) {
   let state = this.state;
   let action = this.action;
 
-  if (state && action) {
+  if (state && action >= 0) {
     let reward = this.reward || 0;
     let final = game.phase.name != 'playing';
 

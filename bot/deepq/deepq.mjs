@@ -59,7 +59,7 @@ DeepQNet.prototype.evolve = function() {
   this.target = clone(this.policy);
 };
 
-DeepQNet.prototype.serialize = function(extra) {
+DeepQNet.prototype.serialize = function(extra = {}) {
   let json = this.policy.toJSON();
   Object.assign(json, extra);
   return JSON.stringify(json);

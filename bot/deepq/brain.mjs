@@ -4,8 +4,8 @@ import { DeepQNet, ReplayMemory, GreedyStrategy } from './deepq.mjs';
 import { Ruleset } from '../../ruleset.mjs';
 
 export function Brain({ network, memory, strat }) {
-  this.memory = memory || new ReplayMemory(1000, 100);
-  this.strat = strat || new GreedyStrategy(1, 0.1, 0.0001);
+  this.memory = memory || new ReplayMemory(0, 0);
+  this.strat = strat || new GreedyStrategy(0, 0, 0);
   this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [166, 64, 32]);
 }
 

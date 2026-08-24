@@ -2,12 +2,12 @@
 import { Game } from '../game.mjs';
 import { Player } from '../player.mjs';
 
-export function Bot(index, brain) {
+export function Bot(index, brain, thinktime = 800) {
   Player.call(this, `Bot ${index}`, index);
 
   this.callbacks = new Map();
   this.brain = brain;
-  this.thinktime = 800;
+  this.thinktime = thinktime;
 }
 
 Bot.prototype = Object.create(Player.prototype);

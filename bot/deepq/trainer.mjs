@@ -11,9 +11,7 @@ Trainer.train = async function(options = {}) {
     episodes = 1000,
     evolutions = 10,
     callback = () => {},
-    memory = null,
-    strat = null,
-    network = null
+    memory, strat, network,
   } = options;
 
   let game = new Game();
@@ -25,15 +23,13 @@ Trainer.train = async function(options = {}) {
 
     brains.push(brain);
 
-    let bot = new Bot(index, brain);
-    bot.thinktime = 0;
-
+    let bot = new Bot(index, brain, 0);
     bot.attach(game);
 
     return bot;
   };
 
-  game.onproceed = () => {
+  game.onproceed = async () => {
     let experiences = memory.sample();
     if (experiences) {
       network.optimize(experiences);
@@ -43,7 +39,7 @@ Trainer.train = async function(options = {}) {
       network.evolve();
     }
 
-    callback(network);
+    await callback(network);
     return --episodes > 0;
   };
 
@@ -52,7 +48,7 @@ Trainer.train = async function(options = {}) {
   return brains;
 };
 
-function bidder(game, actor, rules) {
+export function bidder(game, actor, rules) {
   if (actor.brain != this) {
     return undefined
   }

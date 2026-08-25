@@ -9,7 +9,7 @@ export const Trainer = Object.create(null);
 Trainer.train = async function(options = {}) {
   let {
     episodes = 1000,
-    evolutions = 10,
+    evolve = 10,
     callback = () => {},
     memory, strat, network,
   } = options;
@@ -35,12 +35,12 @@ Trainer.train = async function(options = {}) {
       network.optimize(experiences);
     }
 
-    if (episodes % evolutions == 0) {
+    if (--episodes % evolve == 0) {
       network.evolve();
     }
 
     await callback(network);
-    return --episodes > 0;
+    return episodes > 0;
   };
 
   await game.run();

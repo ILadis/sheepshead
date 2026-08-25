@@ -59,6 +59,24 @@ Builder.prototype.flag = function(flag) {
   return this;
 };
 
+Builder.prototype.position = function(index, size) {
+  let states = this.tensor.append(size);
+  if (index >= 0 && index < size) {
+    states[index] = 1;
+  }
+  states.commit();
+  return this;
+};
+
+Builder.prototype.progress = function(count, size, inverse = false) {
+  let states = this.tensor.append(size);
+  for (let i = 0; i < (inverse ? size - count : count) && i < size; i++) {
+    states[i] = 1;
+  }
+  states.commit();
+  return this;
+};
+
 export function Indices(define) {
   define(this.values = new Map());
 }

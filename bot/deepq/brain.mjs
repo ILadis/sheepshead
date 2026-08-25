@@ -6,7 +6,7 @@ import { Ruleset } from '../../ruleset.mjs';
 export function Brain({ network, memory, strat }) {
   this.memory = memory || new ReplayMemory(0, 0);
   this.strat = strat || new GreedyStrategy(0, 0, 0);
-  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [166, 64, 32]);
+  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [222, 64, 32]);
 }
 
 Brain.prototype.onbid = function() {
@@ -92,27 +92,50 @@ Brain.prototype.observeState = function(game, actor) {
 
   let party = this.determineParty(game, actor);
 
-  let partner = this.yetToBePlayed(game, actor, p => party.has(p));
-  let opponents = this.yetToBePlayed(game, actor, p => !party.has(p));
-
   let rules = Ruleset.forPlaying(game);
   let legal = rules.options(actor.cards);
+
+  let [_, self] = this.playerAndPosition(game, p => p == actor);
+  let [partner, fellow] = this.playerAndPosition(game, p => p != actor && party.has(p));
+  let [foe, near] = this.playerAndPosition(game, p => !party.has(p));
+  let [opponent, far] = this.playerAndPosition(game, p => p != foe && !party.has(p));
+
+  let progress = actor.cards.size();
 
   let tensor = new Tensor();
   let builder = new Builder(tensor);
 
   builder.cards(actor.cards)
-    .cards(partner)
-    .cards(opponents);
+    .cards(partner.cards)
+    .cards(foe.cards)
+    .cards(opponent.cards);
 
   builder.cards(trick.cards())
     .suits(lead)
     .flag(order.trumps.contains(lead))
     .flag(party.has(winner));
 
+  builder.position(self, 4)
+    .position(fellow, 4)
+    .position(near, 4)
+    .position(far, 4)
+    .progress(progress, 8, true);
+
   builder.cards(legal);
 
   return tensor.states;
+};
+
+Brain.prototype.playerAndPosition = function(game, filter) {
+  let { sequence } = game;
+  let position = 0;
+
+  for (let player of sequence) {
+    if (filter(player)) {
+      return [player, position];
+    }
+    position++;
+  }
 };
 
 Brain.prototype.determineParty = function(game, actor) {
@@ -137,21 +160,6 @@ Brain.prototype.determineParty = function(game, actor) {
   }
 
   return declarer.has(actor) ? declarer : defender;
-};
-
-Brain.prototype.yetToBePlayed = function(game, actor, filter) {
-  let { players, trick } = game;
-
-  let cards = new Set();
-  for (let player of players) {
-    if (player != actor && !trick.includes(player) && filter(player)) {
-      for (let card of player.cards) {
-        cards.add(card);
-      }
-    }
-  }
-
-  return cards;
 };
 
 Brain.prototype.wantExplore = function() {

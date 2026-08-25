@@ -22,7 +22,7 @@ const options = {
   memory:  ReplayMemory.forSteps(10e6 * 32,  100),
   strat: GreedyStrategy.forSteps(10e6 * 32, 0.01),
 
-  network: new DeepQNet([166, 32, 32, 32, 32])
+  network: new DeepQNet([222, 32, 32, 32, 32])
 };
 
 if (import.meta.main) {

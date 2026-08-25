@@ -34,7 +34,7 @@ async function main() {
       evolve: 100,
 
       // Every game 100 experiences are learned from the replay memory
-      memory:  ReplayMemory.forSteps(10e6 * 32,  100),
+      memory:  ReplayMemory.forSteps(10e6 * 32, 100, 0.001),
       strat: GreedyStrategy.forSteps(10e6 * 32, 0.01),
 
       network: new DeepQNet([222, 32, 32, 32, 32])

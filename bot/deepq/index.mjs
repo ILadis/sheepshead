@@ -15,8 +15,13 @@ const options = {
   // Number of games to simulate
   episodes: 10e6,
 
-  memory: new ReplayMemory(100_000, 100),
-  strat: new GreedyStrategy(1, 0.1, 0.0000004),
+  // After 100 games evolution takes place
+  evolutions: 100,
+
+  // Every game 100 experiences are learned from the replay memory
+  memory:  ReplayMemory.forSteps(10e6 * 32,  100),
+  strat: GreedyStrategy.forSteps(10e6 * 32, 0.01),
+
   network: new DeepQNet([166, 32, 32, 32, 32])
 };
 

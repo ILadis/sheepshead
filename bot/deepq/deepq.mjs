@@ -42,7 +42,7 @@ DeepQNet.prototype.optimize = function(experiences) {
       }
     }
 
-    let discount = 0.9;
+    let discount = 0.98;
     let value = reward + discount * max;
 
     let rate = 0.001;
@@ -70,6 +70,11 @@ export function ReplayMemory(capacity, batch) {
   this.batch = batch;
   this.size = 0;
 }
+
+ReplayMemory.forSteps = function (steps, batch, fraction = 0.05) {
+  let capacity = Math.round(steps * fraction);
+  return new ReplayMemory(capacity, batch);
+};
 
 ReplayMemory.prototype.save = function(experience) {
   let capacity = this.experiences.length;
@@ -105,6 +110,11 @@ export function GreedyStrategy(start, end, decay) {
   this.end = end;
   this.decay = decay;
 }
+
+GreedyStrategy.forSteps = function(steps, end, floor = 0.8) {
+  let decay = -Math.log(end) / (floor * steps);
+  return new GreedyStrategy(1, end, decay);
+};
 
 GreedyStrategy.prototype.wantExplore = function() {
   let steps = this.steps || 0;

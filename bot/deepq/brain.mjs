@@ -48,9 +48,10 @@ Brain.prototype.oncompleted = function(game) {
   }
 };
 
-Brain.prototype.onfinished = function(game) {
+Brain.prototype.onfinished = function(game, winner, loser) {
   for (let player of game.players) {
     if (player.brain == this) {
+      this.gainFinalReward(player, winner);
       this.gainExperience(game, player);
       break;
     }
@@ -168,6 +169,13 @@ Brain.prototype.gainReward = function(game, player) {
 
   let reward = (won ? +1 : -1) * points;
   this.reward = reward;
+};
+
+Brain.prototype.gainFinalReward = function(player, winner) {
+  let won = winner.players.has(player);
+  let bonus = (won ? +1 : -1) * 50;
+
+  this.reward = (this.reward || 0) + bonus;
 };
 
 Brain.prototype.gainExperience = function(game, player) {

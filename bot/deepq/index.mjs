@@ -20,7 +20,9 @@ async function main() {
       'baseline':  { type: 'string'  },
       'candidate': { type: 'string'  },
     }
-   });
+  });
+
+  let episodes = Number.parseInt(values.episodes) || 10e3;
 
   if (values.evaluate !== true) {
     await Trainer.train({
@@ -28,16 +30,16 @@ async function main() {
       callback: every(1e3, stats(), save()),
 
       // Number of games to simulate
-      episodes: 10e6,
+      episodes,
 
       // After 100 games evolution takes place
       evolve: 100,
 
-      // Every game 100 experiences are learned from the replay memory
-      memory:  ReplayMemory.forSteps(10e6 * 32, 100, 0.001),
-      strat: GreedyStrategy.forSteps(10e6 * 32, 0.01),
+      // Every game 200 experiences are learned from the replay memory
+      memory:  ReplayMemory.forSteps(episodes * 32, 200),
+      strat: GreedyStrategy.forSteps(episodes * 32, 0.01),
 
-      network: new DeepQNet([222, 32, 32, 32, 32])
+      network: new DeepQNet([190, 32, 32, 32, 32])
     });
   } else {
     await Evaluator.evaluate({
@@ -45,7 +47,7 @@ async function main() {
       callback: every(1e2, results()),
 
       // Number of games to simulate
-      episodes: Number.parseInt(values.episodes) || 1000,
+      episodes,
 
       // Baseline and candidate network to evaluate
       baseline:  load(values.baseline),

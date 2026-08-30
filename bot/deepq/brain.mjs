@@ -6,7 +6,7 @@ import { Ruleset } from '../../ruleset.mjs';
 export function Brain({ network, memory, strat }) {
   this.memory = memory || new ReplayMemory(0, 0);
   this.strat = strat || new GreedyStrategy(0, 0, 0);
-  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [222, 64, 32]);
+  this.network = network instanceof DeepQNet ? network : new DeepQNet(network || [190, 64, 32]);
 }
 
 Brain.prototype.onbid = function() {
@@ -66,21 +66,17 @@ Brain.prototype.actRandomly = function(player, rules) {
 
 Brain.prototype.actGreedy = function(state, rules) {
   let output = this.network.predict(state);
+  let legal = state.slice(-32);
 
-  do {
-    let highest = -Infinity, index = 0;
-    for (let i = 0; i < output.length; i++) {
-      if (output[i] > highest) {
-        highest = output[i];
-        index = i;
-      }
+  let highest = -Infinity, index = 0;
+  for (let i = 0; i < output.length; i++) {
+    if (legal[i] && output[i] > highest) {
+      highest = output[i];
+      index = i;
     }
+  }
 
-    output[index] = NaN;
-
-    var card = Indices.cards.valueOf(index);
-  } while (!rules.valid(card));
-
+  let card = Indices.cards.valueOf(index);
   return card;
 };
 
@@ -95,10 +91,13 @@ Brain.prototype.observeState = function(game, actor) {
   let rules = Ruleset.forPlaying(game);
   let legal = rules.options(actor.cards);
 
-  let [_, self] = this.playerAndPosition(game, p => p == actor);
-  let [partner, fellow] = this.playerAndPosition(game, p => p != actor && party.has(p));
-  let [foe, near] = this.playerAndPosition(game, p => !party.has(p));
-  let [opponent, far] = this.playerAndPosition(game, p => p != foe && !party.has(p));
+  let [_,    self] = this.playerAndPosition(game, p => p == actor);
+  let [__, fellow] = this.playerAndPosition(game, p => p != actor && party.has(p));
+  let [foe,  near] = this.playerAndPosition(game, p => !party.has(p));
+  let [___,   far] = this.playerAndPosition(game, p => p != foe && !party.has(p));
+
+  let partner = this.eligibleCards(game, p => p != actor && party.has(p));
+  let opponents = this.eligibleCards(game, p => !party.has(p));
 
   let progress = actor.cards.size();
 
@@ -106,9 +105,8 @@ Brain.prototype.observeState = function(game, actor) {
   let builder = new Builder(tensor);
 
   builder.cards(actor.cards)
-    .cards(partner.cards)
-    .cards(foe.cards)
-    .cards(opponent.cards);
+    .cards(partner)
+    .cards(opponents);
 
   builder.cards(trick.cards())
     .suits(lead)
@@ -124,18 +122,6 @@ Brain.prototype.observeState = function(game, actor) {
   builder.cards(legal);
 
   return tensor.states;
-};
-
-Brain.prototype.playerAndPosition = function(game, filter) {
-  let { sequence } = game;
-  let position = 0;
-
-  for (let player of sequence) {
-    if (filter(player)) {
-      return [player, position];
-    }
-    position++;
-  }
 };
 
 Brain.prototype.determineParty = function(game, actor) {
@@ -160,6 +146,32 @@ Brain.prototype.determineParty = function(game, actor) {
   }
 
   return declarer.has(actor) ? declarer : defender;
+};
+
+Brain.prototype.playerAndPosition = function(game, filter) {
+  let { sequence } = game;
+  let position = 0;
+
+  for (let player of sequence) {
+    if (filter(player)) {
+      return [player, position];
+    }
+    position++;
+  }
+};
+
+Brain.prototype.eligibleCards = function(game, filter) {
+  let { players, trick } = game;
+
+  let cards = new Set();
+  for (let player of players) {
+    if (!trick.includes(player) && filter(player)) {
+      for (let card of player.cards) {
+        cards.add(card);
+      }
+    }
+  }
+  return cards;
 };
 
 Brain.prototype.wantExplore = function() {

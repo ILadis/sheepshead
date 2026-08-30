@@ -31,15 +31,19 @@ DeepQNet.prototype.optimize = function(experiences) {
 
     let max = 0;
     if (next) {
-      let output = this.target.noTraceActivate(next);
+      let output = this.policy.noTraceActivate(next);
       let legal = next.slice(-32);
 
-      max = -Infinity;
+      let highest = -Infinity, index = 0;
       for (let i = 0; i < output.length; i++) {
-        if (legal[i]) {
-          max = Math.max(max, output[i]);
+        if (legal[i] && output[i] > highest) {
+          highest = output[i];
+          index = i;
         }
       }
+
+      output = this.target.noTraceActivate(next);
+      max = output[index];
     }
 
     let discount = 0.98;
@@ -71,8 +75,9 @@ export function ReplayMemory(capacity, batch) {
   this.size = 0;
 }
 
-ReplayMemory.forSteps = function (steps, batch, fraction = 0.05) {
-  let capacity = Math.round(steps * fraction);
+ReplayMemory.forSteps = function (steps, batch, fraction = 0.1) {
+  let max = 300e3;
+  let capacity = Math.min(max, Math.round(steps * fraction));
   return new ReplayMemory(capacity, batch);
 };
 
@@ -112,7 +117,8 @@ export function GreedyStrategy(start, end, decay) {
 }
 
 GreedyStrategy.forSteps = function(steps, end, floor = 0.8) {
-  let decay = -Math.log(end) / (floor * steps);
+  let min = 1e-20;
+  let decay = Math.max(min, -Math.log(end) / (floor * steps));
   return new GreedyStrategy(1, end, decay);
 };
 
